@@ -1,0 +1,87 @@
+remove tab bar at bottom
+replace with keyboard shortcuts:
+g game (current score tab)
+s stats (modified, now has current game + summary score and game totals
+o options
+
+
+g
+make bottom row same height as others
+phases and messages:
+start (new game no score, no play):
+- display click on player with highest double
+play (after highest double player click):
+- display enter score and click on player
+- only display this once per game at the beginning
+- process clicks:
+  - a digit on numpad - add to display, typically only one digit
+  - on player - add current score to players hand score, clear score
+  - on ? - display help text
+      "
+       s for stats
+       o for options for new contest
+      "
+  - on <backspace> delete last entered number from score
+  - on domino:
+    - add current hand scores to current game scores
+    - clear current hand scores
+    - if a game score > 50:
+      - display Eric wins on a 6 3 hand, press domino again for new game
+      - add time and scores to game data
+    - else display Eric lost a 5 8 hand
+  - on new:
+    - display click on highest double
+    - clear hand and game scores
+
+
+app:
+use icon for title and app
+clear status after click or 5 seconds
+if status has text, change icon to checkmark
+if no text icon in ?
+
+
+
+I'll help you reorganize according to n16. Let me first check what's in that file and understand the context.
+
+I can see n16 contains the new requirements. Before I reorganize, I need to clarify several ambiguities:
+
+Bottom row height - "make bottom row same height as others" - Does this refer to the numpad's bottom row (D/0/?), or a different UI element?
+- numpad's bottom row
+
+Keyboard shortcuts scope - Should g/s/o work:
+
+As single key presses only?
+- yes
+With modifiers (Ctrl+G, Ctrl+S, etc.)?
+Throughout the app or only in certain states?
+- throughtout app except when entering user name on options page
+Stats tab structure - How should "current game + summary score and game totals" be laid out? New sections/tabs within stats?
+- leave as is for now, working on design
+
+Help text - Should the help text ("s for stats / o for options...") appear:
+
+Only when ? is clicked?
+- yes
+Automatically on startup?
+As a tooltip or in the status message?
+Game end display - "Eric wins on a 6 3 hand" - Is "6 3" the final hand played, or the winning score difference? How is this calculated?
+- It is the hand totals. as the game progresses:
+  each player has a hand total of points scored since the last domino
+  and a game total of points scored since the beginning of the game
+  a domino displays the hand scores, the game totals are alwasy visible in the player tiles
+  but slightly different text for a domino the ends a game
+
+
+Options tab - What options should "options for new contest" include? (Target score, players, etc.?)
+- leave as is for now
+
+Icon behavior - "if status has text, change icon to checkmark / if no text icon in ?" - Which specific elements/icons are these referring to?
+- the icon in the status box, usally a ?, changes to a check when holding text
+
+Domino multi-function - The domino button seems to:
+
+End hand during play
+Trigger new game after completion
+How should the UI indicate its current function?
+- only by text in the status control saying press domino again to start new game

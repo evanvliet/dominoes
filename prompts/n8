@@ -1,0 +1,55 @@
+on first use:
+show options tab
+
+score:
+need better domino icon with black background, see domscore.jpg
+move domino button to lower right corner opposite delete
+add a help button that displays:
+   on game start click user with highest double
+   click domino button when a user dominoes
+   note message with scores for that hand, and who goes first
+   after player scores, enter score and click player tile
+   to correct / delete score, go to game tab
+   to see statistics go to stats tab
+   to change players, go to options tab
+reorder UI elements:
+   player buttons
+   mumpad
+   score field
+   message field
+redo dominoes processing:
+   dislpay info message at bottom:
+   That was a 9 3 hand for Peter. Eric goes first.
+First player logic:
+   At game start, meaning at beginning and after a game has ended, display message at bottom:
+      Click player with highest double.
+   Clear message on player click.
+   Set First player to be the other player.
+   Toggle First player after dominoes.
+After player goes domino with a winning score:
+   Display messages: Eric won 54 to 37, last hand was 6 to 3 Peter.
+   Click Player with hightest score.
+   Clear message after click
+   Add total scores to stats
+   Clear scores in player tiles
+Player tiles show only name and total, keep it simple
+
+game:
+drop hash marks, just one line for each domino, most recent first, two fields: player1 score, player2 score
+allow editing , deleting entry
+entries can be added from the score tab
+
+stats: (new tab)
+display scrollable history of game scores, e.g. totlals for each player, and dates, most recent first
+options to show score totals, game totals, and histogram of scores, see scores.jpg  games.jpg hist.jpg 
+the histogram is number of times a particular score was a total, in three flavors: one for each player and one for a total number of times either player won with that score
+suggest better, fun stats
+
+options:
+allow tracking of different games, by names of players
+need drop down list of different pairs
+player names update with selection from list
+player names also editable, with a new / update choice
+
+reset doesn't work
+

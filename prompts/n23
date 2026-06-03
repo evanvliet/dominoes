@@ -1,0 +1,29 @@
+App:
+    On start, if no contest, got directly to Options / Contest /
+      add new pair
+      Add help text to Status:
+        "Click Score tab to start a game."
+    Else start on Score
+    fix who goes first, seems like it starts off exactly wrong
+    text in status / message box should be non-bold, like names
+        on player tiles
+
+Score:
+    after domino, click ? to get who goes first
+    ? always displays last message for that tab
+    improve ability to edit mistakes. e.g. move "CURRENT SCORES"
+      from GAME to bottom half of SCORE
+    check total arithmetic, had some deletions and then Suzette
+      wins though I scored more points.
+
+Game:
+    remove entirely, previous games available by Export.
+
+Options:
+    add hours:minutes back to export, import for future analysis
+    have contest UI for adding new players overlay DATA and DETAILS
+      vs pushing them down
+    Clear should be same size as other buttons
+    Clear should delete contest completely
+    make Appearance default to last choice, but settable independently
+    make Top score default to last choice, but settable independently

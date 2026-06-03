@@ -1,0 +1,31 @@
+n20
+
+score:
+make all rows above players (numpad) as tall as bottom row with domino
+make status box default size same height as well but can grow with
+  large text
+
+game:
+make time hr:min, e.g. 10:45
+make date mon/day, e.g. 5/28
+
+options:
+make more compact:
+CONTEST
+    <switch dropdown>
+    - add a new pair option
+      when selected, collect pair of names
+    increase fot size of dropdown so player names are as big as other text
+DATA
+    two buttons, export / import / help
+    - only use data for current contest
+    - help text:
+    Data is copied from or pasted to the clipboard.
+    Data is a set of lines, each line is a game with a mon/year date
+    and two numbers, scores for the players.
+    First line is the names of the players.
+DETAILS
+    - appearance
+    - top score
+    - reset 
+    - these settings are per contest

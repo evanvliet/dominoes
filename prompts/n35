@@ -1,0 +1,19 @@
+n35
+
+Rewrite the CONTEST code:
+UI for New...:
+
+  Players:   _______
+             _______
+
+     Add         Cancel
+   
+  - Add is default after names filled in
+  - Cancel is primary until names filled in.
+  - ----- means text box to enter name. 
+  - help text to display:
+    "Add names to create a new contest."
+  - clicking cancel when there are no contests shows:
+    "Please add names to score dominoes."
+  - Filling in names makes Add primary.
+

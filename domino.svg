@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 760" role="img" aria-label="Domino icon">
+  <defs>
+    <linearGradient id="tile-bg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#fff"/>
+      <stop offset="100%" stop-color="#f5f5f5"/>
+    </linearGradient>
+    <filter id="soft-shadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="16" stdDeviation="16" flood-color="#000" flood-opacity="0.16"/>
+    </filter>
+  </defs>
+  <g transform="translate(200 380) rotate(15)">
+    <rect x="-142" y="-302" width="284" height="604" rx="72" fill="url(#tile-bg)" stroke="#111" stroke-width="24" filter="url(#soft-shadow)"/>
+    <rect x="-142" y="-10" width="284" height="20" fill="#111"/>
+    <g fill="#111">
+      <circle cx="-80" cy="-230" r="22"/>
+      <circle cx="0" cy="-150" r="22"/>
+      <circle cx="80" cy="-70" r="22"/>
+      <circle cx="-72" cy="70" r="22"/>
+      <circle cx="72" cy="70" r="22"/>
+      <circle cx="-72" cy="214" r="22"/>
+      <circle cx="72" cy="214" r="22"/>
+    </g>
+  </g>
+</svg>

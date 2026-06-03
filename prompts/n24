@@ -1,0 +1,18 @@
+n24
+
+App:
+Only start on add contest if empty
+put UI on tab, no pop up
+try to fill in with user name
+else start on Score page
+
+Score:
+more compact display show up to last four scores:
+HISTORY
+x 5 Eric
+x 3 Peter
+x 5 Eric
+x 2 Eric
+
+Options:
+DATA buttons should be same size, Clear is now larger

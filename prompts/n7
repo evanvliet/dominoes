@@ -1,0 +1,28 @@
+icon pips should be on a diagonal for 2 or 3
+move domino button to numpad bottom right and just use just domino icon no text
+make default user names Peter and Eric
+after domino - 
+  a. highlight first user border
+  b. keep hand scores for a bit
+  c. after 10 seconds or after score entered:
+      - clear high lighted border
+      - reset hand scores
+after game reset -
+  show click first user button message
+  show regular (no highlight, no dashes) border
+  also at start, no dashes on the border
+use domino icon for app icon when installing on iphone home screen
+add a game tab to score, history, options
+game tab shows four columns and one row for each domino. columns are:
+Peter      Eric
+hand total hand
+
+hand columns have hand totals for that domino
+total columns have hash marks for user total
+picture:
+
+Peter              Eric *          add star to user with first double
+10   ||||\ ||||\   ||||\ ||||\  7  totals accumulate hash marks slash indicates diagonal crossing first 4 tags
+5    ]]]]\ |||     |||          0  add a line for each domino and hand totals for that domino
+3                               6  there maybe more hand total lines than total lines
+                                    

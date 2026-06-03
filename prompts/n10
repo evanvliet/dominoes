@@ -1,0 +1,37 @@
+n10
+
+score
+redo layout
+big green domino button:
+  smaller
+  same color as other buttons
+  move just below same size as 9
+  change icon to look like domscore.jpg (dots on diagonal)
+move help button to above 1 and split line with zero (each 1/2 width)
+on game complete:
+  show hand and score totals in message, who was winner: Peter won 55 to 34 on a 4 / 10 hand for Eric.
+  change domino button to "new"
+  when new is clicked:
+    display who has the highest double" message
+    revert button to domino icon
+player boxes should not change border
+
+game
+font should batch score display
+entries clear on new game
+split into two boxes:
+top for scores for current game, that clears on new game
+bottom half has final scores for each game and time
+most recent first
+
+stats
+grand totals for each player, scores and number of games
+buttons to generate reoprts
++ histogram, e.g. hist.jpt
++ games and scores (differences between two players)
++ like a stock market graph with variable time slots
+
+options
+select active game should be a list of player pairs
+click on a pair to edit names
+click on new button to create

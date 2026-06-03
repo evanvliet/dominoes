@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+<meta name="apple-mobile-web-app-title" content="Dominoes"/>
+<link rel="icon" type="image/svg+xml" href="domino.svg">
+<link rel="apple-touch-icon" href="domino.svg">
+<link rel="manifest" href="manifest.json">
+<title>Dominoes Scorer</title>
+
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1c1c1e" media="(prefers-color-scheme: dark)">
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+:root{
+  --color-background-primary:#ffffff;
+  --color-background-secondary:#f2f2f7;
+  --color-background-tertiary:#e5e5ea;
+  --color-text-primary:#1c1c1e;
+  --color-text-secondary:#6e6e73;
+  --color-text-tertiary:#aeaeb2;
+  --color-border-tertiary:#d1d1d6;
+  --color-border-secondary:#c7c7cc;
+  --border-radius-lg:14px;
+  --border-radius-md:10px;
+  --font-sans:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;
+}
+@media(prefers-color-scheme:dark){
+  :root{
+    --color-background-primary:#1c1c1e;
+    --color-background-secondary:#2c2c2e;
+    --color-background-tertiary:#3a3a3c;
+    --color-text-primary:#ffffff;
+    --color-text-secondary:#aeaeb2;
+    --color-text-tertiary:#636366;
+    --color-border-tertiary:#3a3a3c;
+    --color-border-secondary:#48484a;
+  }
+}
+html,body{height:100%;background:var(--color-background-tertiary);font-family:var(--font-sans);}
+.app{max-width:430px;margin:0 auto;display:flex;flex-direction:column;height:100%;height:100dvh;}
+.tab-content{flex:1;overflow-y:auto;padding:12px 12px 4px;-webkit-overflow-scrolling:touch;}
+.tabbar{
+  display:flex;
+  background:var(--color-background-primary);
+  border-top:0.5px solid var(--color-border-tertiary);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+.tbtab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;color:var(--color-text-secondary);cursor:pointer;padding:10px 0 6px;}
+.tbtab.active{color:#1D9E75;}
+.tbtab.disabled{opacity:0.3;cursor:default;}
+.tbtab svg{width:24px;height:24px;}
+
+/* numpad */
+.numpad-wrap{background:var(--color-background-primary);border-radius:var(--border-radius-lg);border:0.5px solid var(--color-border-tertiary);padding:10px;margin-bottom:10px;}
+.display-bar{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:8px 16px;text-align:right;font-size:33px;font-weight:500;color:var(--color-text-primary);margin-bottom:8px;min-height:62px;display:flex;align-items:center;justify-content:flex-end;letter-spacing:2px;}
+.display-bar.dim{color:var(--color-text-tertiary);}
+.keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;}
+.key{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);font-size:24px;font-weight:400;color:var(--color-text-primary);height:62px;display:flex;align-items:center;justify-content:center;cursor:pointer;user-select:none;transition:background 0.1s,transform 0.08s;}
+.key:active{background:var(--color-border-tertiary);transform:scale(0.95);}
+.key.del{font-size:18px;color:var(--color-text-secondary);}
+.key.disabled{background:var(--color-background-secondary);color:var(--color-text-tertiary);cursor:default;}
+.status-bar{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:12px 14px;margin:10px 0;min-height:116px;}
+.status-text{font-size:17px;color:var(--color-text-secondary);line-height:1.4;flex:1;font-weight:400;}
+.status-text.empty{color:transparent;}
+.domino-icon{width:62px;height:44px;transform:rotate(90deg);display:block;}
+.domino-key{font-size:0;}
+.status-icon{width:26px;height:26px;font-size:20px;text-align:center;line-height:1.3;color:var(--color-text-secondary);}
+
+/* scorecards */
+.scoreboard{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:10px;}
+.scard{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:12px 12px 10px;text-align:center;cursor:pointer;position:relative;transition:border-color 0.2s,box-shadow 0.2s;user-select:none;}
+.scard:active{transform:scale(0.97);}
+.scard.pending-setup{border:2.5px solid var(--color-border-secondary);}
+.scard .pname{font-size:19px;color:var(--color-text-secondary);margin-bottom:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.score-pair{display:flex;align-items:baseline;justify-content:center;}
+.score-hand{font-size:26px;font-weight:500;color:#1D9E75;line-height:1;}
+.score-slash{font-size:24px;font-weight:300;color:var(--color-text-tertiary);margin:0 3px;line-height:1;}
+.score-total{font-size:33px;font-weight:500;color:var(--color-text-primary);line-height:1;}
+.score-labels{display:flex;justify-content:center;margin-top:2px;}
+.score-lbl-hand{font-size:10px;color:#1D9E75;width:30px;text-align:right;}
+.score-lbl-sep{font-size:10px;color:transparent;margin:0 3px;}
+.score-lbl-tot{font-size:10px;color:var(--color-text-tertiary);width:30px;text-align:left;}
+
+.setup-hint{background:#E1F5EE;border:0.5px solid #9FE1CB;border-radius:var(--border-radius-md);padding:10px 15px;font-size:14px;color:#0F6E56;text-align:center;margin-bottom:12px;line-height:1.6;}
+
+/* history */
+.hist-table{width:100%;border-collapse:collapse;font-size:14px;table-layout:fixed;}
+.hist-table th{text-align:center;padding:7px 8px;color:var(--color-text-secondary);font-weight:600;border-bottom:0.5px solid var(--color-border-tertiary);font-size:12px;text-transform:uppercase;}
+.hist-table td{padding:9px 8px;border-bottom:0.5px solid var(--color-border-tertiary);color:var(--color-text-primary);vertical-align:middle;text-align:center;}
+.hist-table th:first-child, .hist-table td:first-child{text-align:left;width:25%;}
+.hist-table th:last-child, .hist-table td:last-child{text-align:right;width:15%;}
+.hist-table tr.domino-row td{background:var(--color-background-secondary);color:#0F6E56;font-style:italic;font-size:13px;}
+.hist-table tr.gameover-row td{background:#E1F5EE;color:#0F6E56;font-weight:600;font-size:13px;}
+.del-btn{background:none;border:none;cursor:pointer;font-size:16px;padding:3px 7px;border-radius:4px;color:#D85A30;}
+.del-btn:active{opacity:0.6;}
+.pts-display{color:#1D9E75;font-weight:500;cursor:pointer;border-bottom:1px dashed #9FE1CB;display:inline-block;}
+.pts-input{width:60px;font-size:14px;font-weight:500;color:#1D9E75;border:1.5px solid #1D9E75;border-radius:5px;padding:3px 6px;background:var(--color-background-primary);color:#1D9E75;outline:none;font-family:inherit;}
+
+/* mini history */
+.hist-mini{flex:1;overflow:hidden;height:92px;display:flex;flex-direction:column;justify-content:flex-end;}
+.hist-mini-row{display:flex;align-items:center;gap:7px;font-size:14px;color:var(--color-text-secondary);margin-bottom:2px;animation:slideUp 0.3s ease-out;}
+.hist-mini-x{color:#D85A30;font-size:12px;cursor:pointer;padding:3px 5px;}
+.hist-mini-pts{font-weight:600;color:var(--color-text-primary);min-width:20px;text-align:right;}
+.hist-mini-name{flex:1;}
+
+@keyframes slideUp {
+  from { transform: translateY(11px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* stats table */
+.stats-table{width:100%;border-collapse:collapse;margin-top:12px;font-size:14px;}
+.stats-table td{padding:11px 6px;border-bottom:0.5px solid var(--color-border-tertiary);}
+.stats-table tr:last-child td{border-bottom:none;}
+.stats-val{font-size:18px;font-weight:600;color:var(--color-text-primary);text-align:center;width:25%;}
+.stats-lbl{color:var(--color-text-secondary);font-size:13px;text-align:left;padding-left:11px;}
+.stats-header{font-size:15px;font-weight:600;color:var(--color-text-primary);text-align:center;padding-bottom:11px;}
+.chart-container{margin-top:22px;padding:11px;background:var(--color-background-primary);border-radius:var(--border-radius-lg);border:0.5px solid var(--color-border-tertiary);}
+.chart-title{font-size:12px;color:var(--color-text-secondary);font-weight:600;text-transform:uppercase;margin-bottom:13px;text-align:center;}
+
+
+/* options */
+.opt-section{background:var(--color-background-primary);border-radius:var(--border-radius-lg);border:0.5px solid var(--color-border-tertiary);padding:12px 14px;margin-bottom:12px;}
+.opt-label{font-size:11px;color:var(--color-text-secondary);margin-bottom:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;}
+.opt-row{display:flex;align-items:center;gap:11px;margin-bottom:10px;}
+.opt-row:last-child{margin-bottom:0;}
+.opt-row label{font-size:14px;color:var(--color-text-secondary);width:88px;flex-shrink:0;}
+.opt-row input[type=text]{flex:1;font-size:15px;font-weight:500;padding:7px 11px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);background:var(--color-background-secondary);color:var(--color-text-primary);font-family:inherit;}
+.opt-row input[type=number]{width:88px;font-size:15px;padding:7px 11px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);background:var(--color-background-secondary);color:var(--color-text-primary);font-family:inherit;}
+.action-btn{width:100%;background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);font-size:14px;color:var(--color-text-primary);padding:10px;cursor:pointer;text-align:center;margin-bottom:9px;display:block;font-family:inherit;}
+.action-btn:last-child{margin-bottom:0;}
+.action-btn:active{background:var(--color-border-tertiary);}
+.action-btn.primary{background:#1D9E75;color:#ffffff;border-color:#1D9E75;font-weight:700;}
+.action-btn.highlight{background:var(--color-background-tertiary);font-weight:700;}
+.action-btn.danger{color:#D85A30;}
+.copy-status{font-size:12px;color:#1D9E75;text-align:center;margin-top:5px;min-height:18px;}
+textarea.export-area{width:100%;height:145px;font-size:12px;font-family:monospace;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:9px;background:var(--color-background-secondary);color:var(--color-text-secondary);resize:none;margin-top:9px;-webkit-user-select:text;user-select:text;}
+.help-text{font-size:13px;color:var(--color-text-secondary);line-height:1.5;margin-bottom:11px;padding:0 5px;}
+.contest-select{width:100%;padding:11px;font-size:18px;font-weight:500;border-radius:var(--border-radius-md);background:var(--color-background-secondary);color:var(--color-text-primary);border:0.5px solid var(--color-border-tertiary);font-family:inherit;}
+.radio-group{display:flex;background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:3px;gap:3px;flex:1;}
+.radio-group label{flex:1;display:flex;align-items:center;justify-content:center;text-align:center;font-size:13px;color:var(--color-text-secondary);cursor:pointer;border-radius:8px;transition:background 0.2s,color 0.2s;width:auto;min-height:40px;}
+.radio-group input{display:none;}
+.radio-group input:checked + span{background:var(--color-background-primary);color:var(--color-text-primary);box-shadow:0 1px 3px rgba(0,0,0,0.1);}
+.radio-group span{display:block;width:100%;padding:10px 0;border-radius:8px;}
+.action-group{display:flex;background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:3px;gap:3px;}
+.action-group .action-btn{flex:1;margin-bottom:0;border:none;background:none;font-size:13px;color:var(--color-text-secondary);padding:10px 0;border-radius:8px;font-weight:400;min-height:40px;}
+.action-group .action-btn.highlight{background:var(--color-background-primary);color:var(--color-text-primary);box-shadow:0 1px 3px rgba(0,0,0,0.1);font-weight:700;}
+.action-group .action-btn:disabled{opacity:0.5;}
+</style>
+</head>
+<body>
+<div class="app" id="app"></div>
+<script>
+const SK='dom_v9';
+const S={
+  names:['',''],
+  contests:{},
+  scores:[0,0],
+  handScores:[0,0],
+  display:'',
+  records:[],
+  pastGames:[],
+  target:50,
+  gameOver:false,
+  tab:0,
+  phase:'start',
+  firstPlayer:-1,
+  handFirstPlayer:-1,
+  handNum:0,
+  firstPlayerHighlightUntil:0,
+  lastAdded:['',''],
+  pendingWin:false,
+  editingIdx:-1,
+  status:'',
+  statusUntil:0,
+  highestDoublePlayer:-1,
+  theme:'system',
+  showNewContestInputs:false,
+  hideNewContestHelp:false,
+  lastNames:['',''],
+  helpContext:'',
+  newNames:['','']
+};
+let LAST_STATUS_SET=0;
+
+function updateNewName(i,v){
+  S.newNames[i]=v;
+  render();
+}
+
+function load(){
+  try{
+    const r=localStorage.getItem(SK);
+    if(!r) {
+      S.tab = 2;
+      S.showNewContestInputs = true;
+      return;
+    }
+    const d=JSON.parse(r);
+    Object.assign(S, d);
+    if(!S.contests) S.contests = {};
+    if(!S.theme) S.theme = 'system';
+    S.display='';S.editingIdx=-1;
+    applyTheme();
+    
+    const hasContests = Object.keys(S.contests).length > 0;
+    if(!hasContests && (!S.names[0] && !S.names[1])) {
+      S.tab = 2;
+      S.showNewContestInputs = true;
+    } else {
+      S.tab = 0;
+      if (!S.names[0] && !S.names[1] && hasContests) {
+        switchContest(S.contests[Object.keys(S.contests)[0]].names);
+      }
+    }
+    S.newNames = ['', ''];
+  }catch(e){}
+}
+
+function applyTheme() {
+  const root = document.documentElement;
+  if (S.theme === 'dark') {
+    root.style.setProperty('--color-background-primary', '#1c1c1e');
+    root.style.setProperty('--color-background-secondary', '#2c2c2e');
+    root.style.setProperty('--color-background-tertiary', '#111111');
+    root.style.setProperty('--color-text-primary', '#ffffff');
+    root.style.setProperty('--color-text-secondary', '#aeaeb2');
+    root.style.setProperty('--color-text-tertiary', '#636366');
+    root.style.setProperty('--color-border-tertiary', '#3a3a3c');
+    root.style.setProperty('--color-border-secondary', '#48484a');
+    document.body.style.background = '#111111';
+  } else if (S.theme === 'light') {
+    root.style.setProperty('--color-background-primary', '#ffffff');
+    root.style.setProperty('--color-background-secondary', '#f2f2f7');
+    root.style.setProperty('--color-background-tertiary', '#e5e5ea');
+    root.style.setProperty('--color-text-primary', '#1c1c1e');
+    root.style.setProperty('--color-text-secondary', '#6e6e73');
+    root.style.setProperty('--color-text-tertiary', '#aeaeb2');
+    root.style.setProperty('--color-border-tertiary', '#d1d1d6');
+    root.style.setProperty('--color-border-secondary', '#c7c7cc');
+    document.body.style.background = '#e5e5ea';
+  } else {
+    // System: remove overrides and let CSS media queries handle it
+    root.style.removeProperty('--color-background-primary');
+    root.style.removeProperty('--color-background-secondary');
+    root.style.removeProperty('--color-background-tertiary');
+    root.style.removeProperty('--color-text-primary');
+    root.style.removeProperty('--color-text-secondary');
+    root.style.removeProperty('--color-text-tertiary');
+    root.style.removeProperty('--color-border-tertiary');
+    root.style.removeProperty('--color-border-secondary');
+    document.body.style.background = '';
+  }
+}
+
+function getContestKey(names) {
+  return [...names].sort().map(n => n.trim()).join('|');
+}
+
+function updateContest() {
+  if (!S.names[0] && !S.names[1] && S.records.length === 0) return;
+  const key = getContestKey(S.names);
+  S.contests[key] = {
+    names: [...S.names],
+    scores: [...S.scores],
+    handScores: [...S.handScores],
+    records: [...S.records],
+    pastGames: [...S.pastGames],
+    target: S.target,
+    gameOver: S.gameOver,
+    phase: S.phase,
+    firstPlayer: S.firstPlayer,
+    handFirstPlayer: S.handFirstPlayer,
+    handNum: S.handNum,
+    lastAdded: [...S.lastAdded],
+    pendingWin: S.pendingWin,
+    highestDoublePlayer: S.highestDoublePlayer,
+    theme: S.theme
+  };
+}
+
+function save(){
+  updateContest();
+  try{
+    localStorage.setItem(SK,JSON.stringify(S));
+  }catch(e){}
+}
+
+function ts(){return new Date().toLocaleTimeString([],{hour:'numeric',minute:'2-digit',hour12:false});}
+function ds(d=new Date()){
+  const date = (d.getMonth()+1)+'/'+d.getDate();
+  const time = d.toLocaleTimeString([],{hour:'numeric',minute:'2-digit',hour12:false});
+  return date + ' ' + time;
+}
+
+function domTile(){
+  return `<img src="domino.svg" class="domino-icon" alt="Domino icon"/>`;
+}
+
+function setStatus(msg,timeout=5000){
+  S.status=msg;S.statusUntil=Date.now()+timeout;LAST_STATUS_SET=Date.now();
+  if(msg && !msg.includes('Click here to reset')) S.lastStatus = msg;
+  save();render();
+}
+
+function clearStatus(){
+  S.status='';S.statusUntil=0;save();render();
+}
+
+function resetForNewGamePreserveHistory(){
+  S.scores=[0,0];S.handScores=[0,0];S.display='';
+  S.gameOver=false;S.pendingWin=false;S.phase='start';
+  S.firstPlayer=-1;S.handFirstPlayer=-1;S.handNum=0;
+  S.firstPlayerHighlightUntil=0;S.lastAdded=['',''];S.editingIdx=-1;
+  S.status='';S.statusUntil=0;S.highestDoublePlayer=-1;S.tab=0;
+  S.lastStatus='';S.helpContext='';
+  save();render();
+}
+
+function ackStatus(){
+  if(S.status === 'Click here to reset everything.'){
+    resetForNewGame();
+    return;
+  }
+  if(S.phase==='end'&&S.gameOver){
+    resetForNewGamePreserveHistory();
+    return;
+  }
+  clearStatus();
+}
+
+function showHelp(){
+  if (S.tab === 0) {
+    if (S.phase === 'play') {
+      setStatus(`Enter number and click Player to add that to their score. Delete mistakes in recent scores by clicking red x. Replace by adding the correct score.`, 15000);
+      return;
+    }
+    const help=S.phase==='start'
+      ? 'Click user with highest double to start game.'
+      : 'Game finished. Click domino tile to start new game.';
+    setStatus(help);
+  } else {
+    const help = "Data is copied from or pasted to the clipboard. Data is a set of lines, each line is a game with a mon/day date and two numbers, scores for the players. First line is the names of the players. Clear to erase current scores";
+    setStatus(help, 15000);
+  }
+}
+
+function resetForNewGame(){
+  S.scores=[0,0];S.handScores=[0,0];S.display='';S.records=[];
+  S.gameOver=false;S.pendingWin=false;S.phase='start';
+  S.firstPlayer=-1;S.handFirstPlayer=-1;S.handNum=0;
+  S.firstPlayerHighlightUntil=0;S.lastAdded=['',''];S.editingIdx=-1;
+  S.status='';S.statusUntil=0;S.highestDoublePlayer=-1;S.tab=0;
+  S.lastStatus='';S.helpContext='';
+  save();render();
+}
+
+function pressKey(v){
+  if(S.gameOver||S.phase==='end')return;
+  if(S.display.length>=3)return;
+  S.display+=v;
+  const el=document.getElementById('display-bar');
+  if(el){el.textContent=S.display;el.className='display-bar';}
+}
+
+function delKey(){
+  S.display=S.display.slice(0,-1);
+  const el=document.getElementById('display-bar');
+  if(el){el.textContent=S.display||'0';el.className='display-bar'+(S.display?'':' dim');}
+}
+
+function tapPlayer(i){
+  if(S.gameOver)return;
+  const pts=parseInt(S.display)||0;
+  if(S.phase==='start'){
+    const starter=i;
+    S.highestDoublePlayer=i;
+    S.firstPlayer=starter;
+    S.handFirstPlayer=starter;
+    S.handNum=1;
+    if(pts>0){
+      S.scores[i]+=pts;S.handScores[i]+=pts;
+      S.lastAdded=['',''];S.lastAdded[i]='+'+pts;
+      S.records.push({who:i,pts,time:ts(),type:'score',hand:1,totalAfter:[S.scores[0],S.scores[1]]});
+      if(S.scores[i]>=S.target)S.pendingWin=true;
+    }
+    S.display='';S.phase='play';S.helpContext='play';
+    setStatus(`${S.names[i]} had the high double, ${S.names[1-i]} will start the next hand.`, 5000);
+    save();render();return;
+  }
+  if(pts<=0){
+    S.display='';
+    const el=document.getElementById('display-bar');
+    if(el){el.textContent='0';el.className='display-bar dim';}
+    return;
+  }
+  S.scores[i]+=pts;S.handScores[i]+=pts;
+  S.lastAdded=['',''];S.lastAdded[i]='+'+pts;
+  S.records.push({who:i,pts,time:ts(),type:'score',hand:S.handNum,totalAfter:[S.scores[0],S.scores[1]]});
+  if(S.scores[i]>=S.target)S.pendingWin=true;
+  S.display='';S.helpContext='score';
+  save();render();
+}
+
+function callDomino(){
+  if(S.phase==='end'){
+    resetForNewGame();
+    return;
+  }
+  if(S.phase!=='play'||S.gameOver){
+    setStatus('Click user with highest double to start game.');
+    return;
+  }
+  const gameEnds=S.pendingWin;
+  const handTotals=[S.handScores[0],S.handScores[1]];
+  const maxScore=Math.max(handTotals[0],handTotals[1]);
+  const minScore=Math.min(handTotals[0],handTotals[1]);
+  S.records.push({
+    who:-1,pts:0,time:ts(),type:'domino',hand:S.handNum,
+    totalAfter:[S.scores[0],S.scores[1]],
+    handTotals,gameEnds
+  });
+  if(gameEnds){
+    if (S.scores[0] === S.scores[1]) {
+      S.pendingWin = false;
+    } else {
+      const wi=S.scores[0]>S.scores[1]?0:1;
+      S.records.push({who:-1,pts:0,time:ts(),type:'gameover',
+        finalScores:[S.scores[0],S.scores[1]],winnerIdx:wi,winnerName:S.names[wi]});
+      S.pastGames.unshift({
+        time: ds(),
+        names: [S.names[0], S.names[1]],
+        scores: [S.scores[0], S.scores[1]],
+        winnerIdx: wi
+      });
+      S.gameOver=true;S.phase='end';
+      setStatus(`${S.names[wi]} won. Click domino tile to start new game.`, 30000);
+      save();render();return;
+    }
+  }
+  
+  if (handTotals[0] === handTotals[1]) {
+    S.handFirstPlayer = S.handFirstPlayer === 0 ? 1 : 0;
+  } else {
+    S.handFirstPlayer = S.handFirstPlayer === 0 ? 1 : 0;
+  }
+  S.firstPlayer=S.handFirstPlayer;S.handNum++;
+  S.firstPlayerHighlightUntil=Date.now()+10000;
+  S.helpContext='play';
+
+  const nextStarterIdx = S.handFirstPlayer;
+  const nextStarterName = S.names[nextStarterIdx];
+  
+  let message;
+  if (!S.pendingWin && gameEnds && S.scores[0] === S.scores[1]) {
+    message = `Tie game ${S.scores[0]} ${S.scores[1]}, play another hand. ${nextStarterName} starts.`;
+  } else if(handTotals[0] === handTotals[1]) {
+    message = `A ${handTotals[0]} ${handTotals[1]} tied hand. ${nextStarterName} starts.`;
+  } else {
+    const winnerIdx = handTotals[0] > handTotals[1] ? 0 : 1;
+    const winnerName = S.names[winnerIdx];
+    const article = maxScore === 8 ? 'an' : 'a';
+    message = `${winnerName} won that hand ${maxScore} ${minScore}, ${nextStarterName} starts.`;
+  }
+  
+  S.handScores=[0,0];S.lastAdded=['',''];S.pendingWin=false;
+  setStatus(message, 5000);
+  setTimeout(()=>{if(Date.now()>=S.firstPlayerHighlightUntil){S.firstPlayerHighlightUntil=0;render();}},10000);
+  S.display='';save();render();
+}
+
+function recalcTotals(){
+  const running=[0,0];
+  for(const rec of S.records){
+    if(rec.type==='score'){
+      running[rec.who]+=rec.pts;
+      rec.totalAfter=[running[0],running[1]];
+    } else if(rec.type==='domino'){
+      rec.totalAfter=[running[0],running[1]];
+      if(rec.gameEnds){running[0]=0;running[1]=0;}
+    } else if(rec.type==='gameover'){
+      rec.finalScores=[running[0],running[1]];
+      running[0]=0;running[1]=0;
+    }
+  }
+  S.scores=[running[0],running[1]];
+  S.pendingWin=S.scores[0]>=S.target||S.scores[1]>=S.target;
+}
+
+function deleteRecord(idx){
+  S.records.splice(idx,1);
+  recalcTotals();S.gameOver=false;S.pendingWin=false;
+  save();render();
+}
+
+function startEdit(idx){
+  S.editingIdx=idx;
+  render();
+  setTimeout(()=>{
+    const inp=document.getElementById('edit-input-'+idx);
+    if(inp){inp.focus();inp.select();}
+  },50);
+}
+
+function commitEdit(idx){
+  const inp=document.getElementById('edit-input-'+idx);
+  if(!inp)return;
+  const newPts=parseInt(inp.value);
+  if(!isNaN(newPts)&&newPts>=0){
+    S.records[idx].pts=newPts;
+    recalcTotals();
+  }
+  S.editingIdx=-1;
+  save();render();
+}
+
+function cancelEdit(){S.editingIdx=-1;render();}
+
+function getExportText(){
+  const lines = [S.names.join(' | ')];
+  (S.pastGames || []).forEach(g => {
+    lines.push(`${g.time} ${g.scores[0]} ${g.scores[1]}`);
+  });
+  return lines.join('\n');
+}
+
+function copyExport(){
+  const data=getExportText();
+  const count = (S.pastGames || []).length;
+  const statusEl=document.getElementById('copy-status');
+  const taEl=document.getElementById('export-textarea');
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(data).then(()=>{
+      setStatus(`${count} games exported to clipboard`, 3000);
+    }).catch(()=>{
+      if(taEl){taEl.style.display='block';taEl.value=data;taEl.focus();taEl.select();}
+    });
+  } else {
+    if(taEl){taEl.style.display='block';taEl.value=data;taEl.focus();taEl.select();}
+  }
+}
+
+function doImport(){
+  const ta=document.getElementById('import-textarea');
+  if(!ta||!ta.value.trim())return;
+  try{
+    const lines = ta.value.trim().split('\n');
+    if(lines.length < 1) return;
+    const names = lines[0].split('|').map(n => n.trim());
+    if(names.length !== 2) { setStatus('Invalid first line: must be "Player 1 | Player 2"'); return; }
+    
+    const games = [];
+    for(let i=1; i<lines.length; i++) {
+      const parts = lines[i].trim().split(/\s+/);
+      if(parts.length < 3) continue;
+      let s1, s2, time;
+      if (parts.length >= 4 && parts[1].includes(':')) {
+        time = parts[0] + ' ' + parts[1];
+        s1 = parseInt(parts[2]);
+        s2 = parseInt(parts[3]);
+      } else {
+        time = parts[0];
+        s1 = parseInt(parts[1]);
+        s2 = parseInt(parts[2]);
+      }
+      if(isNaN(s1) || isNaN(s2)) continue;
+      games.push({
+        time,
+        names,
+        scores: [s1, s2],
+        winnerIdx: s1 >= s2 ? 0 : 1
+      });
+    }
+    
+    const key = getContestKey(names);
+    // Explicitly hide New... UI and set names before switching
+    S.showNewContestInputs = false;
+    S.names = [...names];
+    
+    if (!S.contests[key]) {
+      switchContest(names);
+      S.pastGames = games;
+    } else {
+      switchContest(names);
+      S.pastGames = [...games, ...S.pastGames];
+    }
+    
+    updateContest();
+    save(); render();
+    document.getElementById('import-area').style.display='none';
+    setStatus(`${games.length} games imported`, 3000);
+  }catch(err){setStatus('Could not parse data — check the format and try again.');}
+}
+
+function clearScores(){
+  const keyToDelete = getContestKey(S.names);
+  delete S.contests[keyToDelete];
+  const keys = Object.keys(S.contests);
+  if (keys.length > 0) {
+    const nextNames = S.contests[keys[0]].names;
+    // We manually switch without updateContest(keyToDelete)
+    const c = S.contests[getContestKey(nextNames)];
+    S.names = [...nextNames];
+    S.scores = c.scores;
+    S.handScores = c.handScores;
+    S.records = c.records;
+    S.pastGames = c.pastGames;
+    S.target = c.target;
+    S.gameOver = c.gameOver;
+    S.phase = c.phase;
+    S.firstPlayer = c.firstPlayer;
+    S.handFirstPlayer = c.handFirstPlayer;
+    S.handNum = c.handNum;
+    S.lastAdded = c.lastAdded;
+    S.pendingWin = c.pendingWin;
+    S.highestDoublePlayer = c.highestDoublePlayer;
+    S.theme = c.theme || 'system';
+    S.lastStatus = '';
+    applyTheme();
+    save();
+    render();
+    setStatus(`Contest deleted`, 3000);
+  } else {
+    S.names = ['', ''];
+    resetForNewGame();
+    S.tab = 2;
+    S.showNewContestInputs = true;
+    save();
+    render();
+    setStatus(`Contest deleted`, 3000);
+  }
+}
+
+function newGame(){
+  setStatus('Click here to reset everything.', 5000);
+}
+
+function handleContestChange(val) {
+  if (val === '__NEW__') {
+    S.lastNames = [...S.names];
+    S.showNewContestInputs = true;
+    S.hideNewContestHelp = false;
+    S.newNames = ['', ''];
+    clearStatus();
+    setTimeout(() => {
+      const inp = document.getElementById('new-name-0');
+      if(inp) { inp.focus(); inp.select(); }
+    }, 150);
+  } else if (val) {
+    S.showNewContestInputs = false;
+    S.newNames = ['', ''];
+    switchContest(S.contests[val].names);
+  }
+}
+
+function cancelNewContest() {
+  const hasContests = Object.keys(S.contests).length > 0;
+  if (!hasContests) {
+    render();
+    return;
+  }
+  S.showNewContestInputs = false;
+  S.newNames = ['', ''];
+  const target = (S.lastNames && (S.lastNames[0] || S.lastNames[1])) 
+    ? S.lastNames 
+    : S.contests[Object.keys(S.contests)[0]].names;
+  switchContest(target);
+}
+
+function switchContest(newNames) {
+  updateContest();
+  const key = getContestKey(newNames);
+  const c = S.contests[key];
+  if (c) {
+    S.scores = c.scores;
+    S.handScores = c.handScores;
+    S.records = c.records;
+    S.pastGames = c.pastGames;
+    S.target = c.target;
+    S.gameOver = c.gameOver;
+    S.phase = c.phase;
+    S.firstPlayer = c.firstPlayer;
+    S.handFirstPlayer = c.handFirstPlayer;
+    S.handNum = c.handNum;
+    S.lastAdded = c.lastAdded;
+    S.pendingWin = c.pendingWin;
+    S.highestDoublePlayer = c.highestDoublePlayer;
+    S.theme = c.theme || 'system';
+  } else {
+    S.scores = [0, 0];
+    S.handScores = [0, 0];
+    S.records = [];
+    S.pastGames = [];
+    S.gameOver = false;
+    S.phase = 'start';
+    S.firstPlayer = -1;
+    S.handFirstPlayer = -1;
+    S.handNum = 0;
+    S.lastAdded = ['', ''];
+    S.pendingWin = false;
+    S.highestDoublePlayer = -1;
+    // S.target and S.theme are preserved from previous contest
+  }
+  S.names = [...newNames];
+  S.newNames = ['', ''];
+  updateContest();
+  applyTheme();
+  save();
+  render();
+}
+
+function initNameInputs(){
+  [0,1].forEach(i=>{
+    const el=document.getElementById('name-input-'+i);
+    if(!el)return;
+    el.addEventListener('blur',()=>{
+      const newName = el.value.trim()||'Player '+(i+1);
+      if (newName !== S.names[i]) {
+        const nextNames = [...S.names];
+        nextNames[i] = newName;
+        switchContest(nextNames);
+      }
+    });
+  });
+}
+
+function setTab(t){
+  S.editingIdx=-1;
+  S.tab=t;
+  if (t === 2 && (S.names[0] || S.names[1])) {
+    S.showNewContestInputs = false;
+  }
+  render();
+}
+
+function render(){
+  const activeId = document.activeElement ? document.activeElement.id : null;
+  if(S.status && Date.now()>S.statusUntil){S.status='';S.statusUntil=0;save();}
+  const tabIcons=[
+    `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4h16v16H4z"/><path d="M4 12h16"/><path d="M12 4v16"/></svg>`,
+    `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 4a4 4 0 014 4 4 4 0 01-8 0 4 4 0 014-4z"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>`,
+    `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/></svg>`
+  ];
+  const tabNames=['Score','Stats','Options'];
+  const hasContests = Object.keys(S.contests).length > 0;
+  const contestActive = (S.names[0] || S.names[1]) && hasContests;
+  
+  const tabbar=tabNames.map((n,i)=>{
+    const isDisabled = (i === 0 || i === 1) && !contestActive;
+    return `<div class="tbtab ${S.tab===i?'active':''} ${isDisabled?'disabled':''}" onclick="${isDisabled?'':'setTab('+i+')'}">${tabIcons[i]}<span>${n}</span></div>`;
+  }).join('');
+  
+  let defaultStartStatus = '';
+  if (S.phase==='start' && !S.status) {
+    if (S.tab === 0) defaultStartStatus = 'Click user with highest double to start game.';
+    else if (S.tab === 2) {
+      if (S.showNewContestInputs && !S.hideNewContestHelp) defaultStartStatus = 'Add names to create a new contest.';
+      else defaultStartStatus = hasContests ? 'Click Score tab to start a game.' : 'Add Player to create contest.';
+    }
+  }
+  const statusText=S.status||defaultStartStatus;
+  const isNewContestHelp = !S.status && defaultStartStatus === 'Add names to create a new contest.';
+  const statusIcon = S.status ? '&#10003;' : '?';
+  const statusClick = S.status ? 'ackStatus()' : (isNewContestHelp ? 'S.hideNewContestHelp=true;render()' : 'showHelp()');
+  
+  let content='';
+
+  if(S.tab===0){
+    const isStart=S.phase==='start';
+    const displayClass=S.display?'display-bar':'display-bar dim';
+    const cards=[0,1].map(i=>`
+      <div class="scard ${isStart?'pending-setup':''}" onclick="tapPlayer(${i})">
+        <div class="pname">${S.names[i]}</div>
+        <div class="score-total">${S.scores[i]}</div>
+      </div>`).join('');
+    const dominoLabel=domTile();
+    
+    const scoreRecs=S.records.filter(r=>r.type==='score').slice(-4);
+    const miniRows=scoreRecs.map(rec=>{
+      const realIdx = S.records.indexOf(rec);
+      return `<div class="hist-mini-row"><span class="hist-mini-x" onclick="event.stopPropagation();deleteRecord(${realIdx})">&#10005;</span><span class="hist-mini-pts">${rec.pts}</span><span class="hist-mini-name">${S.names[rec.who]}</span></div>`;
+    }).join('');
+
+    const showHistory = !S.status && miniRows;
+
+    content=`
+      <div class="numpad-wrap">
+        <div id="display-bar" class="${displayClass}">${S.display||'0'}</div>
+        <div class="keypad">
+          ${[1,2,3,4,5,6,7,8,9].map(n=>`<div class="key" onclick="pressKey('${n}')">${n}</div>`).join('')}
+          <div class="key del" onclick="delKey()">&#9003;</div>
+          <div class="key" onclick="pressKey('0')">0</div>
+          <div class="key domino-key ${S.phase!=='play'&&S.phase!=='end'?'disabled':''}" onclick="callDomino()">${dominoLabel}</div>
+        </div>
+      </div>
+      <div class="scoreboard">${cards}</div>
+      <div class="status-bar" onclick="${statusClick}">
+        <div class="status-text">
+          ${S.status || (showHistory ? `<div class="hist-mini">${miniRows}</div>` : defaultStartStatus)}
+        </div>
+        <div class="status-icon">${statusIcon}</div>
+      </div>
+    `;
+  } else if(S.tab===1){
+    const games = S.pastGames || [];
+    const wins = [0, 0];
+    const totals = [0, 0];
+    const margins = []; // For histogram
+    const diffs = [0]; // Cumulative differences: Player 0 - Player 1
+    
+    games.slice().reverse().forEach(g => {
+      wins[g.winnerIdx]++;
+      totals[0] += g.scores[0];
+      totals[1] += g.scores[1];
+      margins.push(Math.abs(g.scores[0] - g.scores[1]));
+      diffs.push(diffs[diffs.length-1] + (g.scores[0] - g.scores[1]));
+    });
+    
+    const avg = [
+      games.length ? (totals[0] / games.length).toFixed(1) : '0.0',
+      games.length ? (totals[1] / games.length).toFixed(1) : '0.0'
+    ];
+    
+    // Simple SVG Graph for Cumulative Difference
+    let diffGraph = '';
+    if(diffs.length > 1) {
+      const w = 360, h = 120;
+      const maxDiff = Math.max(...diffs.map(Math.abs), 10);
+      const points = diffs.map((d, i) => `${(i / (diffs.length - 1)) * w},${h/2 - (d / maxDiff) * (h/2)}`).join(' ');
+      diffGraph = `
+        <div class="chart-container">
+          <div class="chart-title">Cumulative Point Lead (${S.names[0]} vs ${S.names[1]})</div>
+          <svg viewBox="0 0 ${w} ${h}" width="100%" height="${h}" style="overflow:visible">
+            <line x1="0" y1="${h/2}" x2="${w}" y2="${h/2}" stroke="var(--color-border-tertiary)" stroke-width="1" />
+            <polyline fill="none" stroke="#1D9E75" stroke-width="2" points="${points}" />
+          </svg>
+        </div>
+      `;
+    }
+
+    // Simple SVG Graph for Cumulative Games Won
+    let gamesGraph = '';
+    if(games.length > 0) {
+      const w = 360, h = 120;
+      const winDiffs = [0];
+      games.slice().reverse().forEach(g => {
+        const last = winDiffs[winDiffs.length-1];
+        winDiffs.push(last + (g.winnerIdx === 0 ? 1 : -1));
+      });
+      const maxWinDiff = Math.max(...winDiffs.map(Math.abs), 5);
+      const points = winDiffs.map((d, i) => `${(i / (winDiffs.length - 1)) * w},${h/2 - (d / maxWinDiff) * (h/2)}`).join(' ');
+      gamesGraph = `
+        <div class="chart-container">
+          <div class="chart-title">Cumulative Games Won (${S.names[0]} vs ${S.names[1]})</div>
+          <svg viewBox="0 0 ${w} ${h}" width="100%" height="${h}" style="overflow:visible">
+            <line x1="0" y1="${h/2}" x2="${w}" y2="${h/2}" stroke="var(--color-border-tertiary)" stroke-width="1" />
+            <polyline fill="none" stroke="#1D9E75" stroke-width="2" points="${points}" />
+          </svg>
+        </div>
+      `;
+    }
+
+    // Simple SVG Histogram for Win Margins
+    let marginHist = '';
+    if(margins.length > 0) {
+      const w = 360, h = 80;
+      const bins = 10;
+      const maxMargin = Math.max(...margins, 1);
+      const binWidth = maxMargin / bins;
+      const counts = new Array(bins).fill(0);
+      margins.forEach(m => counts[Math.min(Math.floor(m / binWidth), bins - 1)]++);
+      const maxCount = Math.max(...counts, 1);
+      const bars = counts.map((c, i) => {
+        const barH = (c / maxCount) * h;
+        return `<rect x="${(i / bins) * w}" y="${h - barH}" width="${(w / bins) - 2}" height="${barH}" fill="#1D9E75" opacity="0.6" />`;
+      }).join('');
+      marginHist = `
+        <div class="chart-container">
+          <div class="chart-title">Win Margins</div>
+          <svg viewBox="0 0 ${w} ${h}" width="100%" height="${h}">${bars}</svg>
+        </div>
+      `;
+    }
+
+    content=`
+      <table class="stats-table">
+        <thead>
+          <tr>
+            <th class="stats-header">${S.names[0]}</th>
+            <th class="stats-header">${S.names[1]}</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="stats-val">${wins[0]}</td>
+            <td class="stats-val">${wins[1]}</td>
+            <td class="stats-lbl">Games won</td>
+          </tr>
+          <tr>
+            <td class="stats-val">${avg[0]}</td>
+            <td class="stats-val">${avg[1]}</td>
+            <td class="stats-lbl">Average points per game</td>
+          </tr>
+          <tr>
+            <td class="stats-val">${totals[0]}</td>
+            <td class="stats-val">${totals[1]}</td>
+            <td class="stats-lbl">Total points</td>
+          </tr>
+        </tbody>
+      </table>
+      ${diffGraph}
+      ${gamesGraph}
+      ${marginHist}
+    `;
+  } else {
+    const currentKey = getContestKey(S.names);
+    const contestOptions = Object.keys(S.contests).map(k => {
+      const isSelected = !S.showNewContestInputs && currentKey === k;
+      return `<option value="${k}" ${isSelected ? 'selected' : ''}>${k.replace('|', ' vs ')}</option>`;
+    }).join('');
+    
+    const namesFilled = S.newNames[0].trim() && S.newNames[1].trim();
+
+    content = `
+      <div class="opt-section">
+        <div class="opt-label">CONTEST</div>
+        <select class="contest-select" onchange="handleContestChange(this.value)">
+          <option value="__NEW__" ${S.showNewContestInputs ? 'selected' : ''}>New ...</option>
+          ${contestOptions}
+        </select>
+        
+        ${S.showNewContestInputs ? `
+          <div style="margin-top:12px;border-top:0.5px solid var(--color-border-tertiary);padding-top:12px;">
+            <div class="opt-label" style="font-size:10px;margin-bottom:8px;">PLAYERS</div>
+            <div class="opt-row"><input id="new-name-0" type="text" value="${S.newNames[0]}" placeholder="Name" autocomplete="off" autocorrect="off" oninput="updateNewName(0, this.value)"/></div>
+            <div class="opt-row"><input id="new-name-1" type="text" value="${S.newNames[1]}" placeholder="Name" autocomplete="off" autocorrect="off" oninput="updateNewName(1, this.value)"/></div>
+            <div class="action-group" style="margin-top:10px;">
+              <button class="action-btn ${namesFilled?'highlight':''}" ${!namesFilled?'disabled':''} onclick="if(S.newNames[0].trim()&&S.newNames[1].trim()){S.showNewContestInputs=false;switchContest([S.newNames[0].trim(),S.newNames[1].trim()]);}else{setStatus('Enter both names');}">Add</button>
+              <button class="action-btn ${!namesFilled?'highlight':''}" onclick="cancelNewContest()">Cancel</button>
+            </div>
+          </div>
+        ` : ''}
+      </div>
+
+      <div class="opt-section">
+        <div class="opt-label">DETAILS</div>
+        <div class="opt-row">
+          <label>Top Score</label>
+          <input type="number" value="${S.target}" min="25" max="500" step="25" onchange="S.target=Math.max(25,parseInt(this.value)||50);save();" inputmode="numeric"/>
+        </div>
+        <div class="opt-row">
+          <label>Appearance</label>
+          <div class="radio-group">
+            <label><input type="radio" name="theme" value="light" ${S.theme==='light'?'checked':''} onchange="S.theme=this.value;applyTheme();save();"><span>Light</span></label>
+            <label><input type="radio" name="theme" value="dark" ${S.theme==='dark'?'checked':''} onchange="S.theme=this.value;applyTheme();save();"><span>Dark</span></label>
+            <label><input type="radio" name="theme" value="system" ${S.theme==='system'?'checked':''} onchange="S.theme=this.value;applyTheme();save();"><span>System</span></label>
+          </div>
+        </div>
+        <div class="opt-row" style="margin-top:10px;">
+          <label>Data</label>
+          <div class="action-group" style="flex:1;">
+            <button class="action-btn" onclick="copyExport()">Export</button>
+            <button class="action-btn" onclick="document.getElementById('import-area').style.display='block'">Import</button>
+            <button class="action-btn" onclick="clearScores()">Clear</button>
+          </div>
+        </div>
+        <div id="copy-status" class="copy-status"></div>
+        <div id="import-area" style="display:none;margin-top:8px;">
+          <textarea id="import-textarea" class="export-area" placeholder="Paste data here..."></textarea>
+          <button class="action-btn" style="margin-top:8px;" onclick="doImport()">Done</button>
+        </div>
+        <textarea id="export-textarea" class="export-area" style="display:none;" readonly onclick="this.select()"></textarea>
+      </div>
+    `;
+  }
+
+  const showStatusBarBottom = S.tab !== 0 && S.tab !== 1;
+  const statusHtml = !showStatusBarBottom ? '' : `<div class="status-bar" onclick="${statusClick}"><div class="status-text ${statusText?'':'empty'}">${statusText||' '}</div><button class="action-btn status-icon" style="width:auto;min-width:auto;padding:8px 12px;">${statusIcon}</button></div>`;
+  document.getElementById('app').innerHTML=`<div class="tab-content">${content}${statusHtml}</div><div class="tabbar">${tabbar}</div>`;
+  if(activeId) {
+    const el = document.getElementById(activeId);
+    if(el) {
+      el.focus();
+      if(el.tagName === 'INPUT' && el.type === 'text') {
+        const val = el.value;
+        el.value = '';
+        el.value = val;
+      }
+    }
+  }
+}
+
+load();
+document.addEventListener('keydown', event => {
+  if(event.metaKey || event.ctrlKey || event.altKey || event.shiftKey) return;
+  const target = event.target;
+  const isInput = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA';
+  if(isInput) return;
+  
+  if(event.key === 'g' || event.key === 'G') { event.preventDefault(); setTab(0); }
+  else if(event.key === 's' || event.key === 'S') { event.preventDefault(); setTab(1); }
+  else if(event.key === 'o' || event.key === 'O') { event.preventDefault(); setTab(2); }
+});
+document.addEventListener('click', event => {
+  if(!S.status) return;
+  if(Date.now() - LAST_STATUS_SET < 150) return;
+  if(event.target.closest('.status-bar')) return;
+  clearStatus();
+});
+render();
+</script>
+</body>
+</html>

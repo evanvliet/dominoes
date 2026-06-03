@@ -1,0 +1,30 @@
+n14
+
+"Click who got the highest double" message in status.
+
+message shold be in the status / help area with same 
+font coloring as other info stuff. And not include the other player ...
+
+and messazge should clear after click.
+
+After a Domoino click, should see
+"Suzette won that hand 3 2. And Eric starts this one."
+Or, if she does start:
+"Suzette won that hand 3 2 and starts this one." 
+Or, if no score:
+"No score that hand, Eric sarts this one.
+Or, if score is greater than 50:
+Domino button turns to "New"
+Message is:
+Suzette wins!
+After user clicks checkmark (? turns into check while text shows)
+Totals clear
+Button reverts to domino
+"Click who got the highest double" message in status.
+
+No green highlighting border.
+
+Help text should be same color font as other status text.
+
+Dominno icon needs to yet bigger.
+

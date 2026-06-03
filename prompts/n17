@@ -1,0 +1,24 @@
+n17
+
+need bigger font in status update area and player name
+lose initial message area with white background and border decoration
+need bigger domino icon
+domino messages:
+    peter won an 8 4 hand. Eric goes first.
+    A 5 5 tied hand. Peter goes first
+    Eric won a 3 4 hand and goes first
+    Peter won. click domino tile to start new game.
+
+initial message should be:
+    Click user with highest double to start game.
+    user boxes should have regular (not dashed) border
+   
+
+game page has irrelevant status bar
+need list of previous moves - delete any
+need list of previous games
+status bar help gives info
+
+help text should be:
+enter number and click user to record score for that user
+

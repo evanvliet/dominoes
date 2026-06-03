@@ -1,0 +1,33 @@
+
+n25
+
+App:
+Only start on contest if empty
+Else start on Score tab
+All status messages: reduce font size and make not bold text,
+like Player names in Player tiles on Score tab
+
+Score:
+when showing history in Info:
+remove HISTORY label, just show:
+x 23 Eric 
+x  4 Peter
+x  2 Peter
+x 13 Eric           LAST SCORES
+note right justification of LAST SCOREWS label at bottom of box.
+Player goes first logic is off. After P1 has highest double, message
+should be: "P1 had the high double, P2 will start the next hand."
+After the subsequent dominoes, message will be:
+Px won that hand 4 2, P2 starts.
+P2 alternating.
+Default action of clicking ? is to show "P2 starts this hand.".
+Common for us to wonder who starts this hand? after a domino.
+
+Options:
+DATA buttons should be same size, Clear is still taller.
+Clear does not remove pair form CONTEST drop down, it should.
+If successive Clears remove all contests, dislay initial add contest UI
+Should not show "Click Score tab to start game" message
+until Contest pair resolved.
+Should say instead "Add Player to create contest."
+disable Score button until contest picked.

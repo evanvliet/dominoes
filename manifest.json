@@ -1,0 +1,16 @@
+{
+  "name": "Dominoes Scorer",
+  "short_name": "Dominoes",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "start_url": "./dominoes.html",
+  "icons": [
+    {
+      "src": "domino.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
