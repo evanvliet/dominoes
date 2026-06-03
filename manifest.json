@@ -4,7 +4,7 @@
   "display": "standalone",
   "background_color": "#000000",
   "theme_color": "#000000",
-  "start_url": "./dominoes.html",
+  "start_url": "./index.html",
   "icons": [
     {
       "src": "domino.svg",
