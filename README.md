@@ -44,7 +44,7 @@ View player trends over time:
 
 ## Why I Built This
 
-Our family has played dominoes for years. We started by keeping scores on scraps of paper, then notebooks, then spreadsheets.
+Long time friend Peter and I have played dominoes for years. We kept scores on scraps of paper, and graphs on sheets of graphpaer taped together.
 
 Eventually I wanted something that would:
 
@@ -60,15 +60,15 @@ This project is the result.
 
 ### Score Entry
 
-*(Add screenshot here)*
+<img src="screenshots/score.png" alt="Scores tab" width="300">
 
 ### Statistics Dashboard
 
-*(Add screenshot here)*
+<img src="screenshots/stats.png" alt="Scores tab" width="300">
 
-### Historical Charts
+### Options
 
-*(Add screenshot here)*
+<img src="screenshots/options.png" alt="Scores tab" width="300">
 
 ## Getting Started
 
@@ -76,15 +76,15 @@ This project is the result.
 
 Visit:
 
-http://volvliet.us/dom
+http://evanvliet.github.io/dominoes
 
 ### Option 2: Run Locally
 
 Clone the repository:
 
 ```bash
-git clone https://github.com/evanvliet/dom.git
-cd dom
+git clone https://github.com/evanvliet/dominoes.git
+cd dominoes
 ```
 
 Serve the files using any web server:
