@@ -54,21 +54,36 @@ Eventually I wanted something that would:
 * Provide interesting charts and trends
 * Work from any browser
 
-This project is the result.
+The arrival of all these coding ai tools was too tempting, this is the result.
 
 ## Screenshots
 
 ### Score Entry
 
+This is the "main" screen, where all the scoring takes place.
+
 <img src="screenshots/score.png" alt="Scores tab" width="300">
+
+Note the help screen at the bottom, which typically shows a list of recent
+scores. The red 'x' deletes that score, as a simple edit feature.
 
 ### Statistics Dashboard
 
+This privdes a quick summary and some charts and a hiostogram.
+
 <img src="screenshots/stats.png" alt="Scores tab" width="300">
+
+More detailed analysis would leverage the "Export" function on the
+options tab. Load the dates and  numbers into a database to
+calculate precise numbers, longest win streak, etc.
 
 ### Options
 
+Scores are recorded separately for each contest. When first opened, this page appears to get names of the players.
+
 <img src="screenshots/options.png" alt="Scores tab" width="300">
+
+You can also set the top score, and dark mode.
 
 ## Getting Started
 
