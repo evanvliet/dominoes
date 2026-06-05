@@ -60,7 +60,12 @@ The arrival of all these coding ai tools was too tempting, this is the result.
 
 ### Score Entry
 
-This is the "main" screen, where all the scoring takes place.
+This is the "main" screen, where all the scoring takes place. Enter a
+number of points and click on the player tile to credit those points
+to her. When a player "goes out" or "dominoes", click on the domino tile,
+below the 9, and the status area will report the totals for that hand and who plays next. A player wins by having the most points
+after a domino, and a total more than the top score set on the options tab, by default 50. The status bar will report the winner and wait for
+the domino tile to clicked again to start the next game. 
 
 <img src="screenshots/score.png" alt="Scores tab" width="300">
 
@@ -102,7 +107,14 @@ git clone https://github.com/evanvliet/dominoes.git
 cd dominoes
 ```
 
-Serve the files using any web server:
+THen just open the file, *e.g.*
+
+```text
+file:///Users/eric/dev/dominoes/index.html
+```
+in your browser.
+
+Or serve the files using any web server:
 
 ```bash
 python3 -m http.server 8000
@@ -113,6 +125,9 @@ Then open:
 ```text
 http://localhost:8000
 ```
+
+This is a web app, most browsers support installing it as an app, 
+which creates an icon and full screen display on your phone.
 
 ## Data Storage
 
