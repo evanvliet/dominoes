@@ -1,145 +1,116 @@
 # Dominoes Scorekeeper
 
-A lightweight web application for recording dominoes games, tracking player performance, and visualizing long-term statistics.
-
-Built for family game nights, friendly rivalries, and anyone who wants more than a pencil-and-paper score sheet.
+A lightweight browser-based scorekeeper for dominoes games. Record games quickly, compare player performance over time, and explore trends with simple, mobile-friendly analytics.
 
 ## Features
 
 ### Game Tracking
 
 * Record completed dominoes games in seconds
-* Track multiple players
-* Automatically identify game winners
-* Maintain a permanent game history
+* Track multiple players and contest sessions
+* Automatically identify winners and final standings
+* Keep a permanent history in your browser
 
 ### Lifetime Statistics
 
-Track performance across hundreds of games:
+Track long-term performance across many games:
 
 * Games played
 * Wins
 * Win percentage
 * Total points scored
 * Average score
-* Highest game score
-* Historical rankings
+* Highest score
+* Ranking history
 
 ### Visual Analytics
 
-View player trends over time:
+View player trends at a glance:
 
 * Cumulative points history
-* Total games played
-* Win distributions
+* Games played over time
+* Win distribution
 * Margin-of-victory histograms
-* Long-term performance comparisons
+* Performance comparisons
 
 ### Mobile Friendly
 
 * Works on phones, tablets, and desktops
-* No account required
-* No server backend required
-* Fast, simple interface designed for use during actual game play
+* No login required
+* No backend server required
+* Designed for use during actual game play
 
-## Why I Built This
+## Why This Exists
 
 Long time friend Peter and I have played dominoes for years. We kept scores on scraps of paper, and graphs on sheets of graphpaer taped together.
 
-Eventually I wanted something that would:
+We would scheme on an alternative to pencil-and-paper scorekeeping: a fast, browser-based alternative that preserves game history and reveals who is really winning over time. It would:
 
 * Preserve game history permanently
 * Track lifetime statistics automatically
-* Show who was really winning over time
-* Provide interesting charts and trends
-* Work from any browser
+* Surface winning trends and rankings
+* Provide useful charts and insights
+* Run in any modern browser
 
-The arrival of all these coding ai tools was too tempting, this is the result.
+The arrival of AI coding tools was too tempting, this is the result.
 
 ## Screenshots
 
 ### Score Entry
 
-This is the "main" screen, where all the scoring takes place. Enter a
-number of points and click on the player tile to credit those points
-to her. When a player "goes out" or "dominoes", click on the domino tile,
-below the 9, and the status area will report the totals for that hand and who plays next. A player wins by having the most points
-after a domino, and a total more than the top score set on the options tab, by default 50. The status bar will report the winner and wait for
-the domino tile to clicked again to start the next game. 
+The main screen is where scoring happens. Enter points and tap a player tile to assign points to that player.
 
-<img src="screenshots/score.png" alt="Scores tab" width="300">
+The player with the highest double starts the first hand. Tap that player to begin a new game, then record each hand by selecting scores.
 
-Note the help screen at the bottom, which typically shows a list of recent
-scores. The red 'x' deletes that score, as a simple edit feature.
+When a player plays all their tiles, tap the domino tile below the 9 to mark the hand complete. The status area will summarize the hand and indicate who plays next.
+
+After a domino play, the player with the most points above the top score is declared the winner. The status area then waits for another domino tile tap to begin the next game.
+
+<img src="screenshots/score.png" alt="Score entry screen" width="300">
+
+The help area shows recent scores, and the red X icon deletes an entry for quick edits.
 
 ### Statistics Dashboard
 
-This privdes a quick summary and some charts and a hiostogram.
+The statistics screen provides quick summaries, charts, and distributions.
 
-<img src="screenshots/stats.png" alt="Scores tab" width="300">
+<img src="screenshots/stats.png" alt="Statistics dashboard" width="300">
 
-More detailed analysis would leverage the "Export" function on the
-options tab. Load the dates and  numbers into a database to
-calculate precise numbers, longest win streak, etc.
+Use the export option to analyze raw game data in another tool, calculate streaks, or build custom reports.
 
 ### Options
 
-Scores are recorded separately for each contest. When first opened, this page appears to get names of the players.
+The options screen lets you define player names, set the top score, and toggle dark mode.
 
-<img src="screenshots/options.png" alt="Scores tab" width="300">
-
-You can also set the top score, and dark mode.
+<img src="screenshots/options.png" alt="Options screen" width="300">
 
 ## Getting Started
 
-### Option 1: Use the Hosted Version
-
 Visit:
 
-http://evanvliet.github.io/dominoes
+https://evanvliet.github.io/dominoes
 
-### Option 2: Run Locally
+You will see the options tab above.  Enter the player names
+for your first contest and begin scoring on the scores tab.
 
-Clone the repository:
-
-```bash
-git clone https://github.com/evanvliet/dominoes.git
-cd dominoes
-```
-
-THen just open the file, *e.g.*
-
-```text
-file:///Users/eric/dev/dominoes/index.html
-```
-in your browser.
-
-Or serve the files using any web server:
-
-```bash
-python3 -m http.server 8000
-```
-
-Then open:
-
-```text
-http://localhost:8000
-```
-
-This is a web app, most browsers support installing it as an app, 
-which creates an icon and full screen display on your phone.
+Most modern browsers can install the app to your home screen
+for a more native experience.
+* Android (Chrome): Go to the site, tap the three dots beside
+the address bar, and select Add to Home screen.
+* iOS (Safari): Go to the website, tap the Share button at
+the bottom of the screen, and select Add to Home Screen.
 
 ## Data Storage
 
-Game history is stored locally in your browser.
+Game history is stored locally in your browser using local storage.
 
-This means:
+That means:
 
 * No account required
 * No cloud service required
 * Your data stays under your control
 
-Be sure to export or back up your data periodically if preserving long-term history is important.
+Because data is stored locally, be sure to export or back up your history if you want to preserve it.
 
 ## Statistics Tracked
 
@@ -155,7 +126,7 @@ Be sure to export or back up your data periodically if preserving long-term hist
 
 ## Future Enhancements
 
-Ideas under consideration:
+Potential improvements:
 
 * Data import/export
 * Cloud synchronization
@@ -169,6 +140,8 @@ Ideas under consideration:
 ## Contributing
 
 Bug reports, feature requests, and pull requests are welcome.
+
+Report issues at: https://github.com/evanvliet/dominoes/issues
 
 ## License
 
