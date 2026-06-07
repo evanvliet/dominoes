@@ -52,7 +52,7 @@ We would scheme on an alternative to pencil-and-paper scorekeeping: a fast, brow
 * Provide useful charts and insights
 * Run in any modern browser
 
-The arrival of AI coding tools was too tempting, this is the result.
+The arrival of AI coding tools was too tempting, this is the result.  See [prompts](prompts.md) for most of input.
 
 ## Screenshots
 

@@ -1,5 +1,0 @@
-n34
-
-Make default Name in nonbold font, like Player 1 label. User supplied name should be bold.
-Create button should be disabled until both Names are filled in.
-Swap Create and Cancel buttons and make same height.

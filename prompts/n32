@@ -1,6 +1,0 @@
-n32
-
-Score:
-tie score after domino now gives win to one of the players.
-should be "Tie game, play another hand." and play contninues until
-a domino with a clear winner.

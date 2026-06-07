@@ -1,7 +1,0 @@
-n42
-
-OPTIONS:
-Details:
-- move data down, so it's score, appearance, data
-- make export, import, clear buttons same size (height, width) as Appearance ones
-- fix Import, not functional, just displays Add names msg
