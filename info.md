@@ -15,9 +15,9 @@ The options tab includes Data buttons for Export, Import, and Clear.
 * *Export* pastes current contest as plain ascii into the clipboard: 
 
     ```text
-    Peter | Eric
-    5/31 09:33 50 60
-    5/31 09:42 51 35
+    Host | Guest 
+    5/31 09:33 40 50
+    5/31 09:32 51 45
     ```
 
     First player names, followed by date, time and player scores for each completed game. You have to paste the clipboard data into a mail message or web document to save it.
