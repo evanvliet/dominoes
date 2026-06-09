@@ -1,13 +1,30 @@
-# Dominoes Scorekeeper Info
+## Dominoes Scorekeeper Features
 
-Note browsers can install the app to your home screen
+### Web App
+
+Browsers can install the app to your home screen
 for a more native experience:
 * Android (Chrome): Go to the site, tap the three dots beside
 the address bar, and select Add to Home screen.
 * iOS (Safari): Go to the website, tap the Share button at
 the bottom of the screen, and select Add to Home Screen.
 
-## Features
+### Data
+
+The options tab includes Data buttons for Export, Import, and Clear.
+* *Export* pastes current contest as plain ascii into the clipboard: 
+
+    ```text
+    Peter | Eric
+    5/31 09:33 50 60
+    5/31 09:42 51 35
+    ```
+
+    First player names, followed by date, time and player scores for each completed game. You have to paste the clipboard data into a mail message or web document to save it.
+* *Import* opens an edit control; paste data in above format to add scores. It
+ appends scores to the contest per the first line. If no such contest exists, it creates
+ a new one. For testing, you can import 75 scores from [test75](test75).
+* *Clear* deletes the contest, both scores and players, from the data.
 
 ### Game Tracking
 
