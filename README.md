@@ -10,7 +10,7 @@ https://evanvliet.github.io/dominoes
 
 You will see the main scoring tab, note status advising to click on highest double. This is for play where who goes first alternates on each hand, the one with the highest double starts.
 
-<img src="screenshots/first_screen.png" alt="First run screen" width="300">|
+<img src="screenshots/first_screen.png" alt="First run screen" width="300">
 
 After selecting the starting player, add scores by entering a number and clicking on the scorer.
 After some play, the status lists recent scores.
