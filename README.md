@@ -2,6 +2,44 @@
 
 A lightweight browser-based scorekeeper for dominoes games. Record games quickly, compare player performance over time, and explore trends with simple, mobile-friendly analytics.
 
+## Getting Started
+
+Visit:
+
+https://evanvliet.github.io/dominoes
+
+You will see the main scoring tab:
+
+To start a game, click on
+the player with the highest double. Then enter numbers and credit
+a score by clicking the player tile.
+
+<first_screen>
+
+After entering some scores, note the status area lists some recent ones. Click the red
+**X** to delete that score, and possibly replace by adding another score.
+
+<after_scores>
+
+When a player *goes out* (plays all their tiles), tap the domino tile below the 9 to mark the hand complete. The status area shows hand totals and who plays next.
+
+After a domino play, the player with the most points above the top score wins.
+The status area shows the winner. Tap the domino tile tap to clear and begin the next game.
+
+There are also Stats and Options tabs. Stats has runnint totals averages and charts. Options
+is for creating separate contests labeled by player names. You can also configure top score, appearance, and import/export of data. Screenshots:
+
+<stats> <options>
+
+Also note that most modern browsers can install the app to your home screen
+for a more native experience.[^webapp]
+
+[:webapp]
+* Android (Chrome): Go to the site, tap the three dots beside
+the address bar, and select Add to Home screen.
+* iOS (Safari): Go to the website, tap the Share button at
+the bottom of the screen, and select Add to Home Screen.
+
 ## Features
 
 ### Game Tracking
@@ -52,53 +90,7 @@ We would scheme on an alternative to pencil-and-paper scorekeeping: a fast, brow
 * Provide useful charts and insights
 * Run in any modern browser
 
-The arrival of AI coding tools was too tempting, this is the result.  See [prompts](prompts.md) for most of input.
-
-## Screenshots
-
-### Score Entry
-
-The main screen is where scoring happens. Enter points and tap a player tile to assign points to that player.
-
-The player with the highest double starts the first hand. Tap that player to begin a new game, then record each hand by selecting scores.
-
-When a player plays all their tiles, tap the domino tile below the 9 to mark the hand complete. The status area will summarize the hand and indicate who plays next.
-
-After a domino play, the player with the most points above the top score is declared the winner. The status area then waits for another domino tile tap to begin the next game.
-
-<img src="screenshots/score.png" alt="Score entry screen" width="300">
-
-The help area shows recent scores, and the red X icon deletes an entry for quick edits.
-
-### Statistics Dashboard
-
-The statistics screen provides quick summaries, charts, and distributions.
-
-<img src="screenshots/stats.png" alt="Statistics dashboard" width="300">
-
-Use the export option to analyze raw game data in another tool, calculate streaks, or build custom reports.
-
-### Options
-
-The options screen lets you define player names, set the top score, and toggle dark mode.
-
-<img src="screenshots/options.png" alt="Options screen" width="300">
-
-## Getting Started
-
-Visit:
-
-https://evanvliet.github.io/dominoes
-
-You will see the options tab above.  Enter the player names
-for your first contest and begin scoring on the scores tab.
-
-Most modern browsers can install the app to your home screen
-for a more native experience.
-* Android (Chrome): Go to the site, tap the three dots beside
-the address bar, and select Add to Home screen.
-* iOS (Safari): Go to the website, tap the Share button at
-the bottom of the screen, and select Add to Home Screen.
+The set of AI coding tools was too tempting, this is the result.  See [prompts](prompts.md) for most of input.
 
 ## Data Storage
 

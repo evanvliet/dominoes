@@ -1,1 +1,1 @@
-{"LICENSE": "MIT", "README.md": "readme", "domino.svg": "icon", "history": "pictures of old scores", "index.html": "scoring utility", "manifest.json": "for web app", "prompts": "ai prompts to build this", "sample": "data for import and testing", "screenshots": "for readme"}
+{"index.html": "scoring utility", "screenshots": "for readme", "manifest.json": "for web app", "LICENSE": "MIT", "domino.svg": "icon", "history": "pictures of old scores", "README.md": "readme", "sample": "data for import and testing", "prompts.md": "prompts used during construction"}

@@ -9,6 +9,7 @@
 <link rel="icon" type="image/svg+xml" href="domino.svg">
 <link rel="apple-touch-icon" href="domino.svg">
 <link rel="manifest" href="manifest.json">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;">
 <title>Dominoes Scorer</title>
 
 <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
@@ -64,7 +65,7 @@ html,body{height:100%;background:var(--color-background-tertiary);font-family:va
 .key:active{background:var(--color-border-tertiary);transform:scale(0.95);}
 .key.del{font-size:18px;color:var(--color-text-secondary);}
 .key.disabled{background:var(--color-background-secondary);color:var(--color-text-tertiary);cursor:default;}
-.status-bar{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:12px 14px;margin:10px 0;min-height:116px;}
+.status-bar{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:12px 14px;margin:10px 0;min-height:148px;}
 .status-text{font-size:17px;color:var(--color-text-secondary);line-height:1.4;flex:1;font-weight:400;}
 .status-text.empty{color:transparent;}
 .domino-icon{width:62px;height:44px;transform:rotate(90deg);display:block;}
@@ -102,8 +103,8 @@ html,body{height:100%;background:var(--color-background-tertiary);font-family:va
 .pts-input{width:60px;font-size:14px;font-weight:500;color:#1D9E75;border:1.5px solid #1D9E75;border-radius:5px;padding:3px 6px;background:var(--color-background-primary);color:#1D9E75;outline:none;font-family:inherit;}
 
 /* mini history */
-.hist-mini{flex:1;overflow:hidden;height:92px;display:flex;flex-direction:column;justify-content:flex-end;}
-.hist-mini-row{display:flex;align-items:center;gap:7px;font-size:14px;color:var(--color-text-secondary);margin-bottom:2px;animation:slideUp 0.3s ease-out;}
+.hist-mini{flex:1;overflow:hidden;height:128px;display:flex;flex-direction:column;justify-content:flex-end;}
+.hist-mini-row{display:flex;align-items:center;gap:7px;font-size:14px;color:var(--color-text-secondary);margin-bottom:4px;animation:slideUp 0.3s ease-out;}
 .hist-mini-x{color:#D85A30;font-size:12px;cursor:pointer;padding:3px 5px;}
 .hist-mini-pts{font-weight:600;color:var(--color-text-primary);min-width:20px;text-align:right;}
 .hist-mini-name{flex:1;}
@@ -172,6 +173,18 @@ textarea.export-area{width:100%;height:145px;font-size:12px;font-family:monospac
 <body>
 <div class="app" id="app"></div>
 <script>
+function escapeHTML(str) {
+  if (!str) return '';
+  return String(str).replace(/[&<>"']/g, function(m) {
+    return {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#039;'
+    }[m];
+  });
+}
 const SK='dom_v9';
 const S={
   names:['',''],
@@ -213,8 +226,25 @@ function load(){
   try{
     const r=localStorage.getItem(SK);
     if(!r) {
-      S.tab = 2;
-      S.showNewContestInputs = true;
+      S.names=['Host','Guest'];
+      S.contests={};
+      S.scores=[0,0];
+      S.handScores=[0,0];
+      S.records=[];
+      S.pastGames=[];
+      S.target=50;
+      S.gameOver=false;
+      S.phase='start';
+      S.firstPlayer=-1;
+      S.handFirstPlayer=-1;
+      S.handNum=0;
+      S.lastAdded=['',''];
+      S.pendingWin=false;
+      S.highestDoublePlayer=-1;
+      S.tab=0;
+      S.showNewContestInputs=false;
+      updateContest();
+      save();
       return;
     }
     const d=JSON.parse(r);
@@ -406,7 +436,7 @@ function tapPlayer(i){
       if(S.scores[i]>=S.target)S.pendingWin=true;
     }
     S.display='';S.phase='play';S.helpContext='play';
-    setStatus(`${S.names[i]} had the high double, ${S.names[1-i]} will start the next hand.`, 5000);
+    setStatus(`${escapeHTML(S.names[i])} had the high double, ${escapeHTML(S.names[1-i])} will start the next hand.`, 5000);
     save();render();return;
   }
   if(pts<=0){
@@ -455,7 +485,7 @@ function callDomino(){
         winnerIdx: wi
       });
       S.gameOver=true;S.phase='end';
-      setStatus(`${S.names[wi]} won. Click domino tile to start new game.`, 30000);
+      setStatus(`${escapeHTML(S.names[wi])} won. Click domino tile to start new game.`, 30000);
       save();render();return;
     }
   }
@@ -470,7 +500,7 @@ function callDomino(){
   S.helpContext='play';
 
   const nextStarterIdx = S.handFirstPlayer;
-  const nextStarterName = S.names[nextStarterIdx];
+  const nextStarterName = escapeHTML(S.names[nextStarterIdx]);
   
   let message;
   if (!S.pendingWin && gameEnds && S.scores[0] === S.scores[1]) {
@@ -479,7 +509,7 @@ function callDomino(){
     message = `A ${handTotals[0]} ${handTotals[1]} tied hand. ${nextStarterName} starts.`;
   } else {
     const winnerIdx = handTotals[0] > handTotals[1] ? 0 : 1;
-    const winnerName = S.names[winnerIdx];
+    const winnerName = escapeHTML(S.names[winnerIdx]);
     const article = maxScore === 8 ? 'an' : 'a';
     message = `${winnerName} won that hand ${maxScore} ${minScore}, ${nextStarterName} starts.`;
   }
@@ -773,7 +803,7 @@ function render(){
   
   let defaultStartStatus = '';
   if (S.phase==='start' && !S.status) {
-    if (S.tab === 0) defaultStartStatus = 'Click user with highest double to start game.';
+    if (S.tab === 0) defaultStartStatus = `Click ${escapeHTML(S.names[0]) || 'Player 1'} or ${escapeHTML(S.names[1]) || 'Player 2'} with the highest double to start the game.`;
     else if (S.tab === 2) {
       if (S.showNewContestInputs && !S.hideNewContestHelp) defaultStartStatus = 'Add names to create a new contest.';
       else defaultStartStatus = hasContests ? 'Click Score tab to start a game.' : 'Add Player to create contest.';
@@ -791,7 +821,7 @@ function render(){
     const displayClass=S.display?'display-bar':'display-bar dim';
     const cards=[0,1].map(i=>`
       <div class="scard ${isStart?'pending-setup':''}" onclick="tapPlayer(${i})">
-        <div class="pname">${S.names[i]}</div>
+        <div class="pname">${escapeHTML(S.names[i])}</div>
         <div class="score-total">${S.scores[i]}</div>
       </div>`).join('');
     const dominoLabel=domTile();
@@ -799,7 +829,7 @@ function render(){
     const scoreRecs=S.records.filter(r=>r.type==='score').slice(-4);
     const miniRows=scoreRecs.map(rec=>{
       const realIdx = S.records.indexOf(rec);
-      return `<div class="hist-mini-row"><span class="hist-mini-x" onclick="event.stopPropagation();deleteRecord(${realIdx})">&#10005;</span><span class="hist-mini-pts">${rec.pts}</span><span class="hist-mini-name">${S.names[rec.who]}</span></div>`;
+      return `<div class="hist-mini-row"><span class="hist-mini-x" onclick="event.stopPropagation();deleteRecord(${realIdx})">&#10005;</span><span class="hist-mini-pts">${rec.pts}</span><span class="hist-mini-name">${escapeHTML(S.names[rec.who])}</span></div>`;
     }).join('');
 
     const showHistory = !S.status && miniRows;
@@ -850,7 +880,7 @@ function render(){
       const points = diffs.map((d, i) => `${(i / (diffs.length - 1)) * w},${h/2 - (d / maxDiff) * (h/2)}`).join(' ');
       diffGraph = `
         <div class="chart-container">
-          <div class="chart-title">Cumulative Point Lead (${S.names[0]} vs ${S.names[1]})</div>
+          <div class="chart-title">Cumulative Point Lead (${escapeHTML(S.names[0])} vs ${escapeHTML(S.names[1])})</div>
           <svg viewBox="0 0 ${w} ${h}" width="100%" height="${h}" style="overflow:visible">
             <line x1="0" y1="${h/2}" x2="${w}" y2="${h/2}" stroke="var(--color-border-tertiary)" stroke-width="1" />
             <polyline fill="none" stroke="#1D9E75" stroke-width="2" points="${points}" />
@@ -872,7 +902,7 @@ function render(){
       const points = winDiffs.map((d, i) => `${(i / (winDiffs.length - 1)) * w},${h/2 - (d / maxWinDiff) * (h/2)}`).join(' ');
       gamesGraph = `
         <div class="chart-container">
-          <div class="chart-title">Cumulative Games Won (${S.names[0]} vs ${S.names[1]})</div>
+          <div class="chart-title">Cumulative Games Won (${escapeHTML(S.names[0])} vs ${escapeHTML(S.names[1])})</div>
           <svg viewBox="0 0 ${w} ${h}" width="100%" height="${h}" style="overflow:visible">
             <line x1="0" y1="${h/2}" x2="${w}" y2="${h/2}" stroke="var(--color-border-tertiary)" stroke-width="1" />
             <polyline fill="none" stroke="#1D9E75" stroke-width="2" points="${points}" />
@@ -907,8 +937,8 @@ function render(){
       <table class="stats-table">
         <thead>
           <tr>
-            <th class="stats-header">${S.names[0]}</th>
-            <th class="stats-header">${S.names[1]}</th>
+            <th class="stats-header">${escapeHTML(S.names[0])}</th>
+            <th class="stats-header">${escapeHTML(S.names[1])}</th>
             <th></th>
           </tr>
         </thead>
@@ -938,7 +968,8 @@ function render(){
     const currentKey = getContestKey(S.names);
     const contestOptions = Object.keys(S.contests).map(k => {
       const isSelected = !S.showNewContestInputs && currentKey === k;
-      return `<option value="${k}" ${isSelected ? 'selected' : ''}>${k.replace('|', ' vs ')}</option>`;
+      const displayKey = k.split('|').map(escapeHTML).join(' vs ');
+      return `<option value="${escapeHTML(k)}" ${isSelected ? 'selected' : ''}>${displayKey}</option>`;
     }).join('');
     
     const namesFilled = S.newNames[0].trim() && S.newNames[1].trim();
@@ -954,8 +985,8 @@ function render(){
         ${S.showNewContestInputs ? `
           <div style="margin-top:12px;border-top:0.5px solid var(--color-border-tertiary);padding-top:12px;">
             <div class="opt-label" style="font-size:10px;margin-bottom:8px;">PLAYERS</div>
-            <div class="opt-row"><input id="new-name-0" type="text" value="${S.newNames[0]}" placeholder="Name" autocomplete="off" autocorrect="off" oninput="updateNewName(0, this.value)"/></div>
-            <div class="opt-row"><input id="new-name-1" type="text" value="${S.newNames[1]}" placeholder="Name" autocomplete="off" autocorrect="off" oninput="updateNewName(1, this.value)"/></div>
+            <div class="opt-row"><input id="new-name-0" type="text" value="${escapeHTML(S.newNames[0])}" placeholder="Name" autocomplete="off" autocorrect="off" oninput="updateNewName(0, this.value)"/></div>
+            <div class="opt-row"><input id="new-name-1" type="text" value="${escapeHTML(S.newNames[1])}" placeholder="Name" autocomplete="off" autocorrect="off" oninput="updateNewName(1, this.value)"/></div>
             <div class="action-group" style="margin-top:10px;">
               <button class="action-btn ${namesFilled?'highlight':''}" ${!namesFilled?'disabled':''} onclick="if(S.newNames[0].trim()&&S.newNames[1].trim()){S.showNewContestInputs=false;switchContest([S.newNames[0].trim(),S.newNames[1].trim()]);}else{setStatus('Enter both names');}">Add</button>
               <button class="action-btn ${!namesFilled?'highlight':''}" onclick="cancelNewContest()">Cancel</button>
