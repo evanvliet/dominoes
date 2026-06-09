@@ -35,4 +35,4 @@ Use Options to set up separate contests labeled by player names. Click on the CO
 | :--- | :--- |
 | <img src="screenshots/stats.png" alt="Statistics tab" width="300"> | <img src="screenshots/options.png" alt="Options tab" width="300"> |
 
-For more detail, background info, usage sugesstions, see [info](info.md).
+For more detail, background info, usage suggestions, see [info](info.md).

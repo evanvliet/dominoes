@@ -64,7 +64,7 @@ View player trends at a glance:
 
 ## Why This Exists
 
-Long time friend Peter and I have played dominoes for years. We kept scores on scraps of paper, and graphs on sheets of graphpaer taped together.
+Long time friend Peter and I have played dominoes for years. We kept scores on scraps of paper, and graphs on sheets of graph paper taped together.
 
 We would scheme on an alternative to pencil-and-paper scorekeeping: a fast, browser-based alternative that preserves game history and reveals who is really winning over time. It would:
 
@@ -74,7 +74,13 @@ We would scheme on an alternative to pencil-and-paper scorekeeping: a fast, brow
 * Provide useful charts and insights
 * Run in any modern browser
 
-The set of AI coding tools was too tempting, this is the result.  See [prompts](prompts.md) for most of input.
+The arrival of AI coding tools was too tempting, and this is the result. See [prompts](prompts.md) for the initial development logs.
+
+## Security & Privacy
+
+* **Local Only:** Your data never leaves your device. There is no backend server or cloud storage by default.
+* **Content Security:** The app implements a strict Content Security Policy (CSP) to prevent unauthorized script execution.
+* **XSS Protection:** All user-provided data (like player names) is sanitized before rendering to ensure a safe experience.
 
 ## Data Storage
 
@@ -104,14 +110,12 @@ Because data is stored locally, be sure to export or back up your history if you
 
 Potential improvements:
 
-* Data import/export
-* Cloud synchronization
+* Cloud synchronization (optional)
 * Tournament mode
 * Team play support
 * Additional chart types
 * Player profiles
-* Progressive Web App (PWA) support
-* Installable mobile app experience
+* Advanced offline support (Service Workers)
 
 ## Contributing
 
