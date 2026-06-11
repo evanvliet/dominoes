@@ -66,11 +66,10 @@ View player trends at a glance:
 
 Long time friend Peter and I have played dominoes for years. We kept scores on scraps of paper, and graphs on sheets of graph paper taped together. Here's a gallery of those:
 
-<img src="history/games.jpg" alt="Games" width="250">
-<img src="history/hist.jpg" alt="Games" width="250">. 
-
-<img src="history/points.jpg" alt="Games" width="250">
-<img src="history/scores.jpg" alt="Games" width="250">
+| Games / Points | Histogram / Scores |
+|-|-|
+|<img src="history/games.jpg" alt="Games" width="250">|<img src="history/hist.jpg" alt="Games" width="250">. |
+|<img src="history/scores.jpg" alt="Games" width="250">|<img src="history/points.jpg" alt="Games" width="250">|
 
 We would scheme on an alternative to pencil-and-paper scorekeeping: a fast, browser-based alternative that preserves game history and reveals who is really winning over time. It would:
 
