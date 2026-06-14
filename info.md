@@ -1,31 +1,5 @@
 ## Dominoes Scorekeeper Features
 
-### Web App
-
-Browsers can install the app to your home screen
-for a more native experience:
-* Android (Chrome): Go to the site, tap the three dots beside
-the address bar, and select Add to Home screen.
-* iOS (Safari): Go to the website, tap the Share button at
-the bottom of the screen, and select Add to Home Screen.
-
-### Data
-
-The options tab includes Data buttons for Export, Import, and Clear.
-* *Export* pastes current contest as plain ascii into the clipboard: 
-
-    ```text
-    Host | Guest 
-    5/31 09:33 40 50
-    5/31 09:32 51 45
-    ```
-
-    First player names, followed by date, time and player scores for each completed game. You have to paste the clipboard data into a mail message or web document to save it.
-* *Import* opens an edit control; paste data in above format to add scores. It
- appends scores to the contest per the first line. If no such contest exists, it creates
- a new one. For testing, you can import 75 scores from [test75](test75).
-* *Clear* deletes the contest, both scores and players, from the data.
-
 ### Game Tracking
 
 * Record completed dominoes games in seconds
@@ -61,25 +35,6 @@ View player trends at a glance:
 * No login required
 * No backend server required
 * Designed for use during actual game play
-
-## Why This Exists
-
-Long time friend Peter and I have played dominoes for years. We kept scores on scraps of paper, and graphs on sheets of graph paper taped together. Here's a gallery of those:
-
-| Games / Points | Histogram / Scores |
-|-|-|
-|<img src="history/games.jpg" alt="Games" width="250">|<img src="history/hist.jpg" alt="Games" width="250">. |
-|<img src="history/scores.jpg" alt="Games" width="250">|<img src="history/points.jpg" alt="Games" width="250">|
-
-We would scheme on an alternative to pencil-and-paper scorekeeping: a fast, browser-based alternative that preserves game history and reveals who is really winning over time. It would:
-
-* Preserve game history permanently
-* Track lifetime statistics automatically
-* Surface winning trends and rankings
-* Provide useful charts and insights
-* Run in any modern browser
-
-The arrival of AI coding tools was too tempting, and this is the result. See [prompts](prompts.md) for the initial development logs.
 
 ## Security & Privacy
 
