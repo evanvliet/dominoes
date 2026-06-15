@@ -1,0 +1,4 @@
+# check test75 
+marked < prompts.md > prompts.html
+marked < info.md > info.html
+marked < README.md | sed 's/.md/.html/' > README.html

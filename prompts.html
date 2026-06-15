@@ -1,0 +1,929 @@
+<h3>Prompts used building the scoring app</h3>
+<p>Not all prompts are recorded, but a good percentage. Just for the curious.</p>
+<h4>n01</h4>
+<p>multiple tabs, so main one of just entering score to user / domino
+enter user names, options on other tab
+display score with hashtags as old one
+display next to go
+have multiple undo
+save data on cloud</p>
+<p>on score tab, just have:
+numpad for entering digits
+buttons for two players labelled with name
+move hash tags to history page
+add button to signify score is a domino, and toggle first player</p>
+<h4>n02</h4>
+<p>data record is:
+who
+points
+time</p>
+<p>add a record for each score
+display running totals on first page
+also totals for current hand (points scored between a player going domino) - this should reset to 0 after each domino
+allow data to exported and imported
+move tab bar to bottom
+remove percetages for players
+remove &quot;scoring for peter&quot;
+move numpad to top
+clicking on user button adds current score to that user and resets scoring field 
+no need for switch to eric or undo last
+history should have grid view of scores allowing for deleting or changing
+change + button to &quot;domino&quot; button meaning the current hand is over and the next player alternates from the last hand (not the last play)</p>
+<p>keep track of who goes first - at the beginning it&#39;s whoever has the highest double, so first click on a user box is that person, only scores if it&#39;s a double 5, so after end-of-hand domino, it alternates.</p>
+<p>also save record to data to mark when a domino was called, so that the number of points scored on each hand can be calculated</p>
+<p>And on first page show both total and current hand totals for each user</p>
+<h4>n03</h4>
+<p>scores are 1 pt for each multiple of 5, so a double five would score 2 points</p>
+<p>like to show hand / total numbers as slashed pair, e.g. 3/45. use digits vs. hash marks.</p>
+<p>use border highlighting to indicate who goes first and remove from status bar</p>
+<p>replace clear with domino button</p>
+<p>add export / import data to options</p>
+<h4>n04</h4>
+<p>Player names are hard to enter, loses focus on each letter.
+Make default target score 50.
+scores do not update (hand / total)</p>
+<h4>n05</h4>
+<p>tscoring:
+game is over after a player reaches the target score and someone plays domino, scores should reset to 0.</p>
+<p>history:
+should just contain points scored, no need for +, always positive points.
+edit button not functional, and if a score changes, totals need recalculation.
+each domino should record game totals for each player, use the points column
+display most recent at top
+delete score column
+domino record shold start with time stamp, player column is domino, and points column should be current game totals for users separted by a slash</p>
+<p>options:
+reset should clear game totals on score page</p>
+<h4>n06</h4>
+<p>score:
+nice to have domino button with domino tile icon
+replace target reached alert with changing the domino button to Game over</p>
+<p>history:
+editing pts on history broken, like to see it turn into an edit control, it just highlights border and pts don&#39;t change</p>
+<p>deleted score should update later domino records</p>
+<p>options:
+do not see exported data</p>
+<h4>n07</h4>
+<p>icon pips should be on a diagonal for 2 or 3
+move domino button to numpad bottom right and just use just domino icon no text
+make default user names Peter and Eric
+after domino - 
+  a. highlight first user border
+  b. keep hand scores for a bit
+  c. after 10 seconds or after score entered:
+      - clear high lighted border
+      - reset hand scores
+after game reset -
+  show click first user button message
+  show regular (no highlight, no dashes) border
+  also at start, no dashes on the border
+use domino icon for app icon when installing on iphone home screen
+add a game tab to score, history, options
+game tab shows four columns and one row for each domino. columns are:
+Peter      Eric
+hand total hand</p>
+<p>hand columns have hand totals for that domino
+total columns have hash marks for user total
+picture:</p>
+<p>Peter              Eric *          add star to user with first double
+10   ||||\ ||||\   ||||\ ||||\  7  totals accumulate hash marks slash indicates diagonal crossing first 4 tags
+5    ]]]]\ |||     |||          0  add a line for each domino and hand totals for that domino
+3                               6  there maybe more hand total lines than total lines</p>
+<h4>n08</h4>
+<p>on first use:
+show options tab</p>
+<p>score:
+need better domino icon with black background, see domscore.jpg
+move domino button to lower right corner opposite delete
+add a help button that displays:
+   on game start click user with highest double
+   click domino button when a user dominoes
+   note message with scores for that hand, and who goes first
+   after player scores, enter score and click player tile
+   to correct / delete score, go to game tab
+   to see statistics go to stats tab
+   to change players, go to options tab
+reorder UI elements:
+   player buttons
+   mumpad
+   score field
+   message field
+redo dominoes processing:
+   dislpay info message at bottom:
+   That was a 9 3 hand for Peter. Eric goes first.
+First player logic:
+   At game start, meaning at beginning and after a game has ended, display message at bottom:
+      Click player with highest double.
+   Clear message on player click.
+   Set First player to be the other player.
+   Toggle First player after dominoes.
+After player goes domino with a winning score:
+   Display messages: Eric won 54 to 37, last hand was 6 to 3 Peter.
+   Click Player with hightest score.
+   Clear message after click
+   Add total scores to stats
+   Clear scores in player tiles
+Player tiles show only name and total, keep it simple</p>
+<p>game:
+drop hash marks, just one line for each domino, most recent first, two fields: player1 score, player2 score
+allow editing , deleting entry
+entries can be added from the score tab</p>
+<p>stats: (new tab)
+display scrollable history of game scores, e.g. totlals for each player, and dates, most recent first
+options to show score totals, game totals, and histogram of scores, see scores.jpg  games.jpg hist.jpg 
+the histogram is number of times a particular score was a total, in three flavors: one for each player and one for a total number of times either player won with that score
+suggest better, fun stats</p>
+<p>options:
+allow tracking of different games, by names of players
+need drop down list of different pairs
+player names update with selection from list
+player names also editable, with a new / update choice</p>
+<p>reset doesn&#39;t work</p>
+<h4>n09</h4>
+<p>font not readable on options, make light for dark mode
+for player pairs:</p>
+<ul>
+<li>have listbox to select active game</li>
+<li>entries are player1/player2</li>
+<li>selecting + or new invokes entries for two names</li>
+<li>also method of deleting player/pair game
+only show active pair with option to select another
+each distinct game (user pair) has its own data for scoring
+domino icon more like domscore.jpg
+domino button more to right of 0 uner 9, just icon, small butto
+help button to top row of numpad next to score control
+move messages below mumpad
+games: just player and score fields
+also white if dark background
+stats only for current (user pair)#### n10
+n10</li>
+</ul>
+<p>score
+redo layout
+big green domino button:
+  smaller
+  same color as other buttons
+  move just below same size as 9
+  change icon to look like domscore.jpg (dots on diagonal)
+move help button to above 1 and split line with zero (each 1/2 width)
+on game complete:
+  show hand and score totals in message, who was winner: Peter won 55 to 34 on a 4 / 10 hand for Eric.
+  change domino button to &quot;new&quot;
+  when new is clicked:
+    display who has the highest double&quot; message
+    revert button to domino icon
+player boxes should not change border</p>
+<p>game
+font should batch score display
+entries clear on new game
+split into two boxes:
+top for scores for current game, that clears on new game
+bottom half has final scores for each game and time
+most recent first</p>
+<p>stats
+grand totals for each player, scores and number of games
+buttons to generate reoprts</p>
+<ul>
+<li>histogram, e.g. hist.jpt</li>
+<li>games and scores (differences between two players)</li>
+<li>like a stock market graph with variable time slots</li>
+</ul>
+<p>options
+select active game should be a list of player pairs
+click on a pair to edit names
+click on new button to create#### n11
+n11</p>
+<p>Score Tab</p>
+<p>Action button:
+replaces Domino button, sates G D N 
+G game start
+D domino
+N new game</p>
+<p>G: status =  &quot;who got the high double&quot;
+click -&gt; D
+set frst player to other user</p>
+<p>D: status =  &quot;enter score and click user to assign points&quot;
+after 20 seconds of inactivity blank status
+click -&gt; &quot;Peter ahesd 33 to 27 on a 4 5 hand&quot;
+if total &gt; max -&gt; N</p>
+<p>N: status =  &quot;Peter won 55 to 27 on a 4 5 hand&quot; &quot;click D for next game&quot;
+Action turns Green
+click -&gt; reset scores and start new game and -&gt;G</p>
+<p>Appearance:
+    rotate domino icon 90 degrees 
+    make status box like others, like player boxes - no green color
+    layout:</p>
+<pre><code> user 1.     user 2
+
+numpad conrtrol
+1 2 3
+4 5 6
+7 8 9
+D 0 ?  (D is domino icon)
+
+status box
+</code></pre>
+<p>Game Tab:
+Current Game
+Peter Eric
+4.     9.     (hand totals for each domino)
+3.     2
+8.     0
+...</p>
+<p>Completed games:
+time Peter Eric
+xxx.   43    54
+...</p>
+<p>Options Tab:</p>
+<p>Contests:
+Peter vs Eric
+Eric vs Suzette
+...</p>
+<p>Add     Delete. (buttons)</p>
+<p>Target score
+Import Export</p>
+<p>Reset</p>
+<p>questions:</p>
+<p>I&#39;ll check the n11 file and the repository memory to understand the context.</p>
+<p>Looking at your sketched n11 changes compared to the n10 work, here are the time-consuming ambiguities I&#39;d flag:</p>
+<p>Action button state machine — The G→D→N flow with the 20-second inactivity timeout and status text updates is complex. You&#39;ll need to clarify:</p>
+<p>Does the timer reset on every interaction, or only during specific states (D)?</p>
+<ul>
+<li>only when entering state D
+What happens if user clicks during D state before status updates?</li>
+<li>also clear status (or show game as for entering N)
+How does this interact with actual score submission?</li>
+<li>no scores only updated when user clicks a player button
+Numpad layout semantics — The &quot;D 0 ?&quot; layout is unclear:</li>
+<li>D is the acrtion button, displyas domino icon most of the time, turns red for G and is blank for N</li>
+</ul>
+<p>What does &quot;?&quot; do? (Help? Submit? Skip?)</p>
+<ul>
+<li>shows help in status box
+Is &quot;D&quot; the domino action button or a separate score-entry key?</li>
+<li>the domino action button
+How do numpad inputs map to score entry vs. state transitions?</li>
+<li>click on user adds current score to user tally. And clears current sum. Otherwise like a telephone number input.
+Hand totals display — In &quot;Current Game,&quot; you show stacked numbers (4/3/8 and 9/2/0). Questions:
+Is each column a domino hand (dots on each side)?</li>
+<li>no just one line for each domino, recording hand totals for that domino. Just two number, hand totals for each user under their name.
+Do these update in real-time as dominos are played, or only at round end?</li>
+<li>numbers added to user data as user is clicked. Only displayed when games tab selected
+Should they persist or clear on &quot;New Game&quot;?</li>
+<li>Current game clears on new Game. Complete  Games accumulate for life of &quot;contest&quot; - games between the specific players
+Game completion trigger — &quot;if total &gt; max → N&quot; is vague:</li>
+<li>game is complete when either player has more that the max score (default is 50) after a domino
+What&#39;s the max score (e.g., 100, 150)?</li>
+<li>set on options tab, default 50
+Should this auto-trigger N state or just enable the N button?</li>
+<li>changes action button to red and goes to N state after action button clicked
+Do you need to handle tie-breaks or overtime rules?</li>
+<li>no ties, they are ok.
+Status box styling — &quot;like player boxes - no green color&quot; needs concrete design specs (background, border, font, padding).</li>
+<li>like the Imoport Data box on the options page</li>
+</ul>
+<p>More clarification:</p>
+<ol>
+<li>Numpad input:
+1-&gt;2 means 12, added to current hand score of player that scorer clicks. Then total returns to 0.
+current game total for each user should be under player&#39;s name in player box
+backspace by pressing button beneath 7 (or delete?)</li>
+<li>Action button in N state.
+Is blank, but status message tells user to scorer to click on user with highest double.</li>
+<li>&quot;Clear status or show game as for entering N&quot;
+just clear status. Blank, empty.</li>
+<li>Mutlple rows.
+One for each domino. So when a user &quot;goes out&quot; - plays last tile - end of hand, the hand totals for each user are appended to this list.
+amke room for 10 rows and scroll for more.</li>
+<li>Data timing. Calculate only on demand.</li>
+<li>Tie break calculation<ul>
+<li>no winner, total points accumulate, but neither player gets a game won crediot</li>
+</ul>
+</li>
+</ol>
+<p>and yet more clarification:</p>
+<ol>
+<li>drop backspace button but allow delete or select / copy / paste / delete in edit control for total</li>
+<li>pressing the action button when in D ends a hand</li>
+<li>there&#39;s three numbers: a hand total (scored since last domino), a game total (scored since start of game), and a grand total (calculated sum), only displayed in Stats
+like to see the game total displaye in the player box under the name. Put the hand totals in the status box in D state for 20 seconds</li>
+<li>scrollable rows do persist. There is no live updating, just show current state at time user looks at games tab.</li>
+<li>Highest double is specified in the G state. Scorer clicks on player with highest double to get into D state.</li>
+<li>The scorer is usually one of the two players. Typically the same person throughout.</li>
+</ol>
+<p>Hopefully final notes:
+Hand total timing:
+    display message only upon entering D state and clear when timer expires or user clicks
+Edit control
+    no negative numbers
+    no max
+    no auto focus#### n12
+n12</p>
+<p>Project:</p>
+<ul>
+<li>how to test start from scratch?</li>
+<li>how to revert to earlier version?
+a contest is a collection of games for a given set of players
+a game has the stages:
+= start
+click on highest double player, other one will go first after next domino, then alternate after subsequent dominoes
+erase message after click
+if it was a double five, that player also scores 2, but scorer must enter after.</li>
+</ul>
+<p>= play
+enter score and click player that made it. add score to player total, and clear score entry field
+if user goes out (&quot;dominoes&quot;):
+  add hand scores to current game
+  if score is &gt; 50, enter end stage
+  else
+  display &quot;that was a 3 2 hand for peter&quot;
+  clear hang totals for next hand</p>
+<p>= end</p>
+<p>UX:
+all messages should be in the same place, and not pop up in the middle of the screen
+put them in a status field at the bottom of the screen
+leave blank until needed, then show the message there for 30 seconds, then clear it again
+add ok button to clear the message immediately, make it a help button if no message is showing
+all four tabs should be visible at all times</p>
+<p>expect:
+start on options page until player names are entered
+if player names, start on score page
+use scores for selected contest</p>
+<p>Score:
+keep same border around players
+only show total score in player box
+show numpad always
+bottom row of numpad is &lt;backspace, 0, &lt;domino icon, no text&gt; all buttons should be same size</p>
+<h4>n13</h4>
+<p>n13</p>
+<p>Score:</p>
+<ul>
+<li>remove incremental scores in player tiles, just totals</li>
+<li>replace Help with ?</li>
+<li>help text should be same color, font as names in player tiles</li>
+<li>domino icon button should be bigger and centered</li>
+<li>help / status should clear after any click or 30 seconds</li>
+<li>domino text should be &quot;That was a 5 3 hand for Suzette. Eric starts.&quot;</li>
+<li>at new game, player tiles should not turn into dashed lines. </li>
+<li>help / status replace OK with checkmark icon</li>
+<li>text of name in player tyiles sould be bigger</li>
+</ul>
+<h4>n14</h4>
+<p>n14</p>
+<p>&quot;Click who got the highest double&quot; message in status.</p>
+<p>message shold be in the status / help area with same 
+font coloring as other info stuff. And not include the other player ...</p>
+<p>and messazge should clear after click.</p>
+<p>After a Domoino click, should see
+&quot;Suzette won that hand 3 2. And Eric starts this one.&quot;
+Or, if she does start:
+&quot;Suzette won that hand 3 2 and starts this one.&quot; 
+Or, if no score:
+&quot;No score that hand, Eric sarts this one.
+Or, if score is greater than 50:
+Domino button turns to &quot;New&quot;
+Message is:
+Suzette wins!
+After user clicks checkmark (? turns into check while text shows)
+Totals clear
+Button reverts to domino
+&quot;Click who got the highest double&quot; message in status.</p>
+<p>No green highlighting border.</p>
+<p>Help text should be same color font as other status text.</p>
+<p>Dominno icon needs to yet bigger.</p>
+<h4>n15</h4>
+<p>n15</p>
+<p>Still seeing &quot;Tap the hightest player ...&quot; message. Please delete. It is the wrong color and in the wrong place and replaced by the &quot;Click who got the highest double.&quot;</p>
+<p>After click status help text should clear.</p>
+<p>Do not see status update after domino. From n14:</p>
+<p>After a Domoino click, should see
+&quot;Suzette won that hand 3 2. And Eric starts this one.&quot;
+Or, if she does start:
+&quot;Suzette won that hand 3 2 and starts this one.&quot; 
+Or, if no score:
+&quot;No score that hand, Eric sarts this one.
+Or, if score is greater than 50:
+Domino button turns to &quot;New&quot;
+Message is:
+Suzette wins!
+After user clicks checkmark (? turns into check while text shows)
+Totals clear
+Button reverts to domino
+&quot;Click who got the highest double&quot; message in status.</p>
+<h4>n16</h4>
+<p>remove tab bar at bottom
+replace with keyboard shortcuts:
+g game (current score tab)
+s stats (modified, now has current game + summary score and game totals
+o options</p>
+<p>g
+make bottom row same height as others
+phases and messages:
+start (new game no score, no play):</p>
+<ul>
+<li>display click on player with highest double
+play (after highest double player click):</li>
+<li>display enter score and click on player</li>
+<li>only display this once per game at the beginning</li>
+<li>process clicks:<ul>
+<li>a digit on numpad - add to display, typically only one digit</li>
+<li>on player - add current score to players hand score, clear score</li>
+<li>on ? - display help text
+  &quot;
+   s for stats
+   o for options for new contest
+  &quot;</li>
+<li>on <backspace> delete last entered number from score</li>
+<li>on domino:<ul>
+<li>add current hand scores to current game scores</li>
+<li>clear current hand scores</li>
+<li>if a game score &gt; 50:<ul>
+<li>display Eric wins on a 6 3 hand, press domino again for new game</li>
+<li>add time and scores to game data</li>
+</ul>
+</li>
+<li>else display Eric lost a 5 8 hand</li>
+</ul>
+</li>
+<li>on new:<ul>
+<li>display click on highest double</li>
+<li>clear hand and game scores</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>app:
+use icon for title and app
+clear status after click or 5 seconds
+if status has text, change icon to checkmark
+if no text icon in ?</p>
+<p>I&#39;ll help you reorganize according to n16. Let me first check what&#39;s in that file and understand the context.</p>
+<p>I can see n16 contains the new requirements. Before I reorganize, I need to clarify several ambiguities:</p>
+<p>Bottom row height - &quot;make bottom row same height as others&quot; - Does this refer to the numpad&#39;s bottom row (D/0/?), or a different UI element?</p>
+<ul>
+<li>numpad&#39;s bottom row</li>
+</ul>
+<p>Keyboard shortcuts scope - Should g/s/o work:</p>
+<p>As single key presses only?</p>
+<ul>
+<li>yes
+With modifiers (Ctrl+G, Ctrl+S, etc.)?
+Throughout the app or only in certain states?</li>
+<li>throughtout app except when entering user name on options page
+Stats tab structure - How should &quot;current game + summary score and game totals&quot; be laid out? New sections/tabs within stats?</li>
+<li>leave as is for now, working on design</li>
+</ul>
+<p>Help text - Should the help text (&quot;s for stats / o for options...&quot;) appear:</p>
+<p>Only when ? is clicked?</p>
+<ul>
+<li>yes
+Automatically on startup?
+As a tooltip or in the status message?
+Game end display - &quot;Eric wins on a 6 3 hand&quot; - Is &quot;6 3&quot; the final hand played, or the winning score difference? How is this calculated?</li>
+<li>It is the hand totals. as the game progresses:
+each player has a hand total of points scored since the last domino
+and a game total of points scored since the beginning of the game
+a domino displays the hand scores, the game totals are alwasy visible in the player tiles
+but slightly different text for a domino the ends a game</li>
+</ul>
+<p>Options tab - What options should &quot;options for new contest&quot; include? (Target score, players, etc.?)</p>
+<ul>
+<li>leave as is for now</li>
+</ul>
+<p>Icon behavior - &quot;if status has text, change icon to checkmark / if no text icon in ?&quot; - Which specific elements/icons are these referring to?</p>
+<ul>
+<li>the icon in the status box, usally a ?, changes to a check when holding text</li>
+</ul>
+<p>Domino multi-function - The domino button seems to:</p>
+<p>End hand during play
+Trigger new game after completion
+How should the UI indicate its current function?</p>
+<ul>
+<li>only by text in the status control saying press domino again to start new game</li>
+</ul>
+<h4>n17</h4>
+<p>n17</p>
+<p>need bigger font in status update area and player name
+lose initial message area with white background and border decoration
+need bigger domino icon
+domino messages:
+    peter won an 8 4 hand. Eric goes first.
+    A 5 5 tied hand. Peter goes first
+    Eric won a 3 4 hand and goes first
+    Peter won. click domino tile to start new game.</p>
+<p>initial message should be:
+    Click user with highest double to start game.
+    user boxes should have regular (not dashed) border</p>
+<p>game page has irrelevant status bar
+need list of previous moves - delete any
+need list of previous games
+status bar help gives info</p>
+<p>help text should be:
+enter number and click user to record score for that user</p>
+<h4>n18</h4>
+<p>n18</p>
+<p>after clicking user at beginning of game, status should be:
+Eric will start the next hand, vs. Eric will start hand 1.
+After subsequent dominoes, status should be:
+Eric won an 8 3 hand (vs Eric won a 8 3 hand (only an 8 all other digits are &quot;a 3&quot;)</p>
+<p>After win, shold be Eric won. Click ... (capitlioze Click)</p>
+<p>disable highlighting of player tiles. (no green highlighting)</p>
+<p>on options page, the reset everything message should be in the status box not in a new light background field</p>
+<p>Like to have sets of games between distinct pairs of players. So games between Eric and Nora are held separately from games between Eric and Peter. Call the set of games between two players a contest. Options page should allow selecting a contest from saved pairs of players. Stats show data for the current contest. Also Game shows data for current contest.#### n19
+n19</p>
+<p>when adding to home screen, like to use the domino.svg for an icon</p>
+<p>tighten up game screen:</p>
+<p>Time      Peter  Eric
+9:13         4
+9:05               6
+...</p>
+<p>Date      Peter  Eric
+3/15/25      56    38
+3/14/25      56    38
+...</p>
+<p>Top half has scores, most recent 10</p>
+<p>Bottom half has game totals, most recent 10</p>
+<p>remove green borders player tiles at new game#### n20
+n20</p>
+<p>score:
+make all rows above players (numpad) as tall as bottom row with domino
+make status box default size same height as well but can grow with
+  large text</p>
+<p>game:
+make time hr:min, e.g. 10:45
+make date mon/day, e.g. 5/28</p>
+<p>options:
+make more compact:
+CONTEST
+    <switch dropdown>
+    - add a new pair option
+      when selected, collect pair of names
+    increase fot size of dropdown so player names are as big as other text
+DATA
+    two buttons, export / import / help
+    - only use data for current contest
+    - help text:
+    Data is copied from or pasted to the clipboard.
+    Data is a set of lines, each line is a game with a mon/year date
+    and two numbers, scores for the players.
+    First line is the names of the players.
+DETAILS
+    - appearance
+    - top score
+    - reset 
+    - these settings are per contest</p>
+<h4>n21</h4>
+<p>GAME:
+  game date should be just mon/day, no hour:min</p>
+<p>OPTIONS:
+  under DATA, add Clear button
+  remove Reset from DETAILS
+  make Appearance radio buttons for light / dark / system
+  remove &quot;Scores auto-saved&quot; message
+  In Status, when user clicks ? display help text currently in DATA and add:
+    &quot;Clear to erase current scores&quot;
+  Do not display current text &quot;enter number ...&quot; which is only for Score tab
+  Other status messages to display:
+  number of scores imported / exported / cleared</p>
+<h4>n22</h4>
+<p>n22</p>
+<p>GAME
+Like to line up columns</p>
+<p>CURRENT SCORES</p>
+<p>When           Peter         Eric      Delete
+13:38                           6          x
+13:38                           6          x
+13:38                           6          x
+13:38                           6          x</p>
+<p>PREVIOUS GAMES
+5/28             32           53
+5/24             52           42
+5/23             22           59
+5/23             38           53
+4/28             30           59</p>
+<p>n.b. no need to delete a previous game score</p>
+<p>STATS
+like to see table:</p>
+<p>Peter Eric
+23    31    Games won
+35.2  33.2  Average points per game
+1233  1412  Total points</p>
+<p>Nice to add:
+graph of cumulative differences y axis number of points Peter is ahead, x axis game number.</p>
+<p>histogram of point margins, but small so fits on page with above graph.
+y axis number of games with x margin win</p>
+<p>remove status box on this tab, no help display needed</p>
+<h4>n23</h4>
+<p>App:
+    On start, if no contest, got directly to Options / Contest /
+      add new pair
+      Add help text to Status:
+        &quot;Click Score tab to start a game.&quot;
+    Else start on Score
+    fix who goes first, seems like it starts off exactly wrong
+    text in status / message box should be non-bold, like names
+        on player tiles</p>
+<p>Score:
+    after domino, click ? to get who goes first
+    ? always displays last message for that tab
+    improve ability to edit mistakes. e.g. move &quot;CURRENT SCORES&quot;
+      from GAME to bottom half of SCORE
+    check total arithmetic, had some deletions and then Suzette
+      wins though I scored more points.</p>
+<p>Game:
+    remove entirely, previous games available by Export.</p>
+<p>Options:
+    add hours:minutes back to export, import for future analysis
+    have contest UI for adding new players overlay DATA and DETAILS
+      vs pushing them down
+    Clear should be same size as other buttons
+    Clear should delete contest completely
+    make Appearance default to last choice, but settable independently
+    make Top score default to last choice, but settable independently</p>
+<h4>n24</h4>
+<p>n24</p>
+<p>App:
+Only start on add contest if empty
+put UI on tab, no pop up
+try to fill in with user name
+else start on Score page</p>
+<p>Score:
+more compact display show up to last four scores:
+HISTORY
+x 5 Eric
+x 3 Peter
+x 5 Eric
+x 2 Eric</p>
+<p>Options:
+DATA buttons should be same size, Clear is now larger</p>
+<h4>n25</h4>
+<p>n25</p>
+<p>App:
+Only start on contest if empty
+Else start on Score tab
+All status messages: reduce font size and make not bold text
+like Player names in Player tiles on Score tab</p>
+<p>Score:
+reduce height of controls by 5% like to show on iphone 13 mini screen
+remove small green numeric score change decorations on player tiles
+move status / info box to be alongside history
+HISTORY construct move into status box. show history when status otherwise blank.
+sort most recent last, like messages
+animate update my scrolling lines up and inserting latest at bottom
+x should be red delete
+Status info would look like:</p>
+<p>x 23 Eric           Recent scores
+x  4 Peter
+x  2 Peter
+x 13 Eric</p>
+<p>Options:
+DATA buttons should be same size, Clear is now larger
+Clear does not remove pair form CONTEST drop down, it should.
+If successive Clears remove all contests, dislay initial add contest UI
+no pop up messages, e.g. pressing Create Contest withoug Player 2 Name filled in shows pop up, should be info in status/info box
+Add name should default to camel casing user name
+Import should add top line to users if not already there, and create new contest. Else it should add lines to games for that contest. </p>
+<h4>n26</h4>
+<p>n25</p>
+<p>App:
+Only start on contest if empty
+Else start on Score tab
+All status messages: reduce font size and make not bold text,
+like Player names in Player tiles on Score tab</p>
+<p>Score:
+when showing history in Info:
+remove HISTORY label, just show:
+x 23 Eric 
+x  4 Peter
+x  2 Peter
+x 13 Eric           LAST SCORES
+note right justification of LAST SCOREWS label at bottom of box.
+Player goes first logic is off. After P1 has highest double, message
+should be: &quot;P1 had the high double, P2 will start the next hand.&quot;
+After the subsequent dominoes, message will be:
+Px won that hand 4 2, P2 starts.
+P2 alternating.
+Default action of clicking ? is to show &quot;P2 starts this hand.&quot;.
+Common for us to wonder who starts this hand? after a domino.</p>
+<p>Options:
+DATA buttons should be same size, Clear is still taller.
+Clear does not remove pair form CONTEST drop down, it should.
+If successive Clears remove all contests, dislay initial add contest UI
+Should not show &quot;Click Score tab to start game&quot; message
+until Contest pair resolved.
+Should say instead &quot;Add Player to create contest.&quot;
+disable Score button until contest picked.</p>
+<h4>n27</h4>
+<p>n27</p>
+<p>Score:
+remove LAST SCORES label just show scores</p>
+<p>Options:
+Clear still not removing names from CONTEST dropdown.</p>
+<h4>n28</h4>
+<p>n28
+Score:
+make status info box tall enough to show four whole history lines</p>
+<p>Contest:
+still does not clear the final Player1 vs Player2 pair, so from scratch if you click create contest , error message show enter both names, but Player1 vs Player2 show up as a contest in the drop down</p>
+<h4>n29</h4>
+<p>n29
+Score:
+who starts still messed up.  P1 has high double, get correct message that P2 will start next. Then click domino, and get xx score and P1 starts. Should be P2 starts as promised. Correctly alternates aftewards.</p>
+<h4>n30</h4>
+<p>n30</p>
+<p>please make everything larger, increase by 10% if it will still all fit on aiphone 13 mini</p>
+<h4>n31</h4>
+<p>n31</p>
+<p>Score:
+? now diplays who goes first message after domino.
+Now chage to following after any score added.
+After any score, ? displays:
+ These are recent scores.
+ To change, delete mistake
+ by clicking red x. Replace
+ by adding correct sore.</p>
+<h4>n32</h4>
+<p>n32</p>
+<p>Score:
+tie score after domino now gives win to one of the players.
+should be &quot;Tie game, play another hand.&quot; and play contninues until
+a domino with a clear winner.</p>
+<h4>n33</h4>
+<p>n33</p>
+<p>options:</p>
+<ul>
+<li>click check in status should clear it</li>
+<li>show &quot;Click score...&quot; message only after first contest created</li>
+<li>show question mark if blank, else check</li>
+<li>help text for Add UI should be:
+ &quot;Fill in names of players to create a contest.&quot;</li>
+<li>change &quot;Add new pair...&quot; to &quot;New ...&quot;</li>
+<li>disable Create Contest button until names filled in.</li>
+<li>change &quot;Create Contest&quot; to &quot;Create&quot;</li>
+<li>put Create and Cancel buttons on same line, same size.</li>
+<li>have Top Score detail precede Appearance
+app:</li>
+<li>start at Contest Add UI if no contest selected</li>
+<li>else goto score tab at start</li>
+</ul>
+<p>score:</p>
+<ul>
+<li>revise text for status ? 
+&quot;Enter number and click Player to add that to their score. Delete mistakes in recent scores by clicking red x. Replace by adding the correct score.&quot;</li>
+</ul>
+<h4>n34</h4>
+<p>n34</p>
+<p>Make default Name in nonbold font, like Player 1 label. User supplied name should be bold.
+Create button should be disabled until both Names are filled in.
+Swap Create and Cancel buttons and make same height.</p>
+<h4>n35</h4>
+<p>n35</p>
+<p>Rewrite the CONTEST code:
+UI for New...:</p>
+<p>  Players:   _______
+             _______</p>
+<pre><code> Add         Cancel
+</code></pre>
+<ul>
+<li>Add is default after names filled in</li>
+<li>Cancel is primary until names filled in.</li>
+<li>----- means text box to enter name. </li>
+<li>help text to display:
+&quot;Add names to create a new contest.&quot;</li>
+<li>clicking cancel when there are no contests shows:
+&quot;Please add names to score dominoes.&quot;</li>
+<li>Filling in names makes Add primary.</li>
+</ul>
+<h4>n36</h4>
+<p>n36</p>
+<p>CONTEST
+  New ...</p>
+<h4>n37</h4>
+<p>n38</p>
+<p>app:
+on start continue with last (or first) contest on Score tab
+if no contest, start with Options / Contest with Players UI and New... selected</p>
+<p>OPTIONS:</p>
+<ul>
+<li>only show Players in Contest UI when New... in in the Contest selection.</li>
+<li>Always show current (or last) Contest in contest</li>
+<li>New... <ul>
+<li>? help needs following:<ul>
+<li>clear msg first to alert</li>
+<li>show msg ok, but needs check mark, not ?. and clicking check,
+should blank status, no show data help text.</li>
+</ul>
+</li>
+<li>Add, Cancel button style shoud mimic export, import, etc.</li>
+<li>Use subtle highlight for default button, green too much.</li>
+<li>Clicking Cancel should close Players fields UI, and display first
+contest. If it exists, show in dropdown and Hide Player fields.
+If no existing contests, show Plaers fields again.
+Loop indefinitly until contest created.</li>
+</ul>
+</li>
+<li>DATA:<ul>
+<li>After import, select contest of users in import.</li>
+</ul>
+</li>
+</ul>
+<h4>n38</h4>
+<p>n37</p>
+<p>app:
+on start continue with last (or first) contest on Score tab
+if no contest, start with Options / Contest / New...</p>
+<p>OPTIONS:</p>
+<ul>
+<li>New... =<ul>
+<li>? help needs following:<ul>
+<li>clear msg first to alert</li>
+<li>show msg ok, but needs check mark, not ?. and clicking check,
+should blank status, no show data help text.</li>
+</ul>
+</li>
+<li>Add, Cancel button style shoud mimic export, import, etc.</li>
+<li>Use subtle highlight for default button, green too much.</li>
+<li>Clicking Cancel should close ADD UI dialog, and display first
+contest. If no existing contests, show ADD UI dialog again. Loop
+indefinitly until contest created.</li>
+</ul>
+</li>
+<li>DATA:<ul>
+<li>After import, select contest of users in import.</li>
+</ul>
+</li>
+</ul>
+<h4>n39</h4>
+<p>n39</p>
+<p>OPTIONS
+  Contest</p>
+<ul>
+<li>Player fields lose focus on each letter. Need to keep focus for text entry.</li>
+<li>Show Player fields iff Selection is &quot;New...&quot;</li>
+<li>Leave Dropdown at &quot;New...&quot; until after Add / Cancel</li>
+<li>disable Score / Stats until Contest is selected</li>
+<li>Cancel should return to previous / first Contest</li>
+<li>need consistent boldness/highlighting, make Add and Cancel like Appearance ones.</li>
+</ul>
+<p>status box:</p>
+<ul>
+<li>? iff blank, check iff text</li>
+</ul>
+<h4>n40</h4>
+<p>n40</p>
+<p>n39 review. Items marked with an X not addressed. Please advise.</p>
+<ul>
+<li>Focus Management: Fixed the issue where player name fields lost focus after
+typing each letter. The app now preserves focus and cursor position during
+input.
+X  - Tab Disabling: The Score and Stats tabs are now visually disabled (dimmed)
+and non-clickable until a contest is selected or created.</li>
+<li>Improved Button Style: Re-styled the Add and Cancel buttons to match the
+subtle, integrated look of the Appearance (Theme) buttons. They are now
+part of a clean .action-group row.
+X  - Cancel Logic: Clicking Cancel now correctly returns the selection to the
+previous contest (or the first available one) instead of just clearing the
+inputs.
+X  - Dropdown Persistence: The contest dropdown now stays on &quot;New...&quot; while you
+are entering player names, switching only after you click Add or Cancel.
+X  - Status Box Icon: Simplified the status icon logic—it now shows a ? when the
+status is &quot;blank&quot; (showing default help) and a ✓ whenever there is active
+status text.</li>
+</ul>
+<h4>n41</h4>
+<p>n41</p>
+<p>App:
+On first run, click cancel on New ...
+should flicker, no visible alert.</p>
+<p>OPTIONS:</p>
+<ul>
+<li>move DATA into DETAILS:</li>
+</ul>
+<p>Top Score   ____
+Data        Export Import Clear
+Appearance  Light  Dark   System</p>
+<p>Afer Import show names of imported contest.
+Fails on first addition, works ok on subsequent one.</p>
+<p>STATS:
+add cumulative games one graph (like points, but games)</p>
+<h4>n42</h4>
+<p>n42</p>
+<p>OPTIONS:
+Details:</p>
+<ul>
+<li>move data down, so it&#39;s score, appearance, data</li>
+<li>make export, import, clear buttons same size (height, width) as Appearance ones</li>
+<li>fix Import, not functional, just displays Add names msg</li>
+</ul>
+<h4>n43</h4>
+<p>n43</p>
+<p>OPTIONS
+Details
+Buttons not the same height, make Appearance ones same height as Data
+Cancel msg:
+If no contests:
+Have to have a contest to score, please add names of Players first.
+Else:
+Add names of Players to create a new contest.</p>
+
