@@ -1,0 +1,12 @@
+# mk_htmls 
+(
+echo '<pre>'
+cat ../test75 
+echo '</pre>'
+) > test75.html
+marked < ../prompts.md > prompts.html
+marked < ../info.md > info.html
+marked < ../README.md | sed -e '
+    s/.md/.html/
+    s/"test75/"test75.html/
+    ' > README.html
