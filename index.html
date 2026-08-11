@@ -73,11 +73,13 @@ html,body{height:100%;background:var(--color-background-tertiary);font-family:va
 .status-icon{width:26px;height:26px;font-size:20px;text-align:center;line-height:1.3;color:var(--color-text-secondary);}
 
 /* scorecards */
-.scoreboard{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:10px;}
-.scard{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:12px 12px 10px;text-align:center;cursor:pointer;position:relative;transition:border-color 0.2s,box-shadow 0.2s;user-select:none;}
+.scoreboard{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:10px;min-height:190px;}
+.scard{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:12px 12px 10px;text-align:center;cursor:pointer;position:relative;transition:border-color 0.2s,box-shadow 0.2s;user-select:none;min-height:140px;}
 .scard:active{transform:scale(0.97);}
 .scard.pending-setup{border:2.5px solid var(--color-border-secondary);}
 .scard .pname{font-size:19px;color:var(--color-text-secondary);margin-bottom:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.scard .first-player-indicator{position:absolute;top:10px;right:10px;width:10px;height:10px;border-radius:50%;background:#1D9E75;opacity:0;transition:opacity 0.2s ease-in-out;}
+.scard .first-player-indicator.active{opacity:1;}
 .score-pair{display:flex;align-items:baseline;justify-content:center;}
 .score-hand{font-size:26px;font-weight:500;color:#1D9E75;line-height:1;}
 .score-slash{font-size:24px;font-weight:300;color:var(--color-text-tertiary);margin:0 3px;line-height:1;}
@@ -86,6 +88,14 @@ html,body{height:100%;background:var(--color-background-tertiary);font-family:va
 .score-lbl-hand{font-size:10px;color:#1D9E75;width:30px;text-align:right;}
 .score-lbl-sep{font-size:10px;color:transparent;margin:0 3px;}
 .score-lbl-tot{font-size:10px;color:var(--color-text-tertiary);width:30px;text-align:left;}
+
+.stats-grid{display:grid;gap:9px;margin-top:10px;}
+.stats-box{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:14px;cursor:pointer;min-height:132px;display:flex;flex-direction:column;justify-content:center;transition:box-shadow 0.2s,transform 0.2s;}
+.stats-box:hover{box-shadow:0 4px 10px rgba(0,0,0,0.08);transform:translateY(-1px);}
+.stats-box-title{font-size:12px;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;text-align:left;}
+.stats-box-value{font-size:28px;font-weight:700;color:var(--color-text-primary);text-align:center;line-height:1.1;margin-bottom:6px;}
+.stats-box-label{font-size:13px;color:var(--color-text-secondary);text-align:center;}
+.stats-box-detail{font-size:12px;color:var(--color-text-tertiary);text-align:center;}
 
 .setup-hint{background:#E1F5EE;border:0.5px solid #9FE1CB;border-radius:var(--border-radius-md);padding:10px 15px;font-size:14px;color:#0F6E56;text-align:center;margin-bottom:12px;line-height:1.6;}
 
@@ -103,7 +113,7 @@ html,body{height:100%;background:var(--color-background-tertiary);font-family:va
 .pts-input{width:60px;font-size:14px;font-weight:500;color:#1D9E75;border:1.5px solid #1D9E75;border-radius:5px;padding:3px 6px;background:var(--color-background-primary);color:#1D9E75;outline:none;font-family:inherit;}
 
 /* mini history */
-.hist-mini{flex:1;overflow:hidden;height:128px;display:flex;flex-direction:column;justify-content:flex-end;}
+.hist-mini{flex:1;overflow-y:auto;height:128px;display:flex;flex-direction:column;overflow-anchor:none;}
 .hist-mini-row{display:flex;align-items:center;gap:7px;font-size:14px;color:var(--color-text-secondary);margin-bottom:4px;animation:slideUp 0.3s ease-out;}
 .hist-mini-x{color:#D85A30;font-size:12px;cursor:pointer;padding:3px 5px;}
 .hist-mini-pts{font-weight:600;color:var(--color-text-primary);min-width:20px;text-align:right;}
@@ -113,6 +123,18 @@ html,body{height:100%;background:var(--color-background-tertiary);font-family:va
   from { transform: translateY(11px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
 }
+
+.stats-box-data{display:flex;flex-direction:column;gap:6px;margin-top:8px;}
+.stats-box-row{font-size:14px;font-weight:600;color:var(--color-text-primary);display:flex;justify-content:center;gap:12px;align-items:center;width:100%;}
+.stats-box-num{font-size:18px;font-weight:600;color:var(--color-text-primary);min-width:50px;text-align:right;}
+.stats-box-label{font-size:12px;color:var(--color-text-secondary);min-width:50px;text-align:left;}
+.stats-box-chart{display:flex;flex-direction:column;align-items:center;gap:8px;margin-top:8px;}
+.stats-box-chart svg{width:100%;height:90px;}
+.stats-box-legend{display:flex;justify-content:center;gap:10px;font-size:11px;color:var(--color-text-secondary);}
+.stats-box-legend-item{display:flex;align-items:center;gap:4px;}
+.stats-box-legend-dot{width:10px;height:10px;border-radius:50%;display:inline-block;}
+.stats-box-legend-item.host .stats-box-legend-dot{background:#1D9E75;}
+.stats-box-legend-item.guest .stats-box-legend-dot{background:#5A5AFF;}
 
 /* stats table */
 .stats-table{width:100%;border-collapse:collapse;margin-top:12px;font-size:14px;}
@@ -207,13 +229,18 @@ const S={
   editingIdx:-1,
   status:'',
   statusUntil:0,
+  helpMessage:'',
   highestDoublePlayer:-1,
   theme:'system',
   showNewContestInputs:false,
   hideNewContestHelp:false,
   lastNames:['',''],
   helpContext:'',
-  newNames:['','']
+  newNames:['',''],
+  statsBox1:0,
+  statsBox2:0,
+  statsBox3:0,
+  shouldScrollHistory:false
 };
 let LAST_STATUS_SET=0;
 
@@ -251,6 +278,11 @@ function load(){
     Object.assign(S, d);
     if(!S.contests) S.contests = {};
     if(!S.theme) S.theme = 'system';
+    if(typeof S.helpMessage === 'undefined') S.helpMessage = '';
+    if(typeof S.statsBox1 === 'undefined') S.statsBox1 = 0;
+    if(typeof S.statsBox2 === 'undefined') S.statsBox2 = 0;
+    if(typeof S.statsBox3 === 'undefined') S.statsBox3 = 0;
+    if(typeof S.shouldScrollHistory === 'undefined') S.shouldScrollHistory = false;
     S.display='';S.editingIdx=-1;
     applyTheme();
     
@@ -302,6 +334,21 @@ function applyTheme() {
     root.style.removeProperty('--color-border-secondary');
     document.body.style.background = '';
   }
+}
+
+function smoothScrollTo(el, target, duration=800){
+  if(!el) return;
+  const start = el.scrollTop;
+  const change = target - start;
+  const startTime = performance.now();
+  const easeInOut = t => 0.5 - Math.cos(Math.PI * t) / 2; // ease in-out
+  function animate(now){
+    const elapsed = now - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    el.scrollTop = Math.round(start + change * easeInOut(progress));
+    if(progress < 1) requestAnimationFrame(animate);
+  }
+  requestAnimationFrame(animate);
 }
 
 function getContestKey(names) {
@@ -358,12 +405,20 @@ function clearStatus(){
   S.status='';S.statusUntil=0;save();render();
 }
 
+function clearHelp(){
+  S.helpMessage='';save();render();
+}
+
+function clearStatusOrHelp(){
+  S.status='';S.statusUntil=0;S.helpMessage='';save();render();
+}
+
 function resetForNewGamePreserveHistory(){
   S.scores=[0,0];S.handScores=[0,0];S.display='';
   S.gameOver=false;S.pendingWin=false;S.phase='start';
   S.firstPlayer=-1;S.handFirstPlayer=-1;S.handNum=0;
   S.firstPlayerHighlightUntil=0;S.lastAdded=['',''];S.editingIdx=-1;
-  S.status='';S.statusUntil=0;S.highestDoublePlayer=-1;S.tab=0;
+  S.status='';S.statusUntil=0;S.helpMessage='';S.highestDoublePlayer=-1;S.tab=0;
   S.lastStatus='';S.helpContext='';
   save();render();
 }
@@ -371,6 +426,10 @@ function resetForNewGamePreserveHistory(){
 function ackStatus(){
   if(S.status === 'Click here to reset everything.'){
     resetForNewGame();
+    return;
+  }
+  if(S.helpMessage){
+    clearHelp();
     return;
   }
   if(S.phase==='end'&&S.gameOver){
@@ -381,19 +440,20 @@ function ackStatus(){
 }
 
 function showHelp(){
+  clearStatus();
   if (S.tab === 0) {
     if (S.phase === 'play') {
-      setStatus(`Enter number and click Player to add that to their score. Delete mistakes in recent scores by clicking red x. Replace by adding the correct score.`, 15000);
-      return;
+      S.helpMessage = `Enter number and click Player to add that to their score. Delete mistakes in recent scores by clicking red x. Replace by adding the correct score.`;
+    } else if (S.phase === 'start') {
+      const hasStarter = S.firstPlayerHighlightUntil > Date.now();
+      S.helpMessage = `${hasStarter ? '' : 'Click on player with highest double, then<br/>'}Score by entering points and clicking on player tile.`;
+    } else {
+      S.helpMessage = `Game finished. Click domino tile to start new game.`;
     }
-    const help=S.phase==='start'
-      ? 'Click user with highest double to start game.'
-      : 'Game finished. Click domino tile to start new game.';
-    setStatus(help);
   } else {
-    const help = "Data is copied from or pasted to the clipboard. Data is a set of lines, each line is a game with a mon/day date and two numbers, scores for the players. First line is the names of the players. Clear to erase current scores";
-    setStatus(help, 15000);
+    S.helpMessage = `Create a new contest by selecting New... from CONTEST.<br/>Or import data from clipboard. Export data to see format.<br/>Clear to erase contest and player names.`;
   }
+  save();render();
 }
 
 function resetForNewGame(){
@@ -436,7 +496,9 @@ function tapPlayer(i){
       if(S.scores[i]>=S.target)S.pendingWin=true;
     }
     S.display='';S.phase='play';S.helpContext='play';
-    setStatus(`${escapeHTML(S.names[i])} had the high double, ${escapeHTML(S.names[1-i])} will start the next hand.`, 5000);
+    S.status='';S.statusUntil=0;S.helpMessage='';
+    S.firstPlayerHighlightUntil = Date.now() + 10000;
+    S.shouldScrollHistory = true;
     save();render();return;
   }
   if(pts<=0){
@@ -445,9 +507,12 @@ function tapPlayer(i){
     if(el){el.textContent='0';el.className='display-bar dim';}
     return;
   }
+  if(S.firstPlayerHighlightUntil) S.firstPlayerHighlightUntil = 0;
+  S.status='';S.statusUntil=0;S.helpMessage='';
   S.scores[i]+=pts;S.handScores[i]+=pts;
   S.lastAdded=['',''];S.lastAdded[i]='+'+pts;
   S.records.push({who:i,pts,time:ts(),type:'score',hand:S.handNum,totalAfter:[S.scores[0],S.scores[1]]});
+  S.shouldScrollHistory = true;
   if(S.scores[i]>=S.target)S.pendingWin=true;
   S.display='';S.helpContext='score';
   save();render();
@@ -471,6 +536,7 @@ function callDomino(){
     totalAfter:[S.scores[0],S.scores[1]],
     handTotals,gameEnds
   });
+  S.shouldScrollHistory = true;
   if(gameEnds){
     if (S.scores[0] === S.scores[1]) {
       S.pendingWin = false;
@@ -502,20 +568,20 @@ function callDomino(){
   const nextStarterIdx = S.handFirstPlayer;
   const nextStarterName = escapeHTML(S.names[nextStarterIdx]);
   
-  let message;
-  if (!S.pendingWin && gameEnds && S.scores[0] === S.scores[1]) {
-    message = `Tie game ${S.scores[0]} ${S.scores[1]}, play another hand. ${nextStarterName} starts.`;
+  let message='';
+  if (gameEnds && S.scores[0] === S.scores[1] && S.scores[0] > S.target) {
+    message = `Tie game ${S.scores[0]} ${S.scores[1]}, play another hand.`;
   } else if(handTotals[0] === handTotals[1]) {
-    message = `A ${handTotals[0]} ${handTotals[1]} tied hand. ${nextStarterName} starts.`;
+    message = `A ${handTotals[0]} ${handTotals[1]} tied hand.`;
   } else {
     const winnerIdx = handTotals[0] > handTotals[1] ? 0 : 1;
     const winnerName = escapeHTML(S.names[winnerIdx]);
-    const article = maxScore === 8 ? 'an' : 'a';
-    message = `${winnerName} won that hand ${maxScore} ${minScore}, ${nextStarterName} starts.`;
+    message = `${winnerName} won that hand ${maxScore} ${minScore}.`;
   }
   
   S.handScores=[0,0];S.lastAdded=['',''];S.pendingWin=false;
-  setStatus(message, 5000);
+  if(message) setStatus(message, 5000);
+  else clearStatusOrHelp();
   setTimeout(()=>{if(Date.now()>=S.firstPlayerHighlightUntil){S.firstPlayerHighlightUntil=0;render();}},10000);
   S.display='';save();render();
 }
@@ -802,37 +868,45 @@ function render(){
   }).join('');
   
   let defaultStartStatus = '';
-  if (S.phase==='start' && !S.status) {
-    if (S.tab === 0) defaultStartStatus = `Click ${escapeHTML(S.names[0]) || 'Player 1'} or ${escapeHTML(S.names[1]) || 'Player 2'} with the highest double to start the game.`;
-    else if (S.tab === 2) {
+  if (S.phase==='start' && !S.status && !S.helpMessage) {
+    if (S.tab === 2) {
       if (S.showNewContestInputs && !S.hideNewContestHelp) defaultStartStatus = 'Add names to create a new contest.';
-      else defaultStartStatus = hasContests ? 'Click Score tab to start a game.' : 'Add Player to create contest.';
+      else defaultStartStatus = '';
     }
   }
-  const statusText=S.status||defaultStartStatus;
-  const isNewContestHelp = !S.status && defaultStartStatus === 'Add names to create a new contest.';
-  const statusIcon = S.status ? '&#10003;' : '?';
-  const statusClick = S.status ? 'ackStatus()' : (isNewContestHelp ? 'S.hideNewContestHelp=true;render()' : 'showHelp()');
+  const statusText = S.status || S.helpMessage || defaultStartStatus;
+  const isNewContestHelp = !S.status && !S.helpMessage && defaultStartStatus === 'Add names to create a new contest.';
+  const statusIcon = (S.status || S.helpMessage) ? '&#10003;' : '?';
+  const statusClick = (S.status || S.helpMessage) ? 'ackStatus()' : (isNewContestHelp ? 'S.hideNewContestHelp=true;render()' : 'showHelp()');
   
   let content='';
+  let miniRows='';
+  let showHistory=false;
+  // preserve previous mini-history position for smooth animation
+  const _oldHist = document.querySelector('.hist-mini');
+  const _prevHistTop = _oldHist ? _oldHist.scrollTop : 0;
+  const _prevHistHeight = _oldHist ? _oldHist.scrollHeight : 0;
+  const _prevHistClient = _oldHist ? _oldHist.clientHeight : 0;
+  const _prevHistAtBottom = _oldHist ? (_oldHist.scrollTop + _oldHist.clientHeight >= _oldHist.scrollHeight - 6) : false;
 
   if(S.tab===0){
     const isStart=S.phase==='start';
     const displayClass=S.display?'display-bar':'display-bar dim';
     const cards=[0,1].map(i=>`
       <div class="scard ${isStart?'pending-setup':''}" onclick="tapPlayer(${i})">
+        <div class="first-player-indicator ${S.firstPlayerHighlightUntil > Date.now() && S.firstPlayer === i ? 'active' : ''}"></div>
         <div class="pname">${escapeHTML(S.names[i])}</div>
         <div class="score-total">${S.scores[i]}</div>
       </div>`).join('');
     const dominoLabel=domTile();
     
     const scoreRecs=S.records.filter(r=>r.type==='score').slice(-4);
-    const miniRows=scoreRecs.map(rec=>{
+    miniRows = scoreRecs.map(rec=>{
       const realIdx = S.records.indexOf(rec);
       return `<div class="hist-mini-row"><span class="hist-mini-x" onclick="event.stopPropagation();deleteRecord(${realIdx})">&#10005;</span><span class="hist-mini-pts">${rec.pts}</span><span class="hist-mini-name">${escapeHTML(S.names[rec.who])}</span></div>`;
     }).join('');
 
-    const showHistory = !S.status && miniRows;
+    showHistory = !S.status && !S.helpMessage && miniRows;
 
     content=`
       <div class="numpad-wrap">
@@ -847,122 +921,145 @@ function render(){
       <div class="scoreboard">${cards}</div>
       <div class="status-bar" onclick="${statusClick}">
         <div class="status-text">
-          ${S.status || (showHistory ? `<div class="hist-mini">${miniRows}</div>` : defaultStartStatus)}
+          ${statusText || (showHistory ? `<div class="hist-mini">${miniRows}</div>` : defaultStartStatus)}
         </div>
         <div class="status-icon">${statusIcon}</div>
       </div>
     `;
   } else if(S.tab===1){
     const games = S.pastGames || [];
+    const totalGames = games.length;
     const wins = [0, 0];
     const totals = [0, 0];
-    const margins = []; // For histogram
-    const diffs = [0]; // Cumulative differences: Player 0 - Player 1
-    
+    const margins = [];
+    const hostMargins = [];
+    const guestMargins = [];
+
     games.slice().reverse().forEach(g => {
       wins[g.winnerIdx]++;
       totals[0] += g.scores[0];
       totals[1] += g.scores[1];
-      margins.push(Math.abs(g.scores[0] - g.scores[1]));
-      diffs.push(diffs[diffs.length-1] + (g.scores[0] - g.scores[1]));
+      const diff = Math.abs(g.scores[0] - g.scores[1]);
+      margins.push(diff);
+      if (g.winnerIdx === 0) hostMargins.push(diff);
+      else guestMargins.push(diff);
     });
-    
+
     const avg = [
-      games.length ? (totals[0] / games.length).toFixed(1) : '0.0',
-      games.length ? (totals[1] / games.length).toFixed(1) : '0.0'
+      totalGames ? (totals[0] / totalGames).toFixed(1) : '0.0',
+      totalGames ? (totals[1] / totalGames).toFixed(1) : '0.0'
     ];
-    
-    // Simple SVG Graph for Cumulative Difference
-    let diffGraph = '';
-    if(diffs.length > 1) {
-      const w = 360, h = 120;
-      const maxDiff = Math.max(...diffs.map(Math.abs), 10);
-      const points = diffs.map((d, i) => `${(i / (diffs.length - 1)) * w},${h/2 - (d / maxDiff) * (h/2)}`).join(' ');
-      diffGraph = `
-        <div class="chart-container">
-          <div class="chart-title">Cumulative Point Lead (${escapeHTML(S.names[0])} vs ${escapeHTML(S.names[1])})</div>
-          <svg viewBox="0 0 ${w} ${h}" width="100%" height="${h}" style="overflow:visible">
-            <line x1="0" y1="${h/2}" x2="${w}" y2="${h/2}" stroke="var(--color-border-tertiary)" stroke-width="1" />
-            <polyline fill="none" stroke="#1D9E75" stroke-width="2" points="${points}" />
-          </svg>
-        </div>
-      `;
-    }
 
-    // Simple SVG Graph for Cumulative Games Won
-    let gamesGraph = '';
-    if(games.length > 0) {
-      const w = 360, h = 120;
-      const winDiffs = [0];
-      games.slice().reverse().forEach(g => {
-        const last = winDiffs[winDiffs.length-1];
-        winDiffs.push(last + (g.winnerIdx === 0 ? 1 : -1));
-      });
-      const maxWinDiff = Math.max(...winDiffs.map(Math.abs), 5);
-      const points = winDiffs.map((d, i) => `${(i / (winDiffs.length - 1)) * w},${h/2 - (d / maxWinDiff) * (h/2)}`).join(' ');
-      gamesGraph = `
-        <div class="chart-container">
-          <div class="chart-title">Cumulative Games Won (${escapeHTML(S.names[0])} vs ${escapeHTML(S.names[1])})</div>
-          <svg viewBox="0 0 ${w} ${h}" width="100%" height="${h}" style="overflow:visible">
-            <line x1="0" y1="${h/2}" x2="${w}" y2="${h/2}" stroke="var(--color-border-tertiary)" stroke-width="1" />
-            <polyline fill="none" stroke="#1D9E75" stroke-width="2" points="${points}" />
-          </svg>
-        </div>
-      `;
-    }
+    const box1Titles = ['GAMES WON', 'AVERAGE POINTS PER GAME', 'TOTAL POINTS'];
+    const box1Lines = [
+      [`${wins[0]} Host`, `${wins[1]} Guest`],
+      [`${avg[0]} Host`, `${avg[1]} Guest`],
+      [`${totals[0]} Host`, `${totals[1]} Guest`]
+    ];
 
-    // Simple SVG Histogram for Win Margins
-    let marginHist = '';
-    if(margins.length > 0) {
+    const box2Titles = ['CUMULATIVE GAMES WON', 'CUMULATIVE POINTS'];
+    const box2Lines = [
+      [`${wins[0]} Host`, `${wins[1]} Guest`],
+      [`${totals[0]} Host`, `${totals[1]} Guest`]
+    ];
+
+    const cumulativeWinsHost = [];
+    const cumulativeWinsGuest = [];
+    const cumulativePointsHost = [];
+    const cumulativePointsGuest = [];
+    let runningWinsHost = 0;
+    let runningWinsGuest = 0;
+    let runningPointsHost = 0;
+    let runningPointsGuest = 0;
+    games.forEach(g => {
+      if (g.winnerIdx === 0) runningWinsHost++;
+      else runningWinsGuest++;
+      cumulativeWinsHost.push(runningWinsHost);
+      cumulativeWinsGuest.push(runningWinsGuest);
+      runningPointsHost += g.scores[0];
+      runningPointsGuest += g.scores[1];
+      cumulativePointsHost.push(runningPointsHost);
+      cumulativePointsGuest.push(runningPointsGuest);
+    });
+
+    const makeLinePath = (points, opts={}) => {
+      if (!points.length) return '';
+      const width = opts.width || 320;
+      const height = opts.height || 70;
+      const padding = opts.padding || 16;
+      const minVal = Math.min(...points, 0);
+      const maxVal = Math.max(...points, 0);
+      const range = maxVal - minVal || 1;
+      const step = points.length > 1 ? (width - padding * 2) / (points.length - 1) : 0;
+      return points.map((value, index) => {
+        const x = padding + step * index;
+        const y = height - padding - ((value - minVal) / range) * (height - padding * 2);
+        return `${x},${y}`;
+      }).join(' L ');
+    };
+
+    // Prepare single-line lead series for games or points (host minus guest)
+    const gameLeads = cumulativeWinsHost.map((v,i)=> v - (cumulativeWinsGuest[i]||0));
+    const pointLeads = cumulativePointsHost.map((v,i)=> v - (cumulativePointsGuest[i]||0));
+    const leadSeries = S.statsBox2 === 0 ? gameLeads : pointLeads;
+    const leadTitle = S.statsBox2 === 0 ? 'GAMES' : 'POINTS';
+    const leadPath = makeLinePath(leadSeries, {width:320,height:70,padding:16});
+    const leadZeroY = (()=>{
+      if(!leadSeries.length) return 54;
+      const points = leadSeries;
+      const padding = 16; const height = 70;
+      const minVal = Math.min(...points, 0);
+      const maxVal = Math.max(...points, 0);
+      const range = maxVal - minVal || 1;
+      return Math.round(height - padding - ((0 - minVal) / range) * (height - padding * 2));
+    })();
+
+    const box3Titles = ['WIN MARGINS', 'WIN MARGINS FOR HOST', 'WIN MARGINS FOR GUEST'];
+    const selectedMargins = S.statsBox3 === 0 ? margins : S.statsBox3 === 1 ? hostMargins : guestMargins;
+    const histSvg = (() => {
       const w = 360, h = 80;
-      const bins = 10;
-      const maxMargin = Math.max(...margins, 1);
-      const binWidth = maxMargin / bins;
+      const bins = 8;
+      const values = selectedMargins.length ? selectedMargins : [0];
+      const maxVal = Math.max(...values, 1);
       const counts = new Array(bins).fill(0);
-      margins.forEach(m => counts[Math.min(Math.floor(m / binWidth), bins - 1)]++);
+      values.forEach(v => counts[Math.min(Math.floor(v / maxVal * bins), bins - 1)]++);
       const maxCount = Math.max(...counts, 1);
-      const bars = counts.map((c, i) => {
+      return counts.map((c, i) => {
         const barH = (c / maxCount) * h;
-        return `<rect x="${(i / bins) * w}" y="${h - barH}" width="${(w / bins) - 2}" height="${barH}" fill="#1D9E75" opacity="0.6" />`;
+        return `<rect x="${(i / bins) * w}" y="${h - barH}" width="${(w / bins) - 4}" height="${barH}" fill="#1D9E75" opacity="0.65" />`;
       }).join('');
-      marginHist = `
-        <div class="chart-container">
-          <div class="chart-title">Win Margins</div>
-          <svg viewBox="0 0 ${w} ${h}" width="100%" height="${h}">${bars}</svg>
-        </div>
-      `;
-    }
+    })();
 
-    content=`
-      <table class="stats-table">
-        <thead>
-          <tr>
-            <th class="stats-header">${escapeHTML(S.names[0])}</th>
-            <th class="stats-header">${escapeHTML(S.names[1])}</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td class="stats-val">${wins[0]}</td>
-            <td class="stats-val">${wins[1]}</td>
-            <td class="stats-lbl">Games won</td>
-          </tr>
-          <tr>
-            <td class="stats-val">${avg[0]}</td>
-            <td class="stats-val">${avg[1]}</td>
-            <td class="stats-lbl">Average points per game</td>
-          </tr>
-          <tr>
-            <td class="stats-val">${totals[0]}</td>
-            <td class="stats-val">${totals[1]}</td>
-            <td class="stats-lbl">Total points</td>
-          </tr>
-        </tbody>
-      </table>
-      ${diffGraph}
-      ${gamesGraph}
-      ${marginHist}
+    content = `
+      <div class="stats-grid">
+        <div class="stats-box" onclick="S.statsBox1=(S.statsBox1+1)%3;save();render();">
+          <div class="stats-box-title">${box1Titles[S.statsBox1]}</div>
+          <div class="stats-box-data" style="gap:10px;max-width:180px;margin:0 auto;">
+            <div class="stats-box-row" style="justify-content:space-between;">
+              <span class="stats-box-num">${box1Lines[S.statsBox1][0].split(' ')[0]}</span>
+              <span class="stats-box-label">Host</span>
+            </div>
+            <div class="stats-box-row" style="justify-content:space-between;">
+              <span class="stats-box-num">${box1Lines[S.statsBox1][1].split(' ')[0]}</span>
+              <span class="stats-box-label">Guest</span>
+            </div>
+          </div>
+        </div>
+        <div class="stats-box" onclick="S.statsBox2=(S.statsBox2+1)%2;save();render();">
+          <div class="stats-box-title">${leadTitle}</div>
+          <div class="chart-container" style="margin:0;padding:10px;border:none;">
+            <svg viewBox="0 0 360 90" preserveAspectRatio="none" width="100%" height="90">
+              <path d="M${leadPath}" fill="none" stroke="#1D9E75" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </div>
+        </div>
+        <div class="stats-box" onclick="S.statsBox3=(S.statsBox3+1)%3;save();render();">
+          <div class="stats-box-title">${box3Titles[S.statsBox3]}</div>
+          <div class="chart-container" style="margin:0;padding:10px;border:none;">
+            <svg viewBox="0 0 360 80" width="100%" height="80">${histSvg}</svg>
+          </div>
+        </div>
+      </div>
     `;
   } else {
     const currentKey = getContestKey(S.names);
@@ -1001,17 +1098,17 @@ function render(){
           <label>Top Score</label>
           <input type="number" value="${S.target}" min="25" max="500" step="25" onchange="S.target=Math.max(25,parseInt(this.value)||50);save();" inputmode="numeric"/>
         </div>
-        <div class="opt-row">
+        <div class="opt-row" style="display:grid;grid-template-columns:88px 1fr;gap:10px;align-items:start;">
           <label>Appearance</label>
-          <div class="radio-group">
+          <div class="radio-group" style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;">
             <label><input type="radio" name="theme" value="light" ${S.theme==='light'?'checked':''} onchange="S.theme=this.value;applyTheme();save();"><span>Light</span></label>
             <label><input type="radio" name="theme" value="dark" ${S.theme==='dark'?'checked':''} onchange="S.theme=this.value;applyTheme();save();"><span>Dark</span></label>
             <label><input type="radio" name="theme" value="system" ${S.theme==='system'?'checked':''} onchange="S.theme=this.value;applyTheme();save();"><span>System</span></label>
           </div>
         </div>
-        <div class="opt-row" style="margin-top:10px;">
+        <div class="opt-row" style="margin-top:10px;display:grid;grid-template-columns:88px 1fr;gap:10px;align-items:start;">
           <label>Data</label>
-          <div class="action-group" style="flex:1;">
+          <div class="action-group" style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;">
             <button class="action-btn" onclick="copyExport()">Export</button>
             <button class="action-btn" onclick="document.getElementById('import-area').style.display='block'">Import</button>
             <button class="action-btn" onclick="clearScores()">Clear</button>
@@ -1030,6 +1127,34 @@ function render(){
   const showStatusBarBottom = S.tab !== 0 && S.tab !== 1;
   const statusHtml = !showStatusBarBottom ? '' : `<div class="status-bar" onclick="${statusClick}"><div class="status-text ${statusText?'':'empty'}">${statusText||' '}</div><button class="action-btn status-icon" style="width:auto;min-width:auto;padding:8px 12px;">${statusIcon}</button></div>`;
   document.getElementById('app').innerHTML=`<div class="tab-content">${content}${statusHtml}</div><div class="tabbar">${tabbar}</div>`;
+  const hist = document.querySelector('.hist-mini');
+  if (hist) {
+    requestAnimationFrame(() => {
+      const newHeight = hist.scrollHeight;
+      const newClient = hist.clientHeight;
+      const bottomTop = Math.max(0, newHeight - newClient);
+      const startTop = _prevHistAtBottom
+        ? Math.max(0, Math.min(_prevHistTop + (newHeight - _prevHistHeight), bottomTop))
+        : Math.max(0, Math.min(_prevHistTop + (newHeight - _prevHistHeight), bottomTop));
+      hist.scrollTop = startTop;
+      if (S.shouldScrollHistory && newHeight > newClient) {
+        smoothScrollTo(hist, bottomTop, 600);
+        S.shouldScrollHistory = false;
+        save();
+      }
+    });
+  }
+  if(activeId) {
+    const el = document.getElementById(activeId);
+    if(el) {
+      el.focus();
+      if(el.tagName === 'INPUT' && el.type === 'text') {
+        const val = el.value;
+        el.value = '';
+        el.value = val;
+      }
+    }
+  }
   if(activeId) {
     const el = document.getElementById(activeId);
     if(el) {

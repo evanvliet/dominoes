@@ -1,0 +1,24 @@
+n49
+
+on new game help box is empty, click ? shows blank, should show:
+(if neither player has green dot)
+"click on player with highest double, then"
+(and then, in any case)
+"score by entering points and clicking on player tile"
+
+visual UI on scores flashes, please just soft scroll.
+
+
+on stats first box, please use font and boldness as on options page
+and no need for addtional Host and Guest lines, just:
+
+TOTAL POINTS
+
+ 3222 Host
+32324 Guest
+
+Keep player names on same placement as switching trhough stats
+
+on second box display line charts as before, for games or points as clicked
+
+On Options tab, remove Click score tab to start a games help message.
