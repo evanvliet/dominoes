@@ -17,7 +17,7 @@
 
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-:root{
+:root, [data-theme="light"] {
   --color-background-primary:#ffffff;
   --color-background-secondary:#f2f2f7;
   --color-background-tertiary:#e5e5ea;
@@ -31,16 +31,26 @@
   --font-sans:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;
 }
 @media(prefers-color-scheme:dark){
-  :root{
+  :root:not([data-theme="light"]){
     --color-background-primary:#1c1c1e;
     --color-background-secondary:#2c2c2e;
-    --color-background-tertiary:#3a3a3c;
+    --color-background-tertiary:#111111;
     --color-text-primary:#ffffff;
     --color-text-secondary:#aeaeb2;
     --color-text-tertiary:#636366;
     --color-border-tertiary:#3a3a3c;
     --color-border-secondary:#48484a;
   }
+}
+[data-theme="dark"]{
+  --color-background-primary:#1c1c1e;
+  --color-background-secondary:#2c2c2e;
+  --color-background-tertiary:#111111;
+  --color-text-primary:#ffffff;
+  --color-text-secondary:#aeaeb2;
+  --color-text-tertiary:#636366;
+  --color-border-tertiary:#3a3a3c;
+  --color-border-secondary:#48484a;
 }
 html,body{height:100%;background:var(--color-background-tertiary);font-family:var(--font-sans);}
 .app{max-width:430px;margin:0 auto;display:flex;flex-direction:column;height:100%;height:100dvh;}
@@ -65,7 +75,7 @@ html,body{height:100%;background:var(--color-background-tertiary);font-family:va
 .key:active{background:var(--color-border-tertiary);transform:scale(0.95);}
 .key.del{font-size:18px;color:var(--color-text-secondary);}
 .key.disabled{background:var(--color-background-secondary);color:var(--color-text-tertiary);cursor:default;}
-.status-bar{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:10px 12px;margin:8px 0;min-height:116px;}
+.status-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:8px 12px;margin:8px 0;min-height:118px;}
 .status-text{font-size:15px;color:var(--color-text-secondary);line-height:1.35;flex:1;font-weight:400;}
 .status-text.empty{color:transparent;}
 .domino-icon{width:62px;height:44px;transform:rotate(90deg);display:block;}
@@ -114,20 +124,16 @@ html,body{height:100%;background:var(--color-background-tertiary);font-family:va
 .pts-input{width:60px;font-size:14px;font-weight:500;color:#1D9E75;border:1.5px solid #1D9E75;border-radius:5px;padding:3px 6px;background:var(--color-background-primary);color:#1D9E75;outline:none;font-family:inherit;}
 
 /* mini history */
-.hist-mini{flex:1;overflow:hidden;height:80px;display:flex;flex-direction:column;justify-content:flex-end;overflow-anchor:none;position:relative;}
-.hist-mini-row{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--color-text-secondary);min-height:20px;max-height:20px;height:20px;opacity:1;overflow:hidden;transition:background 0.15s ease, opacity 0.35s ease, transform 0.35s ease, max-height 0.35s ease, padding 0.35s ease, margin 0.35s ease, border-color 0.35s ease;}
-.hist-mini-row.entering{transform: translateY(100%);opacity:0;}
-.hist-mini-row.enter-active{transform: translateY(0);opacity:1;}
-.hist-mini-row.exit-up{transform: translateY(-45%);opacity:0;max-height:0;padding-top:0;padding-bottom:0;margin:0;border-bottom-color:transparent;}
-.hist-mini-row.removing{max-height:0;padding-top:0;padding-bottom:0;margin:0;opacity:0;border-bottom-color:transparent;}
-.hist-mini-x{color:#D85A30;font-size:12px;cursor:pointer;padding:3px 4px;}
-.hist-mini-pts{font-weight:600;color:var(--color-text-primary);min-width:20px;text-align:right;}
-.hist-mini-name{flex:1;}
-
-@keyframes miniScoreIn {
-  from { transform: translateY(8px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
-}
+.hist-mini{flex:1;overflow:hidden;height:98px;min-height:98px;max-height:98px;display:flex;flex-direction:column;justify-content:flex-end;gap:3px;position:relative;contain:paint layout;}
+.hist-mini-row{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--color-text-secondary);min-height:22px;max-height:22px;height:22px;opacity:1;transform:translateY(0);will-change:transform,opacity,max-height,margin;transition:transform 0.28s cubic-bezier(0.16,1,0.3,1),opacity 0.24s ease-out,max-height 0.28s cubic-bezier(0.16,1,0.3,1),min-height 0.28s cubic-bezier(0.16,1,0.3,1),height 0.28s cubic-bezier(0.16,1,0.3,1),margin 0.28s cubic-bezier(0.16,1,0.3,1),padding 0.28s cubic-bezier(0.16,1,0.3,1);}
+.hist-mini-row.entering{transform:translateY(18px);opacity:0;max-height:22px;min-height:22px;}
+.hist-mini-row.enter-active{transform:translateY(0);opacity:1;max-height:22px;min-height:22px;}
+.hist-mini-row.exiting-top{transform:translateY(-20px);opacity:0;max-height:0 !important;min-height:0 !important;height:0 !important;margin-top:-3px !important;margin-bottom:0 !important;padding:0 !important;pointer-events:none;}
+.hist-mini-row.removing{transform:translateX(24px);opacity:0;max-height:0 !important;min-height:0 !important;height:0 !important;margin-top:-3px !important;margin-bottom:0 !important;padding:0 !important;pointer-events:none;}
+.hist-mini-x{color:#D85A30;font-size:12px;cursor:pointer;padding:2px 5px;border-radius:4px;line-height:1;display:inline-flex;align-items:center;justify-content:center;transition:background 0.15s,transform 0.1s;}
+.hist-mini-x:active{background:rgba(216,90,48,0.15);transform:scale(0.88);}
+.hist-mini-pts{font-weight:600;color:var(--color-text-primary);min-width:24px;text-align:right;font-variant-numeric:tabular-nums;}
+.hist-mini-name{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 
 .stats-box-data{display:flex;flex-direction:column;gap:6px;margin-top:8px;}
 .stats-box-row{font-size:14px;font-weight:600;color:var(--color-text-primary);display:flex;justify-content:center;gap:12px;align-items:center;width:100%;}
@@ -175,9 +181,9 @@ html,body{height:100%;background:var(--color-background-tertiary);font-family:va
   .stats-header{font-size:14px;padding-bottom:6px;}
   .chart-container{margin-top:12px;padding:8px;}
   .chart-title{margin-bottom:8px;font-size:11px;}
-  .status-bar{min-height:120px;padding:10px 12px;}
-  .hist-mini{height:74px;}
-  .hist-mini-row{gap:5px;font-size:12px;min-height:17px;}
+  .status-bar{min-height:118px;padding:8px 10px;}
+  .hist-mini{height:98px;min-height:98px;gap:3px;}
+  .hist-mini-row{gap:6px;font-size:12.5px;height:22px;min-height:22px;}
   .radio-group label{min-height:36px;padding:6px 4px;}
   .action-btn{padding:8px;font-size:13px;margin-bottom:8px;}
   textarea.export-area{height:120px;padding:7px;}
@@ -189,9 +195,9 @@ html,body{height:100%;background:var(--color-background-tertiary);font-family:va
   .scard{padding:7px 6px 6px;min-height:76px;}
   .scard .pname{font-size:14px;}
   .score-total{font-size:22px;}
-  .status-bar{min-height:116px;padding:8px 10px;}
-  .hist-mini{height:68px;}
-  .hist-mini-row{font-size:12px;min-height:16px;}
+  .status-bar{min-height:116px;padding:7px 8px;}
+  .hist-mini{height:96px;min-height:96px;gap:2px;}
+  .hist-mini-row{font-size:12px;height:21px;min-height:21px;}
 }
 .copy-status{font-size:12px;color:#1D9E75;text-align:center;margin-top:5px;min-height:18px;}
 textarea.export-area{width:100%;height:145px;font-size:12px;font-family:monospace;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:9px;background:var(--color-background-secondary);color:var(--color-text-secondary);resize:none;margin-top:9px;-webkit-user-select:text;user-select:text;}
@@ -243,7 +249,6 @@ const S={
   showFirstPlayer:false,
   pendingWin:false,
   nextScoreRowId:1,
-  lastAddedScoreId:null,
   editingIdx:-1,
   status:'',
   statusUntil:0,
@@ -253,12 +258,10 @@ const S={
   showNewContestInputs:false,
   hideNewContestHelp:false,
   lastNames:['',''],
-  helpContext:'',
   newNames:['',''],
   statsBox1:0,
   statsBox2:0,
   statsBox3:0,
-  shouldScrollHistory:false,
   gameEndMessage:''
 };
 let LAST_STATUS_SET=0;
@@ -301,9 +304,7 @@ function load(){
     if(typeof S.statsBox1 === 'undefined') S.statsBox1 = 0;
     if(typeof S.statsBox2 === 'undefined') S.statsBox2 = 0;
     if(typeof S.statsBox3 === 'undefined') S.statsBox3 = 0;
-    if(typeof S.shouldScrollHistory === 'undefined') S.shouldScrollHistory = false;
     if(typeof S.nextScoreRowId === 'undefined') S.nextScoreRowId = 1;
-    if(typeof S.lastAddedScoreId === 'undefined') S.lastAddedScoreId = null;
     if(typeof S.showFirstPlayer === 'undefined') S.showFirstPlayer = false;
     S.display='';S.editingIdx=-1;
     applyTheme();
@@ -324,53 +325,9 @@ function load(){
 
 function applyTheme() {
   const root = document.documentElement;
-  if (S.theme === 'dark') {
-    root.style.setProperty('--color-background-primary', '#1c1c1e');
-    root.style.setProperty('--color-background-secondary', '#2c2c2e');
-    root.style.setProperty('--color-background-tertiary', '#111111');
-    root.style.setProperty('--color-text-primary', '#ffffff');
-    root.style.setProperty('--color-text-secondary', '#aeaeb2');
-    root.style.setProperty('--color-text-tertiary', '#636366');
-    root.style.setProperty('--color-border-tertiary', '#3a3a3c');
-    root.style.setProperty('--color-border-secondary', '#48484a');
-    document.body.style.background = '#111111';
-  } else if (S.theme === 'light') {
-    root.style.setProperty('--color-background-primary', '#ffffff');
-    root.style.setProperty('--color-background-secondary', '#f2f2f7');
-    root.style.setProperty('--color-background-tertiary', '#e5e5ea');
-    root.style.setProperty('--color-text-primary', '#1c1c1e');
-    root.style.setProperty('--color-text-secondary', '#6e6e73');
-    root.style.setProperty('--color-text-tertiary', '#aeaeb2');
-    root.style.setProperty('--color-border-tertiary', '#d1d1d6');
-    root.style.setProperty('--color-border-secondary', '#c7c7cc');
-    document.body.style.background = '#e5e5ea';
-  } else {
-    // System: remove overrides and let CSS media queries handle it
-    root.style.removeProperty('--color-background-primary');
-    root.style.removeProperty('--color-background-secondary');
-    root.style.removeProperty('--color-background-tertiary');
-    root.style.removeProperty('--color-text-primary');
-    root.style.removeProperty('--color-text-secondary');
-    root.style.removeProperty('--color-text-tertiary');
-    root.style.removeProperty('--color-border-tertiary');
-    root.style.removeProperty('--color-border-secondary');
-    document.body.style.background = '';
-  }
-}
-
-function smoothScrollTo(el, target, duration=800){
-  if(!el) return;
-  const start = el.scrollTop;
-  const change = target - start;
-  const startTime = performance.now();
-  const easeInOut = t => 0.5 - Math.cos(Math.PI * t) / 2; // ease in-out
-  function animate(now){
-    const elapsed = now - startTime;
-    const progress = Math.min(elapsed / duration, 1);
-    el.scrollTop = Math.round(start + change * easeInOut(progress));
-    if(progress < 1) requestAnimationFrame(animate);
-  }
-  requestAnimationFrame(animate);
+  if (S.theme === 'dark') root.dataset.theme = 'dark';
+  else if (S.theme === 'light') root.dataset.theme = 'light';
+  else delete root.dataset.theme;
 }
 
 function getContestKey(names) {
@@ -424,49 +381,29 @@ function setStatus(msg,timeout=5000){
 }
 
 function clearStatus(){
-  S.status='';S.statusUntil=0;save();render();
+  S.status='';S.statusUntil=0;S.gameEndMessage='';save();render();
 }
 
 function clearScoreHistoryIfNoScores(){
   if(S.scores[0]===0 && S.scores[1]===0){
     S.records=[];
-    S.lastAddedScoreId=null;
   }
 }
 
 function waitingForHighDouble(){
-  // When the app is waiting for the first starter or the next-game starter after a game ends.
-  // only wait for a starter after a game ends
   return (S.phase==='end' && S.gameOver);
 }
 
 function highDoublePrompt(){
-  return S.phase==='end' && S.gameOver
-    ? 'Click player with high double to start a new game.'
-    : 'Click player with high double to start a new game.';
+  return 'Click player with high double to start a new game.';
 }
 
 function notifyHighDoublePrompt(){
-  // Used by disabled controls and non-player clicks while starter selection is required.
   setStatus(highDoublePrompt(), 30000);
 }
 
 function clearHelp(){
   S.helpMessage='';save();render();
-}
-
-function clearStatusOrHelp(){
-  S.status='';S.statusUntil=0;S.helpMessage='';save();render();
-}
-
-function resetForNewGamePreserveHistory(){
-  S.scores=[0,0];S.handScores=[0,0];S.display='';
-  S.gameOver=false;S.pendingWin=false;S.phase='start';
-  S.firstPlayer=-1;S.handFirstPlayer=-1;S.handNum=0;
-  S.lastAdded=['',''];S.lastAddedScoreId=null;S.showFirstPlayer=false;S.editingIdx=-1;
-  S.status='';S.statusUntil=0;S.helpMessage='';S.highestDoublePlayer=-1;S.tab=0;
-  S.lastStatus='';S.helpContext='';
-  save();render();
 }
 
 function ackStatus(){
@@ -478,6 +415,7 @@ function ackStatus(){
     clearHelp();
     return;
   }
+  S.gameEndMessage='';
   clearStatus();
 }
 
@@ -501,9 +439,8 @@ function resetForNewGame(){
   S.scores=[0,0];S.handScores=[0,0];S.display='';S.records=[];
   S.gameOver=false;S.pendingWin=false;S.phase='start';
   S.firstPlayer=-1;S.handFirstPlayer=-1;S.handNum=0;
-  S.lastAdded=['',''];S.lastAddedScoreId=null;S.showFirstPlayer=false;S.editingIdx=-1;
-  S.status='';S.statusUntil=0;S.highestDoublePlayer=-1;S.tab=0;
-  S.lastStatus='';S.helpContext='';
+  S.lastAdded=['',''];S.showFirstPlayer=false;S.editingIdx=-1;
+  S.status='';S.statusUntil=0;S.gameEndMessage='';S.highestDoublePlayer=-1;S.tab=0;
   save();render();
 }
 
@@ -531,8 +468,6 @@ function delKey(){
 
 function tapPlayer(i){
   if (S.phase==='end') {
-    // Select the high-double player to begin the next game.
-    // Reset for new game, clearing old totals now
     S.scores = [0, 0];
     S.handScores = [0, 0];
     clearScoreHistoryIfNoScores();
@@ -544,7 +479,6 @@ function tapPlayer(i){
     S.handFirstPlayer = -1;
     S.handNum = 0;
     S.lastAdded = ['', ''];
-    S.lastAddedScoreId = null;
     S.showFirstPlayer = false;
     S.editingIdx = -1;
     S.status = '';
@@ -553,8 +487,6 @@ function tapPlayer(i){
     S.gameEndMessage = '';
     S.highestDoublePlayer = -1;
     S.tab = 0;
-    S.lastStatus = '';
-    S.helpContext = '';
     save();
     render();
     return;
@@ -574,13 +506,11 @@ function tapPlayer(i){
       S.scores[i]+=pts;S.handScores[i]+=pts;
       S.lastAdded=['',''];S.lastAdded[i]='+'+pts;
       const rowId = S.nextScoreRowId++;
-  S.lastAddedScoreId = rowId;
-  S.records.push({id: rowId, who:i,pts,time:ts(),type:'score',hand:1,totalAfter:[S.scores[0],S.scores[1]]});
+      S.records.push({id: rowId, who:i,pts,time:ts(),type:'score',hand:1,totalAfter:[S.scores[0],S.scores[1]]});
       if(S.scores[i]>=S.target)S.pendingWin=true;
     }
-    S.display='';S.phase='play';S.helpContext='play';
+    S.display='';S.phase='play';
     S.status='';S.statusUntil=0;S.helpMessage='';
-    S.shouldScrollHistory = true;
     save();render();return;
   }
   if(pts<=0){
@@ -590,16 +520,13 @@ function tapPlayer(i){
     return;
   }
   S.status='';S.statusUntil=0;S.helpMessage='';
-    // any score click clears transient starter highlight
-    S.showFirstPlayer = false;
-    S.scores[i]+=pts;S.handScores[i]+=pts;
+  S.showFirstPlayer = false;
+  S.scores[i]+=pts;S.handScores[i]+=pts;
   S.lastAdded=['',''];S.lastAdded[i]='+'+pts;
   const rowId = S.nextScoreRowId++;
-  S.lastAddedScoreId = rowId;
   S.records.push({id: rowId, who:i,pts,time:ts(),type:'score',hand:S.handNum,totalAfter:[S.scores[0],S.scores[1]]});
-  S.shouldScrollHistory = true;
   if(S.scores[i]>=S.target)S.pendingWin=true;
-  S.display='';S.helpContext='score';
+  S.display='';
   save();render();
 }
 
@@ -716,34 +643,74 @@ function deleteScore(id){
   const row = document.querySelector(`.hist-mini-row[data-score-id="${id}"]`);
   if (row) {
     row.classList.add('removing');
-    const list = document.querySelector('.hist-mini');
-    if (list) {
-      list.style.height = list.offsetHeight + 'px';
-      list.style.overflow = 'hidden';
-    }
     setTimeout(() => {
       deleteRecord(idx);
-      if (list) {
-        list.style.height = '';
-        list.style.overflow = '';
-      }
-    }, 320);
+    }, 220);
   } else {
     deleteRecord(idx);
   }
 }
 
-function renderMiniHistory(){
-  const list = document.querySelector('.hist-mini');
-  if (!list) return;
-  const entering = list.querySelector('.hist-mini-row.entering');
-  if (entering) {
-    requestAnimationFrame(() => {
-      entering.classList.add('enter-active');
-      entering.classList.remove('entering');
-    });
+function patchMiniHistory(recentScores) {
+  const statusTextContainer = document.querySelector('.status-bar .status-text');
+  if (!statusTextContainer) return;
+  let list = statusTextContainer.querySelector('.hist-mini');
+
+  if (!list) {
+    statusTextContainer.innerHTML = '<div class="hist-mini"></div>';
+    list = statusTextContainer.querySelector('.hist-mini');
   }
-  S.lastAddedScoreId = null;
+
+  const existingRowMap = new Map();
+  list.querySelectorAll('.hist-mini-row').forEach(row => {
+    const id = Number(row.dataset.scoreId);
+    if (!isNaN(id)) existingRowMap.set(id, row);
+  });
+
+  const targetIds = new Set(recentScores.map(r => r.id));
+
+  // 1. Mark and remove rows that are no longer in recentScores (e.g. pushed off top or deleted)
+  existingRowMap.forEach((row, id) => {
+    if (!targetIds.has(id)) {
+      if (!row.classList.contains('removing') && !row.classList.contains('exiting-top')) {
+        row.classList.add('exiting-top');
+        setTimeout(() => {
+          if (row.parentNode) row.parentNode.removeChild(row);
+        }, 280);
+      }
+    }
+  });
+
+  // 2. Insert new rows or update existing rows
+  recentScores.forEach(rec => {
+    let row = existingRowMap.get(rec.id);
+    if (row) {
+      if (!row.classList.contains('removing') && !row.classList.contains('exiting-top')) {
+        const ptsEl = row.querySelector('.hist-mini-pts');
+        const nameEl = row.querySelector('.hist-mini-name');
+        if (ptsEl && ptsEl.textContent !== String(rec.pts)) ptsEl.textContent = rec.pts;
+        if (nameEl && nameEl.textContent !== S.names[rec.who]) nameEl.textContent = escapeHTML(S.names[rec.who]);
+      }
+    } else {
+      row = document.createElement('div');
+      row.className = 'hist-mini-row entering';
+      row.dataset.scoreId = rec.id;
+      row.innerHTML = `
+        <span class="hist-mini-x" onclick="event.stopPropagation();deleteScore(${rec.id})">&#10005;</span>
+        <span class="hist-mini-pts">${rec.pts}</span>
+        <span class="hist-mini-name">${escapeHTML(S.names[rec.who])}</span>
+      `;
+      list.appendChild(row);
+
+      // Force synchronous reflow to register initial state
+      void row.offsetHeight;
+
+      requestAnimationFrame(() => {
+        row.classList.remove('entering');
+        row.classList.add('enter-active');
+      });
+    }
+  });
 }
 
 function startEdit(idx){
@@ -826,15 +793,12 @@ function doImport(){
     }
     
     const key = getContestKey(names);
-    // Explicitly hide New... UI and set names before switching
+    const exists = !!S.contests[key];
     S.showNewContestInputs = false;
-    S.names = [...names];
-    
-    if (!S.contests[key]) {
-      switchContest(names);
+    switchContest(names);
+    if (!exists) {
       S.pastGames = games;
     } else {
-      switchContest(names);
       S.pastGames = [...games, ...S.pastGames];
     }
     
@@ -850,29 +814,8 @@ function clearScores(){
   delete S.contests[keyToDelete];
   const keys = Object.keys(S.contests);
   if (keys.length > 0) {
-    const nextNames = S.contests[keys[0]].names;
-    // We manually switch without updateContest(keyToDelete)
-    const c = S.contests[getContestKey(nextNames)];
-    S.names = [...nextNames];
-    S.scores = c.scores;
-    S.handScores = c.handScores;
-    S.records = c.records;
-    S.pastGames = c.pastGames;
-    S.target = c.target;
-    S.gameOver = c.gameOver;
-    S.phase = c.phase;
-    S.firstPlayer = c.firstPlayer;
-    S.handFirstPlayer = c.handFirstPlayer;
-    S.handNum = c.handNum;
-    S.lastAdded = c.lastAdded;
-    S.pendingWin = c.pendingWin;
-    S.highestDoublePlayer = c.highestDoublePlayer;
-    S.theme = c.theme || 'system';
-    S.lastStatus = '';
-    applyTheme();
-    save();
-    render();
-    setStatus(`Contest deleted`, 3000);
+    switchContest(S.contests[keys[0]].names);
+    setStatus('Contest deleted', 3000);
   } else {
     S.names = ['', ''];
     resetForNewGame();
@@ -880,12 +823,8 @@ function clearScores(){
     S.showNewContestInputs = true;
     save();
     render();
-    setStatus(`Contest deleted`, 3000);
+    setStatus('Contest deleted', 3000);
   }
-}
-
-function newGame(){
-  setStatus('Click here to reset everything.', 5000);
 }
 
 function handleContestChange(val) {
@@ -952,29 +891,16 @@ function switchContest(newNames) {
     S.lastAdded = ['', ''];
     S.pendingWin = false;
     S.highestDoublePlayer = -1;
-    // S.target and S.theme are preserved from previous contest
   }
   S.names = [...newNames];
   S.newNames = ['', ''];
+  S.gameEndMessage = '';
+  S.status = '';
+  S.statusUntil = 0;
   updateContest();
   applyTheme();
   save();
   render();
-}
-
-function initNameInputs(){
-  [0,1].forEach(i=>{
-    const el=document.getElementById('name-input-'+i);
-    if(!el)return;
-    el.addEventListener('blur',()=>{
-      const newName = el.value.trim()||'Player '+(i+1);
-      if (newName !== S.names[i]) {
-        const nextNames = [...S.names];
-        nextNames[i] = newName;
-        switchContest(nextNames);
-      }
-    });
-  });
 }
 
 function setTab(t){
@@ -987,6 +913,8 @@ function setTab(t){
 }
 
 function render(){
+  const appEl = document.getElementById('app');
+  if (!appEl) return;
   const activeId = document.activeElement ? document.activeElement.id : null;
   if(S.status && Date.now()>S.statusUntil){S.status='';S.statusUntil=0;save();}
   const tabIcons=[
@@ -1013,15 +941,81 @@ function render(){
     }
   }
   const controlsDisabled = waitingForHighDouble();
-  const statusText = S.gameEndMessage || S.status || S.helpMessage || defaultStartStatus;
+  const statusText = (S.tab === 0 ? S.gameEndMessage : '') || S.status || S.helpMessage || defaultStartStatus;
   const isNewContestHelp = !S.status && !S.helpMessage && defaultStartStatus === 'Add names to create a new contest.';
-  const statusIcon = (S.status || S.helpMessage) ? '&#10003;' : '?';
-  const statusClick = (S.status || S.helpMessage) ? 'ackStatus()' : (isNewContestHelp ? 'S.hideNewContestHelp=true;render()' : 'showHelp()');
+  const statusIcon = (S.status || S.helpMessage || (S.tab === 0 && S.gameEndMessage)) ? '&#10003;' : '?';
+  const statusClick = (S.status || S.helpMessage || (S.tab === 0 && S.gameEndMessage)) ? 'ackStatus()' : (isNewContestHelp ? 'S.hideNewContestHelp=true;render()' : 'showHelp()');
   
-  let content='';
-  let miniRows='';
-  let showHistory=false;
-  // preserve previous mini-history position for smooth animation
+  const recentScores = S.records.filter(r => r.type === 'score').slice(-4);
+  const showHistory = !S.status && !S.helpMessage && (S.tab !== 0 || !S.gameEndMessage) && recentScores.length > 0;
+
+  // Targeted DOM update for Tab 0 if already mounted
+  const isTab0Mounted = S.tab === 0 && appEl.dataset.tab === '0' && appEl.querySelector('.scoreboard');
+  if (isTab0Mounted) {
+    const isStart = S.phase === 'start';
+    const highlightPlayers = waitingForHighDouble();
+
+    // 1. Display bar
+    const displayEl = document.getElementById('display-bar');
+    if (displayEl) {
+      displayEl.textContent = S.display || '0';
+      displayEl.className = 'display-bar' + (S.display ? '' : ' dim');
+    }
+
+    // 2. Keypad
+    const keypadKeys = appEl.querySelectorAll('.keypad .key');
+    keypadKeys.forEach(k => {
+      if (k.classList.contains('domino-key')) {
+        k.innerHTML = domTile();
+      } else {
+        if (highlightPlayers) k.classList.add('disabled');
+        else k.classList.remove('disabled');
+      }
+    });
+
+    // 3. Scoreboard Cards
+    const scards = appEl.querySelectorAll('.scoreboard .scard');
+    [0, 1].forEach(i => {
+      const sc = scards[i];
+      if (sc) {
+        sc.className = `scard ${isStart ? 'pending-setup' : ''} ${highlightPlayers ? 'select-starter' : ''} ${(S.showFirstPlayer && S.firstPlayer === i) ? 'first-player' : ''}`;
+        const pname = sc.querySelector('.pname');
+        const scoreTot = sc.querySelector('.score-total');
+        if (pname && pname.textContent !== S.names[i]) pname.textContent = S.names[i];
+        const val = String(isStart ? 0 : S.scores[i]);
+        if (scoreTot && scoreTot.textContent !== val) scoreTot.textContent = val;
+      }
+    });
+
+    // 4. Status Bar
+    const statusBar = appEl.querySelector('.status-bar');
+    const statusTextEl = appEl.querySelector('.status-bar .status-text');
+    const statusIconEl = appEl.querySelector('.status-bar .status-icon');
+    if (statusBar) statusBar.setAttribute('onclick', statusClick);
+    if (statusIconEl) statusIconEl.innerHTML = statusIcon;
+    
+    if (statusTextEl) {
+      if (statusText) {
+        statusTextEl.innerHTML = escapeHTML(statusText).replace(/\n/g, '<br/>');
+        statusTextEl.classList.remove('empty');
+      } else if (showHistory) {
+        statusTextEl.classList.remove('empty');
+        patchMiniHistory(recentScores);
+      } else {
+        statusTextEl.innerHTML = defaultStartStatus ? escapeHTML(defaultStartStatus) : '&nbsp;';
+        if (!defaultStartStatus) statusTextEl.classList.add('empty');
+        else statusTextEl.classList.remove('empty');
+      }
+    }
+
+    // 5. Tabbar
+    const tabbarEl = appEl.querySelector('.tabbar');
+    if (tabbarEl) tabbarEl.innerHTML = tabbar;
+    return;
+  }
+
+  appEl.dataset.tab = String(S.tab);
+  let content = '';
   if(S.tab===0){
     const isStart=S.phase==='start';
     const highlightPlayers = waitingForHighDouble();
@@ -1032,16 +1026,10 @@ function render(){
         <div class="score-total">${isStart ? 0 : S.scores[i]}</div>
       </div>`).join('');
     const dominoLabel=domTile();
-    
-    const recentScores = S.records.filter(r => r.type === 'score').slice(-4);
-    miniRows = recentScores.map(rec => `
-      <div class="hist-mini-row${rec.id === S.lastAddedScoreId ? ' entering' : ''}" data-score-id="${rec.id}">
-        <span class="hist-mini-x" onclick="event.stopPropagation();deleteScore(${rec.id})">&#10005;</span>
-        <span class="hist-mini-pts">${rec.pts}</span>
-        <span class="hist-mini-name">${escapeHTML(S.names[rec.who])}</span>
-      </div>`).join('');
 
-    showHistory = !S.status && !S.helpMessage && recentScores.length > 0;
+    const statusInner = statusText 
+      ? escapeHTML(statusText).replace(/\n/g, '<br/>') 
+      : (showHistory ? '<div class="hist-mini"></div>' : (defaultStartStatus ? escapeHTML(defaultStartStatus) : '&nbsp;'));
 
     content=`
       <div class="numpad-wrap">
@@ -1055,8 +1043,8 @@ function render(){
       </div>
       <div class="scoreboard">${cards}</div>
       <div class="status-bar" onclick="${statusClick}">
-        <div class="status-text">
-          ${statusText || (showHistory ? `<div class="hist-mini">${miniRows}</div>` : defaultStartStatus)}
+        <div class="status-text ${(!statusText && !showHistory && !defaultStartStatus) ? 'empty' : ''}">
+          ${statusInner}
         </div>
         <div class="status-icon">${statusIcon}</div>
       </div>
@@ -1080,23 +1068,22 @@ function render(){
       else guestMargins.push(diff);
     });
 
+    const p1Name = escapeHTML(S.names[0]) || 'Host';
+    const p2Name = escapeHTML(S.names[1]) || 'Guest';
+
     const avg = [
       totalGames ? (totals[0] / totalGames).toFixed(1) : '0.0',
       totalGames ? (totals[1] / totalGames).toFixed(1) : '0.0'
     ];
 
     const box1Titles = ['GAMES WON', 'AVERAGE POINTS PER GAME', 'TOTAL POINTS'];
-    const box1Lines = [
-      [`${wins[0]} Host`, `${wins[1]} Guest`],
-      [`${avg[0]} Host`, `${avg[1]} Guest`],
-      [`${totals[0]} Host`, `${totals[1]} Guest`]
+    const box1Data = [
+      [wins[0], wins[1]],
+      [avg[0], avg[1]],
+      [totals[0], totals[1]]
     ];
 
     const box2Titles = ['CUMULATIVE GAMES WON', 'CUMULATIVE POINTS'];
-    const box2Lines = [
-      [`${wins[0]} Host`, `${wins[1]} Guest`],
-      [`${totals[0]} Host`, `${totals[1]} Guest`]
-    ];
 
     const cumulativeWinsHost = [];
     const cumulativeWinsGuest = [];
@@ -1139,17 +1126,8 @@ function render(){
     const leadSeries = S.statsBox2 === 0 ? gameLeads : pointLeads;
     const leadTitle = S.statsBox2 === 0 ? 'GAMES' : 'POINTS';
     const leadPath = makeLinePath(leadSeries, {width:320,height:70,padding:16});
-    const leadZeroY = (()=>{
-      if(!leadSeries.length) return 54;
-      const points = leadSeries;
-      const padding = 16; const height = 70;
-      const minVal = Math.min(...points, 0);
-      const maxVal = Math.max(...points, 0);
-      const range = maxVal - minVal || 1;
-      return Math.round(height - padding - ((0 - minVal) / range) * (height - padding * 2));
-    })();
 
-    const box3Titles = ['WIN MARGINS', 'WIN MARGINS FOR HOST', 'WIN MARGINS FOR GUEST'];
+    const box3Titles = ['WIN MARGINS', `WIN MARGINS FOR ${p1Name.toUpperCase()}`, `WIN MARGINS FOR ${p2Name.toUpperCase()}`];
     const selectedMargins = S.statsBox3 === 0 ? margins : S.statsBox3 === 1 ? hostMargins : guestMargins;
     const histSvg = (() => {
       const w = 360, h = 80;
@@ -1171,12 +1149,12 @@ function render(){
           <div class="stats-box-title">${box1Titles[S.statsBox1]}</div>
           <div class="stats-box-data" style="gap:10px;max-width:180px;margin:0 auto;">
             <div class="stats-box-row" style="justify-content:space-between;">
-              <span class="stats-box-num">${box1Lines[S.statsBox1][0].split(' ')[0]}</span>
-              <span class="stats-box-label">Host</span>
+              <span class="stats-box-num">${box1Data[S.statsBox1][0]}</span>
+              <span class="stats-box-label">${p1Name}</span>
             </div>
             <div class="stats-box-row" style="justify-content:space-between;">
-              <span class="stats-box-num">${box1Lines[S.statsBox1][1].split(' ')[0]}</span>
-              <span class="stats-box-label">Guest</span>
+              <span class="stats-box-num">${box1Data[S.statsBox1][1]}</span>
+              <span class="stats-box-label">${p2Name}</span>
             </div>
           </div>
         </div>
@@ -1261,22 +1239,10 @@ function render(){
 
   const showStatusBarBottom = S.tab !== 0 && S.tab !== 1;
   const statusHtml = !showStatusBarBottom ? '' : `<div class="status-bar" onclick="${statusClick}"><div class="status-text ${statusText?'':'empty'}">${statusText||' '}</div><button class="action-btn status-icon" style="width:auto;min-width:auto;padding:8px 12px;">${statusIcon}</button></div>`;
-  document.getElementById('app').innerHTML=`<div class="tab-content">${content}${statusHtml}</div><div class="tabbar">${tabbar}</div>`;
-  const hist = document.querySelector('.hist-mini');
-  if (hist) {
-    renderMiniHistory();
-    hist.scrollTop = hist.scrollHeight;
-  }
-  if(activeId) {
-    const el = document.getElementById(activeId);
-    if(el) {
-      el.focus();
-      if(el.tagName === 'INPUT' && el.type === 'text') {
-        const val = el.value;
-        el.value = '';
-        el.value = val;
-      }
-    }
+  appEl.innerHTML = `<div class="tab-content">${content}${statusHtml}</div><div class="tabbar">${tabbar}</div>`;
+  
+  if (S.tab === 0 && showHistory) {
+    patchMiniHistory(recentScores);
   }
   if(activeId) {
     const el = document.getElementById(activeId);
@@ -1303,11 +1269,11 @@ document.addEventListener('keydown', event => {
   else if(event.key === 'o' || event.key === 'O') { event.preventDefault(); setTab(2); }
 });
 document.addEventListener('click', event => {
-  if (waitingForHighDouble() && !event.target.closest('.scard')) {
+  if (S.tab === 0 && waitingForHighDouble() && !event.target.closest('.scard') && !event.target.closest('.tabbar') && !event.target.closest('.status-bar')) {
     notifyHighDoublePrompt();
     return;
   }
-  if(!S.status) return;
+  if(!S.status && !S.gameEndMessage) return;
   if(Date.now() - LAST_STATUS_SET < 150) return;
   if(event.target.closest('.status-bar')) return;
   clearStatus();
