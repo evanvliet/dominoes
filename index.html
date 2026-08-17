@@ -80,12 +80,12 @@ html,body{height:100%;background:var(--color-background-tertiary);font-family:va
 .status-text.empty{color:transparent;}
 .domino-icon{width:62px;height:44px;transform:rotate(90deg);display:block;}
 .domino-key{font-size:0;}
-.status-icon{width:26px;height:26px;font-size:20px;text-align:center;line-height:1.3;color:var(--color-text-secondary);}
+.status-icon{width:26px;height:26px;font-size:20px;text-align:center;line-height:1.3;color:var(--color-text-secondary);align-self:flex-start;}
 .scard.select-starter{border:2px solid #1D9E75;box-shadow:0 0 0 1px rgba(29,158,117,0.12);}
 
 /* scorecards */
 .scoreboard{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px;min-height:92px;}
-.scard{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:7px 7px 6px;text-align:center;cursor:pointer;position:relative;transition:border-color 0.2s,box-shadow 0.2s;user-select:none;min-height:74px;display:flex;flex-direction:column;justify-content:center;align-items:center;}
+.scard{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:7px 7px 6px;text-align:center;cursor:pointer;position:relative;user-select:none;min-height:74px;display:flex;flex-direction:column;justify-content:center;align-items:center;}
 .scard:active{transform:scale(0.97);}
 .scard.pending-setup{border:2.5px solid var(--color-border-secondary);}
 .scard.first-player{border:2px solid #1D9E75;box-shadow:inset 0 0 0 1px rgba(29,158,117,0.15);}
@@ -248,11 +248,13 @@ const S={
   lastAdded:['',''],
   showFirstPlayer:false,
   pendingWin:false,
+  starterSelection:true,
   nextScoreRowId:1,
   editingIdx:-1,
   status:'',
   statusUntil:0,
   helpMessage:'',
+  helpTab:-1,
   highestDoublePlayer:-1,
   theme:'system',
   showNewContestInputs:false,
@@ -301,11 +303,13 @@ function load(){
     if(!S.contests) S.contests = {};
     if(!S.theme) S.theme = 'system';
     if(typeof S.helpMessage === 'undefined') S.helpMessage = '';
+    if(typeof S.helpTab === 'undefined') S.helpTab = -1;
     if(typeof S.statsBox1 === 'undefined') S.statsBox1 = 0;
     if(typeof S.statsBox2 === 'undefined') S.statsBox2 = 0;
     if(typeof S.statsBox3 === 'undefined') S.statsBox3 = 0;
     if(typeof S.nextScoreRowId === 'undefined') S.nextScoreRowId = 1;
     if(typeof S.showFirstPlayer === 'undefined') S.showFirstPlayer = false;
+    if(typeof d.starterSelection === 'undefined') S.starterSelection = S.phase === 'start';
     S.display='';S.editingIdx=-1;
     applyTheme();
     
@@ -351,6 +355,7 @@ function updateContest() {
     handNum: S.handNum,
     lastAdded: [...S.lastAdded],
     pendingWin: S.pendingWin,
+    starterSelection: S.starterSelection,
     highestDoublePlayer: S.highestDoublePlayer,
     theme: S.theme
   };
@@ -394,6 +399,15 @@ function waitingForHighDouble(){
   return (S.phase==='end' && S.gameOver);
 }
 
+function clearStarterSelection(){
+  S.starterSelection = false;
+}
+
+function clearPlayerHighlights(){
+  S.starterSelection = false;
+  S.showFirstPlayer = false;
+}
+
 function highDoublePrompt(){
   return 'Click player with high double to start a new game.';
 }
@@ -403,7 +417,7 @@ function notifyHighDoublePrompt(){
 }
 
 function clearHelp(){
-  S.helpMessage='';save();render();
+  S.helpMessage='';S.helpTab=-1;save();render();
 }
 
 function ackStatus(){
@@ -411,7 +425,7 @@ function ackStatus(){
     resetForNewGame();
     return;
   }
-  if(S.helpMessage){
+  if(S.helpMessage && S.helpTab === S.tab){
     clearHelp();
     return;
   }
@@ -421,6 +435,7 @@ function ackStatus(){
 
 function showHelp(){
   clearStatus();
+  S.helpTab = S.tab;
   if (S.tab === 0) {
     if (S.phase === 'play') {
       S.helpMessage = `Enter number and click Player to add that to their score. Delete mistakes in recent scores by clicking red x. Replace by adding the correct score.`;
@@ -438,6 +453,7 @@ function showHelp(){
 function resetForNewGame(){
   S.scores=[0,0];S.handScores=[0,0];S.display='';S.records=[];
   S.gameOver=false;S.pendingWin=false;S.phase='start';
+  S.starterSelection=true;
   S.firstPlayer=-1;S.handFirstPlayer=-1;S.handNum=0;
   S.lastAdded=['',''];S.showFirstPlayer=false;S.editingIdx=-1;
   S.status='';S.statusUntil=0;S.gameEndMessage='';S.highestDoublePlayer=-1;S.tab=0;
@@ -451,7 +467,10 @@ function pressKey(v){
   }
   if(S.gameOver||S.phase==='end')return;
   if(S.display.length>=3)return;
+  const hadPlayerHighlight = S.starterSelection || S.showFirstPlayer;
+  clearPlayerHighlights();
   S.display+=v;
+  if(hadPlayerHighlight){save();render();return;}
   const el=document.getElementById('display-bar');
   if(el){el.textContent=S.display;el.className='display-bar';}
 }
@@ -461,12 +480,16 @@ function delKey(){
     notifyHighDoublePrompt();
     return;
   }
+  const hadPlayerHighlight = S.starterSelection || S.showFirstPlayer;
+  clearPlayerHighlights();
   S.display=S.display.slice(0,-1);
+  if(hadPlayerHighlight){save();render();return;}
   const el=document.getElementById('display-bar');
   if(el){el.textContent=S.display||'0';el.className='display-bar'+(S.display?'':' dim');}
 }
 
 function tapPlayer(i){
+  clearPlayerHighlights();
   if (S.phase==='end') {
     S.scores = [0, 0];
     S.handScores = [0, 0];
@@ -475,6 +498,7 @@ function tapPlayer(i){
     S.gameOver = false;
     S.pendingWin = false;
     S.phase = 'start';
+    S.starterSelection = false;
     S.firstPlayer = -1;
     S.handFirstPlayer = -1;
     S.handNum = 0;
@@ -483,13 +507,10 @@ function tapPlayer(i){
     S.editingIdx = -1;
     S.status = '';
     S.statusUntil = 0;
-    S.helpMessage = '';
+    S.helpMessage = '';S.helpTab = -1;
     S.gameEndMessage = '';
     S.highestDoublePlayer = -1;
     S.tab = 0;
-    save();
-    render();
-    return;
   }
   if(S.gameOver)return;
   const pts=parseInt(S.display)||0;
@@ -502,6 +523,7 @@ function tapPlayer(i){
     S.firstPlayer=starter;
     S.handFirstPlayer=starter;
     S.handNum=1;
+    S.showFirstPlayer=false;
     if(pts>0){
       S.scores[i]+=pts;S.handScores[i]+=pts;
       S.lastAdded=['',''];S.lastAdded[i]='+'+pts;
@@ -510,7 +532,7 @@ function tapPlayer(i){
       if(S.scores[i]>=S.target)S.pendingWin=true;
     }
     S.display='';S.phase='play';
-    S.status='';S.statusUntil=0;S.helpMessage='';
+    S.status='';S.statusUntil=0;S.helpMessage='';S.helpTab=-1;
     save();render();return;
   }
   if(pts<=0){
@@ -519,7 +541,7 @@ function tapPlayer(i){
     if(el){el.textContent='0';el.className='display-bar dim';}
     return;
   }
-  S.status='';S.statusUntil=0;S.helpMessage='';
+  S.status='';S.statusUntil=0;S.helpMessage='';S.helpTab=-1;
   S.showFirstPlayer = false;
   S.scores[i]+=pts;S.handScores[i]+=pts;
   S.lastAdded=['',''];S.lastAdded[i]='+'+pts;
@@ -531,6 +553,7 @@ function tapPlayer(i){
 }
 
 function callDomino(){
+  clearStarterSelection();
   if(S.phase!=='play'||S.gameOver){
     setStatus(highDoublePrompt());
     return;
@@ -814,7 +837,7 @@ function clearScores(){
   delete S.contests[keyToDelete];
   const keys = Object.keys(S.contests);
   if (keys.length > 0) {
-    switchContest(S.contests[keys[0]].names);
+    switchContest(S.contests[keys[0]].names, true);
     setStatus('Contest deleted', 3000);
   } else {
     S.names = ['', ''];
@@ -859,8 +882,8 @@ function cancelNewContest() {
   switchContest(target);
 }
 
-function switchContest(newNames) {
-  updateContest();
+function switchContest(newNames, skipCurrentUpdate = false) {
+  if (!skipCurrentUpdate) updateContest();
   const key = getContestKey(newNames);
   const c = S.contests[key];
   if (c) {
@@ -876,6 +899,7 @@ function switchContest(newNames) {
     S.handNum = c.handNum;
     S.lastAdded = c.lastAdded;
     S.pendingWin = c.pendingWin;
+    S.starterSelection = typeof c.starterSelection === 'boolean' ? c.starterSelection : c.phase === 'start';
     S.highestDoublePlayer = c.highestDoublePlayer;
     S.theme = c.theme || 'system';
   } else {
@@ -890,6 +914,7 @@ function switchContest(newNames) {
     S.handNum = 0;
     S.lastAdded = ['', ''];
     S.pendingWin = false;
+    S.starterSelection = true;
     S.highestDoublePlayer = -1;
   }
   S.names = [...newNames];
@@ -897,6 +922,7 @@ function switchContest(newNames) {
   S.gameEndMessage = '';
   S.status = '';
   S.statusUntil = 0;
+  S.showFirstPlayer = false;
   updateContest();
   applyTheme();
   save();
@@ -932,8 +958,9 @@ function render(){
   }).join('');
   
   let defaultStartStatus = '';
-  if (!S.status && !S.helpMessage) {
-    if (waitingForHighDouble() && S.tab === 0) {
+  const activeHelpMessage = S.helpTab === S.tab ? S.helpMessage : '';
+  if (!S.status && !activeHelpMessage) {
+    if ((waitingForHighDouble() || (S.phase === 'start' && S.starterSelection)) && S.tab === 0) {
       defaultStartStatus = highDoublePrompt();
     } else if (S.phase==='start' && S.tab === 2) {
       if (S.showNewContestInputs && !S.hideNewContestHelp) defaultStartStatus = 'Add names to create a new contest.';
@@ -941,19 +968,19 @@ function render(){
     }
   }
   const controlsDisabled = waitingForHighDouble();
-  const statusText = (S.tab === 0 ? S.gameEndMessage : '') || S.status || S.helpMessage || defaultStartStatus;
-  const isNewContestHelp = !S.status && !S.helpMessage && defaultStartStatus === 'Add names to create a new contest.';
-  const statusIcon = (S.status || S.helpMessage || (S.tab === 0 && S.gameEndMessage)) ? '&#10003;' : '?';
-  const statusClick = (S.status || S.helpMessage || (S.tab === 0 && S.gameEndMessage)) ? 'ackStatus()' : (isNewContestHelp ? 'S.hideNewContestHelp=true;render()' : 'showHelp()');
+  const statusText = (S.tab === 0 ? S.gameEndMessage : '') || S.status || activeHelpMessage || defaultStartStatus;
+  const isNewContestHelp = !S.status && !activeHelpMessage && defaultStartStatus === 'Add names to create a new contest.';
+  const statusIcon = (S.status || activeHelpMessage || (S.tab === 0 && S.gameEndMessage)) ? '&#10003;' : '?';
+  const statusClick = (S.status || activeHelpMessage || (S.tab === 0 && S.gameEndMessage)) ? 'ackStatus()' : (isNewContestHelp ? 'S.hideNewContestHelp=true;render()' : 'showHelp()');
   
   const recentScores = S.records.filter(r => r.type === 'score').slice(-4);
-  const showHistory = !S.status && !S.helpMessage && (S.tab !== 0 || !S.gameEndMessage) && recentScores.length > 0;
+  const showHistory = !S.status && !activeHelpMessage && (S.tab !== 0 || !S.gameEndMessage) && recentScores.length > 0;
 
   // Targeted DOM update for Tab 0 if already mounted
   const isTab0Mounted = S.tab === 0 && appEl.dataset.tab === '0' && appEl.querySelector('.scoreboard');
   if (isTab0Mounted) {
     const isStart = S.phase === 'start';
-    const highlightPlayers = waitingForHighDouble();
+    const highlightPlayers = S.starterSelection || waitingForHighDouble();
 
     // 1. Display bar
     const displayEl = document.getElementById('display-bar');
@@ -968,7 +995,7 @@ function render(){
       if (k.classList.contains('domino-key')) {
         k.innerHTML = domTile();
       } else {
-        if (highlightPlayers) k.classList.add('disabled');
+        if (controlsDisabled) k.classList.add('disabled');
         else k.classList.remove('disabled');
       }
     });
@@ -978,7 +1005,7 @@ function render(){
     [0, 1].forEach(i => {
       const sc = scards[i];
       if (sc) {
-        sc.className = `scard ${isStart ? 'pending-setup' : ''} ${highlightPlayers ? 'select-starter' : ''} ${(S.showFirstPlayer && S.firstPlayer === i) ? 'first-player' : ''}`;
+        sc.className = `scard ${highlightPlayers ? 'select-starter' : ''} ${(S.showFirstPlayer && S.firstPlayer === i) ? 'first-player' : ''}`;
         const pname = sc.querySelector('.pname');
         const scoreTot = sc.querySelector('.score-total');
         if (pname && pname.textContent !== S.names[i]) pname.textContent = S.names[i];
@@ -1018,10 +1045,10 @@ function render(){
   let content = '';
   if(S.tab===0){
     const isStart=S.phase==='start';
-    const highlightPlayers = waitingForHighDouble();
+    const highlightPlayers = S.starterSelection || waitingForHighDouble();
     const displayClass=S.display?'display-bar':'display-bar dim';
     const cards=[0,1].map(i=>`
-      <div class="scard ${isStart?'pending-setup':''} ${highlightPlayers?'select-starter':''} ${(S.showFirstPlayer && S.firstPlayer === i) ? 'first-player' : ''}" onclick="tapPlayer(${i})">
+      <div class="scard ${highlightPlayers?'select-starter':''} ${(S.showFirstPlayer && S.firstPlayer === i) ? 'first-player' : ''}" onclick="tapPlayer(${i})">
         <div class="pname">${escapeHTML(S.names[i])}</div>
         <div class="score-total">${isStart ? 0 : S.scores[i]}</div>
       </div>`).join('');
@@ -1035,9 +1062,9 @@ function render(){
       <div class="numpad-wrap">
         <div id="display-bar" class="${displayClass}">${S.display||'0'}</div>
         <div class="keypad">
-          ${[1,2,3,4,5,6,7,8,9].map(n=>`<div class="key ${highlightPlayers?'disabled':''}" onclick="${highlightPlayers ? 'notifyHighDoublePrompt()' : 'pressKey(\''+n+'\')'}">${n}</div>`).join('')}
-          <div class="key del ${highlightPlayers?'disabled':''}" onclick="${highlightPlayers ? 'notifyHighDoublePrompt()' : 'delKey()'}">&#9003;</div>
-          <div class="key ${highlightPlayers?'disabled':''}" onclick="${highlightPlayers ? 'notifyHighDoublePrompt()' : 'pressKey(\'0\')'}">0</div>
+          ${[1,2,3,4,5,6,7,8,9].map(n=>`<div class="key ${controlsDisabled?'disabled':''}" onclick="${controlsDisabled ? 'notifyHighDoublePrompt()' : 'pressKey(\''+n+'\')'}">${n}</div>`).join('')}
+          <div class="key del ${controlsDisabled?'disabled':''}" onclick="${controlsDisabled ? 'notifyHighDoublePrompt()' : 'delKey()'}">&#9003;</div>
+          <div class="key ${controlsDisabled?'disabled':''}" onclick="${controlsDisabled ? 'notifyHighDoublePrompt()' : 'pressKey(\'0\')'}">0</div>
           <div class="key domino-key" onclick="callDomino()">${dominoLabel}</div>
         </div>
       </div>
