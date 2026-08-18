@@ -1305,6 +1305,13 @@ document.addEventListener('click', event => {
   if(event.target.closest('.status-bar')) return;
   clearStatus();
 });
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./service-worker.js').catch(() => {});
+  });
+}
+
 render();
 </script>
 </body>
