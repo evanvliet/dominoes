@@ -165,7 +165,7 @@ html,body{height:100%;background:var(--color-background-tertiary);font-family:va
 .opt-row:last-child{margin-bottom:0;}
 .opt-row label{font-size:14px;color:var(--color-text-secondary);width:88px;flex-shrink:0;}
 .opt-row input[type=text]{flex:1;font-size:15px;font-weight:500;padding:7px 11px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);background:var(--color-background-secondary);color:var(--color-text-primary);font-family:inherit;}
-.opt-row input[type=number]{width:88px;font-size:15px;padding:7px 11px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);background:var(--color-background-secondary);color:var(--color-text-primary);font-family:inherit;}
+.opt-row input[type=number]{width:88px;height:40px;font-size:15px;padding:7px 11px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);background:var(--color-background-secondary);color:var(--color-text-primary);font-family:inherit;}
 .action-btn{width:100%;background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);font-size:14px;color:var(--color-text-primary);padding:10px;cursor:pointer;text-align:center;margin-bottom:9px;display:block;font-family:inherit;}
 .action-btn:last-child{margin-bottom:0;}
 .action-btn:active{background:var(--color-border-tertiary);}
@@ -207,9 +207,9 @@ textarea.export-area{width:100%;height:145px;font-size:12px;font-family:monospac
 .radio-group label{flex:1;display:flex;align-items:center;justify-content:center;text-align:center;font-size:13px;color:var(--color-text-secondary);cursor:pointer;border-radius:8px;transition:background 0.2s,color 0.2s;width:auto;min-height:40px;}
 .radio-group input{display:none;}
 .radio-group input:checked + span{background:var(--color-background-primary);color:var(--color-text-primary);box-shadow:0 1px 3px rgba(0,0,0,0.1);}
-.radio-group span{display:block;width:100%;padding:10px 0;border-radius:8px;}
+.radio-group span{display:flex;align-items:center;justify-content:center;width:100%;height:100%;border-radius:8px;}
 .action-group{display:flex;background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:3px;gap:3px;}
-.action-group .action-btn{flex:1;margin-bottom:0;border:none;background:none;font-size:13px;color:var(--color-text-secondary);padding:10px 0;border-radius:8px;font-weight:400;min-height:40px;}
+.action-group .action-btn{flex:1;margin-bottom:0;border:none;background:none;font-size:13px;color:var(--color-text-secondary);padding:10px 0;border-radius:8px;font-weight:400;height:40px;min-height:40px;}
 .action-group .action-btn.highlight{background:var(--color-background-primary);color:var(--color-text-primary);box-shadow:0 1px 3px rgba(0,0,0,0.1);font-weight:700;}
 .action-group .action-btn:disabled{opacity:0.5;}
 </style>
@@ -1238,7 +1238,7 @@ function render(){
           <label>Top Score</label>
           <input type="number" value="${S.target}" min="25" max="500" step="25" onchange="S.target=Math.max(25,parseInt(this.value)||50);save();" inputmode="numeric"/>
         </div>
-        <div class="opt-row" style="display:grid;grid-template-columns:88px 1fr;gap:10px;align-items:start;">
+          <div class="opt-row" style="display:grid;grid-template-columns:88px 1fr;gap:10px;align-items:center;">
           <label>Appearance</label>
           <div class="radio-group" style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;">
             <label><input type="radio" name="theme" value="light" ${S.theme==='light'?'checked':''} onchange="S.theme=this.value;applyTheme();save();"><span>Light</span></label>
@@ -1246,7 +1246,7 @@ function render(){
             <label><input type="radio" name="theme" value="system" ${S.theme==='system'?'checked':''} onchange="S.theme=this.value;applyTheme();save();"><span>System</span></label>
           </div>
         </div>
-        <div class="opt-row" style="margin-top:10px;display:grid;grid-template-columns:88px 1fr;gap:10px;align-items:start;">
+        <div class="opt-row" style="margin-top:10px;display:grid;grid-template-columns:88px 1fr;gap:10px;align-items:center;">
           <label>Data</label>
           <div class="action-group" style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;">
             <button class="action-btn" onclick="copyExport()">Export</button>
