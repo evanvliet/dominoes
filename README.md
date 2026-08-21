@@ -1,6 +1,6 @@
 # Dominoes Scorekeeper
 
-A lightweight browser-based scorekeeper for dominoes games. Record games quickly, compare player performance over time, and explore trends with simple, mobile-friendly analytics.
+A lightweight browser-based scorekeeper for domino games. Record games quickly, compare player performance over time, and explore trends with simple, mobile-friendly analytics.
 
 ## Usage
 
@@ -18,18 +18,21 @@ Click the red **X** to delete a score, and possibly replace by adding another sc
 
 <img src="screenshots/after_scores.png" alt="Options tab" width="300"> 
 
-When a player *dominoes* (plays all their tiles), the hand ends. First enter any score from that play, then tap the domino tile below the **9** to mark the hand complete. The status area shows hand totals and who plays next.
+When a player *dominoes* (plays all their tiles), the hand ends. First, enter any score from that play, then tap the domino tile below the **9** to mark the hand complete. The status area shows hand totals and who plays next.
 
 After a domino, the player with the most points above the top score wins.
-The status area shows the winner. Tap the domino tile to begin the next game.
+The status area shows the winner. Tap the player
+with the highest double to begin the next game.
 
-There are also Statistics and Options tabs. Statistics has running totals, averages and charts. Screenshots: 
+Next is STATS, it has three sections: numric data, graphs, and histograms. Click on the first to cycle through points, averages, and games. The second shows hisotry of point and game scores. There are three histograms, click to see winning margins for each player, and another for both. 
+
+Screenshots: 
 
 | Statistics | Options |
 | :--- | :--- |
-| <img src="screenshots/stats.png" alt="Statistics tab" width="300"> | <img src="screenshots/options.png" alt="Options tab" width="300"> |
+| <img src="screenshots/stats.png" alt="Statistics tab" height="350"> | <img src="screenshots/options.png" alt="Options tab" height="350"> |
 
-Use Options to set up separate contests labeled by player names. Click on the CONTEST dropdown and select **New...** to set the players. You can also configure top score, dark mode, and import/export of data.
+Last is Options: set up separate contests labeled by player names. Click on the CONTEST dropdown and select **New...** to set the players. You can also configure top score, dark mode, and import/export of data.
 
 ### Web App
 
@@ -51,7 +54,7 @@ The options tab includes Data buttons for Export, Import, and Clear.
     5/31 09:32 51 45
     ```
 
-    First player names, followed by date, time and player scores for each completed game. You have to paste the clipboard data into a mail message or web document to save it.
+First player names, followed by date, time and player scores for each completed game. You have to paste the clipboard data into a mail message or web document to save it.
 * *Import* opens an edit control; paste data in above format to add scores. It
  appends scores to the contest per the first line. If no such contest exists, it creates
  a new one. For testing, you can import 75 scores from [test75](test75).
