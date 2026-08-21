@@ -9,4 +9,6 @@ marked < ../info.md > info.html
 marked < ../README.md | sed -e '
     s/.md/.html/
     s/"test75/"test75.html/
+    s/screenshots\//..\/&/
+    s/history\//..\/&/
     ' > README.html

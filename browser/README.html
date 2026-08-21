@@ -1,16 +1,18 @@
 <h1>Dominoes Scorekeeper</h1>
-<p>A lightweight browser-based scorekeeper for dominoes games. Record games quickly, compare player performance over time, and explore trends with simple, mobile-friendly analytics.</p>
+<p>A lightweight browser-based scorekeeper for domino games. Record games quickly, compare player performance over time, and explore trends with simple, mobile-friendly analytics.</p>
 <h2>Usage</h2>
 <p>Visit:</p>
 <p><a href="https://evanvliet.github.io/dominoes">https://evanvliet.github.io/dominoes</a></p>
 <p>You will see the main scoring tab, note status advising to click on highest double. This is for play where who goes first alternates on each hand, the one with the highest double starts.</p>
-<img src="screenshots/first_screen.png" alt="First run screen" width="300"><p>After selecting the starting player, add scores by entering a number and clicking on the scorer.
+<img src="../screenshots/first_screen.png" alt="First run screen" width="300"><p>After selecting the starting player, add scores by entering a number and clicking on the scorer.
 After some play, the status lists recent scores.
 Click the red <strong>X</strong> to delete a score, and possibly replace by adding another score.</p>
-<img src="screenshots/after_scores.png" alt="Options tab" width="300"> <p>When a player <em>dominoes</em> (plays all their tiles), the hand ends. First enter any score from that play, then tap the domino tile below the <strong>9</strong> to mark the hand complete. The status area shows hand totals and who plays next.</p>
+<img src="../screenshots/after_scores.png" alt="Options tab" width="300"> <p>When a player <em>dominoes</em> (plays all their tiles), the hand ends. First, enter any score from that play, then tap the domino tile below the <strong>9</strong> to mark the hand complete. The status area shows hand totals and who plays next.</p>
 <p>After a domino, the player with the most points above the top score wins.
-The status area shows the winner. Tap the domino tile to begin the next game.</p>
-<p>There are also Statistics and Options tabs. Statistics has running totals, averages and charts. Screenshots: </p>
+The status area shows the winner. Tap the player
+with the highest double to begin the next game.</p>
+<p>Next is STATS, it has three sections: numric data, graphs, and histograms. Click on the first to cycle through points, averages, and games. The second shows hisotry of point and game scores. There are three histograms, click to see winning margins for each player, and another for both. </p>
+<p>Screenshots: </p>
 <table>
 <thead>
 <tr>
@@ -19,11 +21,11 @@ The status area shows the winner. Tap the domino tile to begin the next game.</p
 </tr>
 </thead>
 <tbody><tr>
-<td align="left"><img src="screenshots/stats.png" alt="Statistics tab" width="300"></td>
-<td align="left"><img src="screenshots/options.png" alt="Options tab" width="300"></td>
+<td align="left"><img src="../screenshots/stats.png" alt="Statistics tab" height="350"></td>
+<td align="left"><img src="../screenshots/options.png" alt="Options tab" height="350"></td>
 </tr>
 </tbody></table>
-<p>Use Options to set up separate contests labeled by player names. Click on the CONTEST dropdown and select <strong>New...</strong> to set the players. You can also configure top score, dark mode, and import/export of data.</p>
+<p>Last is Options: set up separate contests labeled by player names. Click on the CONTEST dropdown and select <strong>New...</strong> to set the players. You can also configure top score, dark mode, and import/export of data.</p>
 <h3>Web App</h3>
 <p>Browsers can install the app to your home screen
 for a more native experience:</p>
@@ -41,14 +43,14 @@ the bottom of the screen, and select Add to Home Screen.</li>
 5/31 09:33 40 50
 5/31 09:32 51 45
 </code></pre>
-<p>  First player names, followed by date, time and player scores for each completed game. You have to paste the clipboard data into a mail message or web document to save it.</p>
 </li>
-<li><p><em>Import</em> opens an edit control; paste data in above format to add scores. It
+</ul>
+<p>First player names, followed by date, time and player scores for each completed game. You have to paste the clipboard data into a mail message or web document to save it.</p>
+<ul>
+<li><em>Import</em> opens an edit control; paste data in above format to add scores. It
  appends scores to the contest per the first line. If no such contest exists, it creates
- a new one. For testing, you can import 75 scores from <a href="test75.html">test75</a>.</p>
-</li>
-<li><p><em>Clear</em> deletes the contest, both scores and players, from the data.</p>
-</li>
+ a new one. For testing, you can import 75 scores from <a href="test75.html">test75</a>.</li>
+<li><em>Clear</em> deletes the contest, both scores and players, from the data.</li>
 </ul>
 <h2>Why This Exists</h2>
 <p>Long time friend Peter and I have played dominoes for years. We kept scores on scraps of paper, and graphs on sheets of graph paper taped together. Here&#39;s a gallery of those:</p>
@@ -60,12 +62,12 @@ the bottom of the screen, and select Add to Home Screen.</li>
 </tr>
 </thead>
 <tbody><tr>
-<td><img src="history/games.jpg" alt="Games" width="250"></td>
-<td><img src="history/hist.jpg" alt="Games" width="250">.</td>
+<td><img src="../history/games.jpg" alt="Games" width="250"></td>
+<td><img src="../history/hist.jpg" alt="Games" width="250">.</td>
 </tr>
 <tr>
-<td><img src="history/scores.jpg" alt="Games" width="250"></td>
-<td><img src="history/points.jpg" alt="Games" width="250"></td>
+<td><img src="../history/scores.jpg" alt="Games" width="250"></td>
+<td><img src="../history/points.jpg" alt="Games" width="250"></td>
 </tr>
 </tbody></table>
 <p>We would scheme on an alternative to pencil-and-paper scorekeeping: a fast, browser-based alternative that preserves game history and reveals who is really winning over time. It would:</p>
