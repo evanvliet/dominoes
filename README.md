@@ -18,13 +18,12 @@ Click the red **X** to delete a score, and possibly replace by adding another sc
 
 <img src="screenshots/after_scores.png" alt="Options tab" width="300"> 
 
-When a player *dominoes* (plays all their tiles), the hand ends. First, enter any score from that play, then tap the domino tile below the **9** to mark the hand complete. The status area shows hand totals and who plays next.
-
+When a player *dominoes* (plays all their tiles), the hand ends. First, enter any score from that play, then tap the domino tile below the **9** to mark the hand complete. A highlit border indicates who goes first on the next hand and the status area gives hand totals.
 After a domino, the player with the most points above the top score wins.
 The status area shows the winner. Tap the player
 with the highest double to begin the next game.
 
-Next is STATS, it has three sections: numric data, graphs, and histograms. Click on the first to cycle through points, averages, and games. The second shows hisotry of point and game scores. There are three histograms, click to see winning margins for each player, and another for both. 
+The middle tab is STATS; it has three sections: numric data, graphs, and histograms. Click on the first to cycle through points, averages, and games. The middle toggles between graphs of point and game scores. The third has three histograms, click to see winning margins for each player, and another for both. 
 
 Screenshots: 
 
