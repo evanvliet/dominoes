@@ -1308,7 +1308,8 @@ document.addEventListener('click', event => {
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./service-worker.js').then(reg => {
+    // updateViaCache:'none' stops Safari from serving a stale sw.js from HTTP cache during update checks.
+    navigator.serviceWorker.register('./service-worker.js', { updateViaCache: 'none' }).then(reg => {
       reg.update();
       reg.addEventListener('updatefound', () => {
         const nw = reg.installing;
