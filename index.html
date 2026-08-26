@@ -1308,7 +1308,22 @@ document.addEventListener('click', event => {
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./service-worker.js').catch(() => {});
+    navigator.serviceWorker.register('./service-worker.js').then(reg => {
+      reg.update();
+      reg.addEventListener('updatefound', () => {
+        const nw = reg.installing;
+        if (nw) nw.addEventListener('statechange', () => {
+          if (nw.state === 'activated') location.reload();
+        });
+      });
+    }).catch(() => {});
+  });
+  // Reload once when a new service worker takes control, so users get the fresh app shell.
+  let swRefreshing = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (swRefreshing) return;
+    swRefreshing = true;
+    location.reload();
   });
 }
 

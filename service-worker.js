@@ -1,4 +1,4 @@
-const CACHE_NAME = 'dominoes-scorer-v1';
+const CACHE_NAME = 'dominoes-scorer-v2';
 const APP_SHELL = [
   './',
   './index.html',
@@ -20,9 +20,14 @@ self.addEventListener('activate', event => {
   self.clients.claim();
 });
 
+// Network-first so deployed changes show up immediately; cache is only an offline fallback.
 self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
   event.respondWith(
-    caches.match(event.request).then(cached => cached || fetch(event.request))
+    fetch(event.request).then(response => {
+      const copy = response.clone();
+      caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy));
+      return response;
+    }).catch(() => caches.match(event.request))
   );
 });
