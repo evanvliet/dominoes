@@ -618,10 +618,10 @@ function callDomino(){
       S.showFirstPlayer = false;
     }
   } else {
-    // Normal hand end - determine next starter
-    const handWinner = handTotals[0] > handTotals[1] ? 0 : (handTotals[0] === handTotals[1] ? (S.handFirstPlayer === 0 ? 1 : 0) : 1);
-    S.handFirstPlayer = handWinner;
-    S.firstPlayer = handWinner;
+    // Next hand always alternates starter, regardless of who scored
+    const nextStarter = S.handFirstPlayer === 0 ? 1 : 0;
+    S.handFirstPlayer = nextStarter;
+    S.firstPlayer = nextStarter;
     S.handNum++;
     S.showFirstPlayer = true;
   }
