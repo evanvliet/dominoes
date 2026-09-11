@@ -1,0 +1,70 @@
+Act as an expert frontend engineer. We want to update our pure client-side
+HTML/JavaScript dominoes scoring web app to support a background cloud backup
+using a Google Apps Script Web App URL, while preserving our offline local storage architecture.
+
+Please review my index.html file and add the following functionality:
+
+1. App Settings Configuration:
+   - derive a backup db name from player1 vs player2: player1_player2
+   - store url for db in local storage,
+
+2. Background Sync Architecture:
+   - When a game is finalized and logged, append it to a queue array in localStorage
+   (e.g., 'pending_sync_games'). Each game payload should look like this:
+     {
+       date: ISO 8601,    /* YYYY-MM-DDTHH:MM minute precision */
+       p1_score: Number,
+       p2_score: Number
+     }
+   - Create an asynchronous function `syncPendingGames()` that reads the queue,
+     loops through each game, and sends a POST request via fetch() to the saved
+     Google Web App URL using 'cors' mode.
+   - If the Google Sheet returns a success status, remove that specific game
+     from the localStorage queue. If it fails or there is no network connection,
+     keep it safely in localStorage to try again later.
+   - dominoes scoring webapp url and deployment ID 
+ https://script.google.com/macros/s/AKfycbyxuBBODwP1r42jZnGxH8-M1S3qV_CPs8aoTkR2LkDOJxOvjQnDYZ585p5JNmvZ6dp-hw/exec 
+ AKfycbyxuBBODwP1r42jZnGxH8-M1S3qV_CPs8aoTkR2LkDOJxOvjQnDYZ585p5JNmvZ6dp-hw
+- code.gs running on server:
+see  code.gs here, need to iron out name of sheet
+
+3. UI Integration:
+   - on options page, next to top score, have Backup On/Off toggle.
+   - if off, no backup
+   - if on, call syncPendingGames on each game completion
+   - if on and backupdb exists, load all new scores into import area on import click
+   - screen records on import and skip duplicates (date and scores the same)
+
+
+Please provide the updated HTML, JavaScript, and CSS code matching our single-file layout, ensuring that swipe actions and core logic are unaffected.
+
+Here is some javascript for talking to Google:
+
+const APPS_SCRIPT_URL = "YOUR_COPIED_WEB_APP_URL_HERE";
+
+async function backupGameToCloud(gameData) {
+  // Example gameData shape:
+  // { date: "2026-08-30T15:34", p1_score: 250, p2_score: 180 }
+
+  try {
+    const response = await fetch(APPS_SCRIPT_URL, {
+      method: "POST",
+      mode: "cors", // Crucial for client-side pages
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(gameData)
+    });
+
+    const result = await response.json();
+    if (result.status === "success") {
+      console.log("Game successfully backed up to Google Sheets!");
+      // Pro-tip: Flag this game as "synced" in localStorage so you don't upload duplicates
+    } else {
+      console.error("Cloud backup failed:", result.message);
+    }
+  } catch (error) {
+    console.error("Network error trying to reach cloud backup:", error);
+  }
+}
+

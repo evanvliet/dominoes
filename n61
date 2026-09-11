@@ -1,0 +1,9 @@
+n61
+
+move backup button on same line with top score
+drop player names and derive from contest name
+sync backup is a collection of lists of records.
+the name of the list is the contest name  - the names of the players.
+the records are just scores and dates, no need for player names.
+make url import nicer, use import field.
+how to share spreadsheet.

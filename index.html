@@ -9,7 +9,7 @@
 <link rel="icon" type="image/svg+xml" href="domino.svg">
 <link rel="apple-touch-icon" href="domino.svg">
 <link rel="manifest" href="manifest.json">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' https://script.google.com https://script.googleusercontent.com; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;">
 <title>Dominoes Scorer</title>
 
 <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
@@ -164,7 +164,7 @@ html,body{height:100%;background:var(--color-background-tertiary);font-family:va
 .opt-row{display:flex;align-items:center;gap:11px;margin-bottom:10px;}
 .opt-row:last-child{margin-bottom:0;}
 .opt-row label{font-size:14px;color:var(--color-text-secondary);width:88px;flex-shrink:0;}
-.opt-row input[type=text]{flex:1;font-size:15px;font-weight:500;padding:7px 11px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);background:var(--color-background-secondary);color:var(--color-text-primary);font-family:inherit;}
+.opt-row input[type=text],.opt-row input[type=url]{flex:1;font-size:15px;font-weight:500;padding:7px 11px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);background:var(--color-background-secondary);color:var(--color-text-primary);font-family:inherit;}
 .opt-row input[type=number]{width:88px;height:40px;font-size:15px;padding:7px 11px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);background:var(--color-background-secondary);color:var(--color-text-primary);font-family:inherit;}
 .action-btn{width:100%;background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);font-size:14px;color:var(--color-text-primary);padding:10px;cursor:pointer;text-align:center;margin-bottom:9px;display:block;font-family:inherit;}
 .action-btn:last-child{margin-bottom:0;}
@@ -212,11 +212,20 @@ textarea.export-area{width:100%;height:145px;font-size:12px;font-family:monospac
 .action-group .action-btn{flex:1;margin-bottom:0;border:none;background:none;font-size:13px;color:var(--color-text-secondary);padding:10px 0;border-radius:8px;font-weight:400;height:40px;min-height:40px;}
 .action-group .action-btn.highlight{background:var(--color-background-primary);color:var(--color-text-primary);box-shadow:0 1px 3px rgba(0,0,0,0.1);font-weight:700;}
 .action-group .action-btn:disabled{opacity:0.5;}
+.opt-heading{display:flex;align-items:center;justify-content:space-between;}
+.opt-version{font-size:11px;font-weight:400;color:var(--color-text-tertiary);letter-spacing:0;}
+.backup-toggle{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--color-text-primary);}
+.backup-toggle input{width:18px;height:18px;margin:0;}
 </style>
 </head>
 <body>
 <div class="app" id="app"></div>
 <script>
+const APP_VERSION = 'v2.0.2';
+const BACKUP_URL_KEY = 'dom_backup_url';
+const BACKUP_ENABLED_KEY = 'dom_backup_enabled';
+const PENDING_SYNC_KEY = 'pending_sync_games';
+
 function escapeHTML(str) {
   if (!str) return '';
   return String(str).replace(/[&<>"']/g, function(m) {
@@ -265,8 +274,88 @@ const S={
   statsBox2:0,
   statsBox3:0,
   gameEndMessage:''
+  ,backupEnabled:false
 };
 let LAST_STATUS_SET=0;
+
+function getBackupUrl(){
+  return localStorage.getItem(BACKUP_URL_KEY) || '';
+}
+
+function readPendingGames(){
+  try{return JSON.parse(localStorage.getItem(PENDING_SYNC_KEY) || '[]');}catch(e){return [];}
+}
+
+function writePendingGames(games){
+  try{localStorage.setItem(PENDING_SYNC_KEY,JSON.stringify(games));}catch(e){}
+}
+
+function setBackupEnabled(enabled){
+  if(enabled && !getBackupUrl()){
+    setStatus('Enter a Backup URL first');
+    render();
+    return;
+  }
+  S.backupEnabled=!!enabled;
+  localStorage.setItem(BACKUP_ENABLED_KEY,String(S.backupEnabled));
+  save();render();
+  if(S.backupEnabled)syncPendingGames();
+}
+
+function saveBackupUrl(value){
+  const url=(value || '').trim();
+  if(url && !/^https:\/\/script\.google\.com\/macros\/s\/.+\/exec$/.test(url)){
+    setStatus('Enter a valid Apps Script /exec URL');
+    return;
+  }
+  if(url) localStorage.setItem(BACKUP_URL_KEY,url);
+  else localStorage.removeItem(BACKUP_URL_KEY);
+  if(S.backupEnabled && url)syncPendingGames();
+  setStatus(url ? 'Backup URL saved' : 'Backup URL cleared',3000);
+}
+
+function queueFinishedGame(){
+  const games=readPendingGames();
+  games.push({
+    date:new Date().toISOString().slice(0,16),
+    contest:getContestKey(S.names),
+    p1_score:S.scores[0],
+    p2_score:S.scores[1]
+  });
+  writePendingGames(games);
+}
+
+async function syncPendingGames(){
+  const url=getBackupUrl();
+  if(!S.backupEnabled || !url)return;
+  const games=readPendingGames();
+  const remaining=[];
+  for(const game of games){
+    try{
+      const response=await fetch(url,{method:'POST',mode:'cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(game)});
+      const result=await response.json();
+      if(result.status!=='success')remaining.push(game);
+    }catch(e){remaining.push(game);}
+  }
+  writePendingGames(remaining);
+}
+
+async function openImport(){
+  const area=document.getElementById('import-area');
+  const textarea=document.getElementById('import-textarea');
+  if(area)area.style.display='block';
+  if(!S.backupEnabled || !getBackupUrl())return;
+  try{
+    const response=await fetch(`${getBackupUrl()}?contest=${encodeURIComponent(getContestKey(S.names))}`,{mode:'cors'});
+    const result=await response.json();
+    if(result.status!=='success')throw new Error(result.message || 'Cloud import failed');
+    const games=result.games || [];
+    if(textarea){
+      textarea.value=[S.names.join(' | '),...games.map(game => `${game.date} ${game.p1_score} ${game.p2_score}`)].join('\n');
+    }
+    setStatus(`${games.length} cloud games loaded`,3000);
+  }catch(e){setStatus('Could not load cloud games');}
+}
 
 function updateNewName(i,v){
   S.newNames[i]=v;
@@ -276,6 +365,7 @@ function updateNewName(i,v){
 function load(){
   try{
     const r=localStorage.getItem(SK);
+    S.backupEnabled=localStorage.getItem(BACKUP_ENABLED_KEY)==='true';
     if(!r) {
       S.names=['Host','Guest'];
       S.contests={};
@@ -603,9 +693,10 @@ function callDomino(){
         finalScores: [S.scores[0], S.scores[1]], winnerIdx: gameWinner, winnerName: S.names[gameWinner]
       });
       S.pastGames.unshift({
-        time: ds(), names: [S.names[0], S.names[1]],
+        time: ds(), date: new Date().toISOString().slice(0,16), names: [S.names[0], S.names[1]],
         scores: [S.scores[0], S.scores[1]], winnerIdx: gameWinner
       });
+      queueFinishedGame();
       S.gameOver = true;
       S.phase = 'end';
       S.showFirstPlayer = false;
@@ -809,6 +900,7 @@ function doImport(){
       if(isNaN(s1) || isNaN(s2)) continue;
       games.push({
         time,
+        date: parts.length >= 4 && parts[1].includes(':') ? `${parts[0]} ${parts[1]}` : parts[0],
         names,
         scores: [s1, s2],
         winnerIdx: s1 >= s2 ? 0 : 1
@@ -819,16 +911,14 @@ function doImport(){
     const exists = !!S.contests[key];
     S.showNewContestInputs = false;
     switchContest(names);
-    if (!exists) {
-      S.pastGames = games;
-    } else {
-      S.pastGames = [...games, ...S.pastGames];
-    }
+    const newGames = games.filter(game => !(S.pastGames || []).some(existing =>
+      existing.date === game.date && existing.scores[0] === game.scores[0] && existing.scores[1] === game.scores[1]));
+    S.pastGames = exists ? [...newGames, ...S.pastGames] : newGames;
     
     updateContest();
     save(); render();
     document.getElementById('import-area').style.display='none';
-    setStatus(`${games.length} games imported`, 3000);
+    setStatus(`${newGames.length} games imported`, 3000);
   }catch(err){setStatus('Could not parse data — check the format and try again.');}
 }
 
@@ -1233,10 +1323,16 @@ function render(){
       </div>
 
       <div class="opt-section">
-        <div class="opt-label">DETAILS</div>
+        <div class="opt-label opt-heading"><span>DETAILS</span><span class="opt-version">${APP_VERSION}</span></div>
         <div class="opt-row">
           <label>Top Score</label>
           <input type="number" value="${S.target}" min="25" max="500" step="25" onchange="S.target=Math.max(25,parseInt(this.value)||50);save();" inputmode="numeric"/>
+          <label style="width:auto;margin-left:auto;">Backup</label>
+          <div class="backup-toggle"><input type="checkbox" ${S.backupEnabled?'checked':''} onchange="setBackupEnabled(this.checked)"/><span>${S.backupEnabled?'On':'Off'}</span></div>
+        </div>
+        <div class="opt-row">
+          <label>Backup URL</label>
+          <input type="url" value="${escapeHTML(getBackupUrl())}" placeholder="Apps Script /exec URL" onchange="saveBackupUrl(this.value)"/>
         </div>
           <div class="opt-row" style="display:grid;grid-template-columns:88px 1fr;gap:10px;align-items:center;">
           <label>Appearance</label>
@@ -1250,7 +1346,7 @@ function render(){
           <label>Data</label>
           <div class="action-group" style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;">
             <button class="action-btn" onclick="copyExport()">Export</button>
-            <button class="action-btn" onclick="document.getElementById('import-area').style.display='block'">Import</button>
+            <button class="action-btn" onclick="openImport()">Import</button>
             <button class="action-btn" onclick="clearScores()">Clear</button>
           </div>
         </div>
@@ -1285,6 +1381,7 @@ function render(){
 }
 
 load();
+if(S.backupEnabled)syncPendingGames();
 document.addEventListener('keydown', event => {
   if(event.metaKey || event.ctrlKey || event.altKey || event.shiftKey) return;
   const target = event.target;
