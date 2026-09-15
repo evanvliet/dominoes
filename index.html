@@ -221,7 +221,7 @@ textarea.export-area{width:100%;height:145px;font-size:12px;font-family:monospac
 <body>
 <div class="app" id="app"></div>
 <script>
-const APP_VERSION = 'v2.0.2';
+const APP_VERSION = 'v2.0.3';
 const BACKUP_URL_KEY = 'dom_backup_url';
 const BACKUP_ENABLED_KEY = 'dom_backup_enabled';
 const PENDING_SYNC_KEY = 'pending_sync_games';
@@ -314,13 +314,59 @@ function saveBackupUrl(value){
   setStatus(url ? 'Backup URL saved' : 'Backup URL cleared',3000);
 }
 
-function queueFinishedGame(){
-  const games=readPendingGames();
+function formatIsoDate(d = new Date()) {
+  const pad = n => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+function normalizeGameDate(input) {
+  if (!input) {
+    const now = new Date();
+    return { date: formatIsoDate(now), time: ds(now) };
+  }
+  let d = null;
+  if (typeof input === 'string') {
+    const s = input.trim();
+    const mdMatch = s.match(/^(\d{1,2})\/(\d{1,2})(?:\/(\d{2,4}))?(?:\s+(\d{1,2}):(\d{2})(?::\d{2})?(?:\s*(AM|PM))?)?$/i);
+    if (mdMatch) {
+      const month = parseInt(mdMatch[1], 10) - 1;
+      const day = parseInt(mdMatch[2], 10);
+      let year = mdMatch[3] ? parseInt(mdMatch[3], 10) : new Date().getFullYear();
+      if (year < 100) year += 2000;
+      let hour = mdMatch[4] ? parseInt(mdMatch[4], 10) : 0;
+      const min = mdMatch[5] ? parseInt(mdMatch[5], 10) : 0;
+      if (mdMatch[7]) {
+        const ampm = mdMatch[7].toUpperCase();
+        if (ampm === 'PM' && hour < 12) hour += 12;
+        if (ampm === 'AM' && hour === 12) hour = 0;
+      }
+      d = new Date(year, month, day, hour, min);
+    } else {
+      const parsed = new Date(s);
+      if (!isNaN(parsed.getTime())) {
+        d = parsed;
+      }
+    }
+  } else if (input instanceof Date) {
+    d = input;
+  }
+  if (d && !isNaN(d.getTime())) {
+    return { date: formatIsoDate(d), time: ds(d) };
+  }
+  return { date: String(input), time: String(input) };
+}
+
+function queueFinishedGame(dateObj = new Date()){
+  const contestKey = getContestKey(S.names);
+  const contestNames = contestKey.split('|');
+  const p1_idx = S.names[0].trim() === contestNames[0] ? 0 : 1;
+  const p2_idx = p1_idx === 0 ? 1 : 0;
+  const games = readPendingGames();
   games.push({
-    date:new Date().toISOString().slice(0,16),
-    contest:getContestKey(S.names),
-    p1_score:S.scores[0],
-    p2_score:S.scores[1]
+    date: formatIsoDate(dateObj),
+    contest: contestKey,
+    p1_score: S.scores[p1_idx],
+    p2_score: S.scores[p2_idx]
   });
   writePendingGames(games);
 }
@@ -346,12 +392,17 @@ async function openImport(){
   if(area)area.style.display='block';
   if(!S.backupEnabled || !getBackupUrl())return;
   try{
-    const response=await fetch(`${getBackupUrl()}?contest=${encodeURIComponent(getContestKey(S.names))}`,{mode:'cors'});
+    const contestKey = getContestKey(S.names);
+    const contestNames = contestKey.split('|');
+    const response=await fetch(`${getBackupUrl()}?contest=${encodeURIComponent(contestKey)}`,{mode:'cors'});
     const result=await response.json();
     if(result.status!=='success')throw new Error(result.message || 'Cloud import failed');
     const games=result.games || [];
     if(textarea){
-      textarea.value=[S.names.join(' | '),...games.map(game => `${game.date} ${game.p1_score} ${game.p2_score}`)].join('\n');
+      textarea.value=[contestNames.join(' | '),...games.map(game => {
+        const norm = normalizeGameDate(game.date);
+        return `${norm.time} ${game.p1_score} ${game.p2_score}`;
+      })].join('\n');
     }
     setStatus(`${games.length} cloud games loaded`,3000);
   }catch(e){setStatus('Could not load cloud games');}
@@ -390,6 +441,18 @@ function load(){
     }
     const d=JSON.parse(r);
     Object.assign(S, d);
+    (S.pastGames || []).forEach(g => {
+      const norm = normalizeGameDate(g.date || g.time);
+      if(!g.date) g.date = norm.date;
+      if(!g.time) g.time = norm.time;
+    });
+    Object.values(S.contests || {}).forEach(c => {
+      (c.pastGames || []).forEach(g => {
+        const norm = normalizeGameDate(g.date || g.time);
+        if(!g.date) g.date = norm.date;
+        if(!g.time) g.time = norm.time;
+      });
+    });
     if(!S.contests) S.contests = {};
     if(!S.theme) S.theme = 'system';
     if(typeof S.helpMessage === 'undefined') S.helpMessage = '';
@@ -692,11 +755,12 @@ function callDomino(){
         who: -1, pts: 0, time: ts(), type: 'gameover',
         finalScores: [S.scores[0], S.scores[1]], winnerIdx: gameWinner, winnerName: S.names[gameWinner]
       });
+      const now = new Date();
       S.pastGames.unshift({
-        time: ds(), date: new Date().toISOString().slice(0,16), names: [S.names[0], S.names[1]],
+        time: ds(now), date: formatIsoDate(now), names: [S.names[0], S.names[1]],
         scores: [S.scores[0], S.scores[1]], winnerIdx: gameWinner
       });
-      queueFinishedGame();
+      queueFinishedGame(now);
       S.gameOver = true;
       S.phase = 'end';
       S.showFirstPlayer = false;
@@ -853,7 +917,9 @@ function cancelEdit(){S.editingIdx=-1;render();}
 function getExportText(){
   const lines = [S.names.join(' | ')];
   (S.pastGames || []).forEach(g => {
-    lines.push(`${g.time} ${g.scores[0]} ${g.scores[1]}`);
+    const norm = normalizeGameDate(g.date || g.time);
+    const dateStr = g.time || norm.time;
+    lines.push(`${dateStr} ${g.scores[0]} ${g.scores[1]}`);
   });
   return lines.join('\n');
 }
@@ -881,44 +947,75 @@ function doImport(){
     const lines = ta.value.trim().split('\n');
     if(lines.length < 1) return;
     const names = lines[0].split('|').map(n => n.trim());
-    if(names.length !== 2) { setStatus('Invalid first line: must be "Player 1 | Player 2"'); return; }
+    if(names.length !== 2 || !names[0] || !names[1]) {
+      setStatus('Invalid first line: must be "Player 1 | Player 2"');
+      return;
+    }
     
     const games = [];
     for(let i=1; i<lines.length; i++) {
-      const parts = lines[i].trim().split(/\s+/);
+      const line = lines[i].trim();
+      if(!line) continue;
+      const parts = line.split(/\s+/);
       if(parts.length < 3) continue;
-      let s1, s2, time;
-      if (parts.length >= 4 && parts[1].includes(':')) {
-        time = parts[0] + ' ' + parts[1];
-        s1 = parseInt(parts[2]);
-        s2 = parseInt(parts[3]);
-      } else {
-        time = parts[0];
-        s1 = parseInt(parts[1]);
-        s2 = parseInt(parts[2]);
-      }
+
+      const s2 = parseInt(parts[parts.length - 1], 10);
+      const s1 = parseInt(parts[parts.length - 2], 10);
       if(isNaN(s1) || isNaN(s2)) continue;
+
+      const rawDate = parts.slice(0, parts.length - 2).join(' ');
+      const norm = normalizeGameDate(rawDate);
+
       games.push({
-        time,
-        date: parts.length >= 4 && parts[1].includes(':') ? `${parts[0]} ${parts[1]}` : parts[0],
-        names,
+        time: norm.time,
+        date: norm.date,
+        names: [...names],
         scores: [s1, s2],
         winnerIdx: s1 >= s2 ? 0 : 1
       });
+    }
+
+    if(lines.length > 1 && games.length === 0) {
+      setStatus('No valid games found — format: date score1 score2');
+      return;
     }
     
     const key = getContestKey(names);
     const exists = !!S.contests[key];
     S.showNewContestInputs = false;
     switchContest(names);
-    const newGames = games.filter(game => !(S.pastGames || []).some(existing =>
-      existing.date === game.date && existing.scores[0] === game.scores[0] && existing.scores[1] === game.scores[1]));
-    S.pastGames = exists ? [...newGames, ...S.pastGames] : newGames;
+
+    const reverseOrder = S.names[0] !== names[0];
+    const isDuplicate = (existing, incoming) => {
+      const exScores = reverseOrder ? [existing.scores[1], existing.scores[0]] : existing.scores;
+      if (exScores[0] !== incoming.scores[0] || exScores[1] !== incoming.scores[1]) return false;
+      const exNorm = normalizeGameDate(existing.date || existing.time);
+      const incNorm = normalizeGameDate(incoming.date || incoming.time);
+      if (exNorm.date && incNorm.date && exNorm.date === incNorm.date) return true;
+      if (exNorm.time && incNorm.time && exNorm.time === incNorm.time) return true;
+      if (existing.time && incoming.time && existing.time === incoming.time) return true;
+      if (existing.date && incoming.date && existing.date === incoming.date) return true;
+      return false;
+    };
+
+    const newGames = games.filter(game => !(S.pastGames || []).some(existing => isDuplicate(existing, game)));
+    const normalizedNewGames = reverseOrder ? newGames.map(g => ({
+      ...g,
+      names: [...S.names],
+      scores: [g.scores[1], g.scores[0]],
+      winnerIdx: g.scores[1] >= g.scores[0] ? 0 : 1
+    })) : newGames;
+
+    S.pastGames = exists ? [...normalizedNewGames, ...S.pastGames] : normalizedNewGames;
     
     updateContest();
     save(); render();
     document.getElementById('import-area').style.display='none';
-    setStatus(`${newGames.length} games imported`, 3000);
+    if(games.length > 0 && newGames.length === 0) {
+      setStatus('All games already imported (no duplicates added)', 3000);
+    } else {
+      setStatus(`${newGames.length} game${newGames.length === 1 ? '' : 's'} imported`, 3000);
+    }
   }catch(err){setStatus('Could not parse data — check the format and try again.');}
 }
 

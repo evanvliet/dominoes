@@ -4,9 +4,13 @@ function doPost(e) {
     var sheet = getContestSheet(payload.contest);
 
     ensureHeader(sheet);
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var tz = ss.getSpreadsheetTimeZone();
     var values = sheet.getDataRange().getValues();
+    var payloadDate = formatRowDate(payload.date, tz);
     for (var i = 1; i < values.length; i++) {
-      if (String(values[i][0]) === String(payload.date) &&
+      var rowDate = formatRowDate(values[i][0], tz);
+      if (rowDate === payloadDate &&
           Number(values[i][1]) === Number(payload.p1_score) &&
           Number(values[i][2]) === Number(payload.p2_score)) {
         return jsonOutput({"status": "success", "duplicate": true});
@@ -24,15 +28,17 @@ function doGet(e) {
   try {
     var requestedContest = e && e.parameter ? e.parameter.contest : "";
     if (!requestedContest) return jsonOutput({"status": "error", "message": "contest is required"});
-    var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName(requestedContest));
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var sheet = ss.getSheetByName(sheetName(requestedContest));
     if (!sheet) return jsonOutput({"status": "success", "games": []});
+    var tz = ss.getSpreadsheetTimeZone();
     var values = sheet.getDataRange().getValues();
     var games = [];
     for (var i = 1; i < values.length; i++) {
       var row = values[i];
       if (!row[0]) continue;
       games.push({
-        date: row[0],
+        date: formatRowDate(row[0], tz),
         p1_score: Number(row[1]),
         p2_score: Number(row[2])
       });
@@ -41,6 +47,14 @@ function doGet(e) {
   } catch(error) {
     return jsonOutput({"status": "error", "message": error.toString()});
   }
+}
+
+function formatRowDate(val, tz) {
+  if (!val) return "";
+  if (val instanceof Date) {
+    return Utilities.formatDate(val, tz, "yyyy-MM-dd'T'HH:mm");
+  }
+  return String(val).trim();
 }
 
 function getContestSheet(contest) {
