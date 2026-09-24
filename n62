@@ -1,0 +1,25 @@
+n62
+
+nice! But still some issues.
+
+1. Odd state at new game start. Believe it's after clicking on a non-player button on the score screen. Possible fix: disable all other controls except user tiles. Leave Click User Tile with high double message on in message area and clear after high double selected.
+
+2. Date format looks right on spreadsheet, but not on import / export. Please ensure same format on each, need to redo test sample and hisgtorical data to revlect addtion of ISO data format.
+
+3. cloud backup, On load, first download scores from server and merge with local data, i.e., no duplication. Display in data box and allow overwrite by pasting data from clipboard. On Ok, update local data and post data to server. On export, just write data to data block and clipboard with full ISO date format. Perhaps wasteful but small amount of data. No need for a Paste Clipboard button.
+
+4. on sheet, first row should have names of players, vs. p1_score...
+
+Clarification:
+
+1. can not now repro the odd state, looks like controls are now disabled. table this for now.
+
+2. I will redo historical and test data to have right data format, no need to change code to do so on the fly.
+
+3. Best next stop issues:
+
+    1. option A. contest sheet starts with names and then game rows
+
+    2. Option C. But, to be clear, on import, whatever the user puts into the text box, e.g. overwrites downloaded data, wins. what is sent back after import overwrites existing data on the server.
+
+4. Sheet schema should start with a contest header row with player names

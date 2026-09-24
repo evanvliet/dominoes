@@ -2,8 +2,19 @@ function doPost(e) {
   try {
     var payload = JSON.parse(e.postData.contents);
     var sheet = getContestSheet(payload.contest);
+    var names = Array.isArray(payload.names) ? payload.names : [];
 
-    ensureHeader(sheet);
+    if (payload.mode === 'replace') {
+      sheet.clearContents();
+      ensureHeader(sheet, names);
+      var rows = Array.isArray(payload.games) ? payload.games : [];
+      for (var i = 0; i < rows.length; i++) {
+        sheet.appendRow([rows[i].date, Number(rows[i].p1_score || 0), Number(rows[i].p2_score || 0)]);
+      }
+      return jsonOutput({"status": "success", "replaced": true, "count": rows.length});
+    }
+
+    ensureHeader(sheet, names);
     var ss = SpreadsheetApp.getActiveSpreadsheet();
     var tz = ss.getSpreadsheetTimeZone();
     var values = sheet.getDataRange().getValues();
@@ -34,9 +45,22 @@ function doGet(e) {
     var tz = ss.getSpreadsheetTimeZone();
     var values = sheet.getDataRange().getValues();
     var games = [];
-    for (var i = 1; i < values.length; i++) {
+    var startIndex = 1;
+
+    if (values.length > 0) {
+      var firstRow = values[0] || [];
+      var firstCell = String(firstRow[0] || '').trim().toLowerCase();
+      if (firstCell === 'date') {
+        startIndex = 1;
+      } else {
+        startIndex = 0;
+      }
+    }
+
+    for (var i = startIndex; i < values.length; i++) {
       var row = values[i];
       if (!row[0]) continue;
+      if (row.length < 3) continue;
       games.push({
         date: formatRowDate(row[0], tz),
         p1_score: Number(row[1]),
@@ -68,9 +92,15 @@ function sheetName(contest) {
   return (name || "Contest").substring(0, 100);
 }
 
-function ensureHeader(sheet) {
-  if (sheet.getLastRow() === 0) {
-    sheet.appendRow(["date", "p1_score", "p2_score"]);
+function ensureHeader(sheet, names) {
+  var values = sheet.getDataRange().getValues();
+  var firstRow = values.length ? (values[0] || []) : [];
+  var hasDateHeader = firstRow.length >= 3 && String(firstRow[0] || '').trim().toLowerCase() === 'date';
+
+  if (sheet.getLastRow() === 0 || !hasDateHeader) {
+    var left = Array.isArray(names) && names.length >= 2 ? String(names[0] || 'Player 1') : 'Player 1';
+    var right = Array.isArray(names) && names.length >= 2 ? String(names[1] || 'Player 2') : 'Player 2';
+    sheet.getRange(1, 1, 1, 3).setValues([['date', left, right]]);
   }
 }
 
