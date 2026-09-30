@@ -212,11 +212,15 @@ textarea.export-area{width:100%;height:145px;font-size:12px;font-family:monospac
 .action-group .action-btn{flex:1;margin-bottom:0;border:none;background:none;font-size:13px;color:var(--color-text-secondary);padding:10px 0;border-radius:8px;font-weight:400;height:40px;min-height:40px;}
 .action-group .action-btn.highlight{background:var(--color-background-primary);color:var(--color-text-primary);box-shadow:0 1px 3px rgba(0,0,0,0.1);font-weight:700;}
 .action-group .action-btn:disabled{opacity:0.5;}
+.opt-heading{display:flex;align-items:center;justify-content:space-between;}
+.opt-version{font-size:11px;font-weight:400;color:var(--color-text-tertiary);letter-spacing:0;}
 </style>
 </head>
 <body>
 <div class="app" id="app"></div>
 <script>
+const APP_VERSION = 'v2.0.4';
+
 function escapeHTML(str) {
   if (!str) return '';
   return String(str).replace(/[&<>"']/g, function(m) {
@@ -559,7 +563,9 @@ function callDomino(){
     return;
   }
   
-  const gameEnds = S.pendingWin;
+  const scoreTied = S.scores[0] === S.scores[1];
+  const tiedGame = S.pendingWin && scoreTied;
+  const gameEnds = S.pendingWin && !scoreTied;
   const handTotals = [S.handScores[0], S.handScores[1]];
   
   // Record the domino call
@@ -609,15 +615,14 @@ function callDomino(){
       S.gameOver = true;
       S.phase = 'end';
       S.showFirstPlayer = false;
-    } else {
-      // Game is tied
-      msg = handMsg + ' and the game is tied.\nClick player with high double to start new game.';
-      S.gameEndMessage = msg;
-      S.gameOver = true;
-      S.phase = 'end';
-      S.showFirstPlayer = false;
     }
-  } else {
+  }
+
+  if (tiedGame) {
+    msg = 'Tied score, play another hand.';
+  }
+
+  if (!gameEnds) {
     // Next hand always alternates starter, regardless of who scored
     const nextStarter = S.handFirstPlayer === 0 ? 1 : 0;
     S.handFirstPlayer = nextStarter;
@@ -1233,7 +1238,7 @@ function render(){
       </div>
 
       <div class="opt-section">
-        <div class="opt-label">DETAILS</div>
+        <div class="opt-label opt-heading"><span>DETAILS</span><span class="opt-version">${APP_VERSION}</span></div>
         <div class="opt-row">
           <label>Top Score</label>
           <input type="number" value="${S.target}" min="25" max="500" step="25" onchange="S.target=Math.max(25,parseInt(this.value)||50);save();" inputmode="numeric"/>
