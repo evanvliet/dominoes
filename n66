@@ -1,0 +1,15 @@
+n66
+
+more on feedback
+
+Import can erase games: should only happen when the user presses the clear button. Else only adds games from the text box. Text box is only populated with new data from clipboard or server. so for cloud backup, each press of the import button downloads scores from the server and only adds new ones to the textbox. It then does the same from data on the clipboard. In either case put status result in info box at bottom:
+"87 game scores copied to clipboard"
+"34 new scores downloaded from server, 3 from clipboard"
+and do not overwrite score records in score box.
+
+Player-score order is defined by the name of the contest. Eric Peter is a separate contest from Peter Eric and scores follow order of names in conest name.
+
+Duplicate detection is only used to suppress addition of duplicates, never to delete. Two games in the same contest would not occur in the same minute.
+
+Tied games are games in progress, and not complete until a winning hand.
+

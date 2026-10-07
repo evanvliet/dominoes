@@ -1,0 +1,27 @@
+n67
+
+Ordered contest identity is a requirement change. The current getContestKey() sorts names, so it treats “Eric Peter” and “Peter Eric” as the same contest. Preserve name order in the key and use that same order for score columns, queues, and sheet headers. Trim names consistently; encoding the pair as JSON avoids collisions if a name contains |. A new storage label is appropriate if old data is intentionally abandoned.
+
+- player names are letters only and single words
+
+Treat the text box as an append-only working set. Fetching from the server or pasting clipboard data should add unseen rows without clearing what is already there. Importing should add those rows to local history, also without replacing it. Only an explicit clear action should delete scores. Browser clipboard reads may require permission, so I recommend an explicit Paste action (or have the user paste into the box) rather than silently reading it during import.
+
+- just populate text box with new server data and allow user paste to add scores.
+
+Make counts describe the destination. “Copied to clipboard” is clear for export. For import, report how many new records were added from each source and, optionally, how many duplicates were skipped. Avoid saying “downloaded” if those records were actually added to local history.
+
+- on export:
+32 game scores copied to clipboard
+  on import:
+23 scores 
+just show in lower info box, leave text area alone. clear both when user clicks check
+mark in lower box or selects other action (new contest)
+
+Use one duplicate rule everywhere. Within an ordered contest, (ISO date to minute, score1, score2) is workable given your assumption that two games won’t occur in the same minute. Apply it consistently for local import, cloud append, and merging. Keep records sorted by date for display/export, not as a side effect of deduplication.
+
+- perfect
+
+Keep ordinary sync append-only. The current cloud endpoint supports duplicate suppression for individual posts, but bulk sync has a replace mode that clears the sheet. Remove replace from normal import/sync; make clearing a distinct, deliberate operation that clears both local and cloud data if that is what “start from scratch” means.
+Tied scores stay in progress. Don’t add a tie to completed-game history or the sync queue. Continue hands until there is a
+
+- perfect

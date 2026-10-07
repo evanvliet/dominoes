@@ -1,0 +1,19 @@
+n68
+
+Import just adds scores from the text area.
+
+Change cloud sync processing as follows. Make indepondent of import, which is used as before
+to add scores. If cloud synd is enabled, just asynchronously (i.e. background) get all scores from server and add any it does not have. Do no more than once a day.
+
+When user clicks import button, info (bottom) text area says:
+<if cloud sync and nRecentImports> Found <nRecentImports> scores 3 days ago. 
+    set nRecentImports = 0
+Paste new scores above and press Done to
+update score history.
+<after user clicks done>
+Added 3 scores.
+and delete input area
+
+Clear deletes all scores from both local and server histories.
+
+I like Eric vs Peter for contest names, the vs a small bit of eye candy.

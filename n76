@@ -1,0 +1,11 @@
+n76
+
+Idea is that Eric | Peter is a different contest than 
+Peter | Eric, so identtity should be stable. 
+
+Both players are active. after a single game one one of the players
+will have a win margin, the other none. But there are three "views" to click through, one for win margins for one player,
+one for margins for the other, and third for all margins.
+
+In case of version stamp failure, please provide good
+diagnostic feecback in lower box on options page.

@@ -1,0 +1,9 @@
+n75
+
+can't create contest with names reversed,
+more testing on import export
+single game still shows no game or point history and shows histogram for both users should only show one
+import broken, create new contest, click import, says no games to import, regardless if backup is turned on. no way to paste data into box
+backup not working
+not seeing version stamp from sheet code.gs
+

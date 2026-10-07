@@ -1,0 +1,12 @@
+n69
+
+yes all this is contest specific.
+
+yes, cloud updates not visible, and likely quite exceptional.
+
+I like your status wording, but like to keep it as a prefix, rather than a separate prompt. Only disply in hte exceptional case of discovering new scores on the server.
+
+yes Clear only deletes scores for the currnet contest, both server and client. Put a warning
+in the lower status box if any failure.
+
+Yes background sync can amend to history, ignoring duplicates. And the app appends scores on Import, also ignoring duplicates. Is there a race condition, do we need a lock or something?

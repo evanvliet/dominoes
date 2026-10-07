@@ -1,0 +1,11 @@
+n70
+
+show the "upper text area" to show imported or exported scores,
+it disappears after click on check mark or other button.
+placed below the DETAILS box, above the status ? box
+
+Headers on server sheet are p1_score... should be player names
+
+I like Peter vs Eric style name for sheets. not Peter!Eric
+
+Adds scores ok, but Clear does not clear server scores.

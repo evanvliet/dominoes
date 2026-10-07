@@ -1,0 +1,26 @@
+n65
+
+Comments after N64 feedback
+
+the tie rule: in the event of a tie score, the game is not over, and
+continues with another hand. the tie is not saved as a game statistic.
+
+player ordering: exports and imports are contest specific. the sync of
+finished games should operate on one contest at a time. so the queue
+of finished games should be a dictionary of lists, one list per
+contest. each list would have scores for that contest. in either case,
+the player is specified by the name of the contest.
+
+Currently data box clears and shows number of records exported, not
+the actual records.
+
+No need for a migration plan for existing dom_v9
+data, in fact just use a new label.
+
+scores should be ordered by date.
+
+idea is scores only get added. need to clear data and start from
+scratch to delete scores. so all sync operations should only add new
+(different) scores. amount of data is miniscule, two ints and a date
+per score. possible optimization is to remember time of last sync and
+only ask for later scores.

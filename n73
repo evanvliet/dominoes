@@ -1,0 +1,11 @@
+n73
+
+looks great! just a few things:
+change style of version stamp on options page, now small caps, prefer mixed case
+version stamp still shows earlier server version, but works ok
+after import, should show number of scores added out of number submitted.
+on clear, put confirmation text into lower box with cancel ok buttons
+on clear, if cleared, remove even context name and delete sheet on server.
+review stats. on new contest shows zero games but has non-negative win margins.
+after just one game, total points, games is ok but graph of cumulative points / games won is empty
+and histogram does not seem right, has entry for both me and peter, should onoly have one.
