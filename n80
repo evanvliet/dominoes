@@ -1,0 +1,20 @@
+n80
+
+only check cloud sync for one active contest, only once per day,
+at startup or contest change
+
+completed game identified by timestamp. two games with same timestamp will be pruned at sync time, with local taking precedence.
+
+merge overwrites existing entries, local winning. 
+
+cloud api need only provide complete list of all scores for a given contest. and accept new scores to
+add to cloud version, and keep them sorted by date.
+
+so cloud sync gets all scores, updates local, and sends back any scores in local version not on server. cloud deletes any scores on server that have conflict
+with timestamp of posted scores.
+
+clear does reset both local and server. 
+
+import reports scores accepted and supplied, and resolves all conflicts by local coopy winning. Export shows nuimber of records in status and score data in data block
+
+revsist modularity later.

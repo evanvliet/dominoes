@@ -55,9 +55,20 @@ The options tab includes Data buttons for Export, Import, and Clear.
 
 First player names, followed by date, time and player scores for each completed game. You have to paste the clipboard data into a mail message or web document to save it.
 * *Import* opens an edit control; paste data in above format to add scores. It
- appends scores to the contest per the first line. If no such contest exists, it creates
- a new one. For testing, you can import 75 scores from [test75](test75).
-* *Clear* deletes the contest, both scores and players, from the data.
+ adds scores to the contest per the first line. If a timestamp already exists, the existing
+ local score is kept. The status reports how many records were added out of those supplied.
+ If no such contest exists, it creates a new one. For testing, you can import 75 scores from [test75](test75).
+* *Clear* deletes the contest, both scores and players, from this device and, when configured,
+ from the cloud.
+
+To use cloud backup, deploy the current [code.gs](code.gs) as an Apps Script web app, set its
+`/exec` URL in Options, and turn Backup on. Completed
+games are uploaded when possible; the active contest is reconciled with the server at startup
+or when selected, at most once per day. Sync merges by contest and minute-level timestamp:
+local scores win timestamp conflicts, cloud-only scores are added locally, and local-only or
+conflicting local scores are sent to the server. The server keeps at most one score record per
+contest timestamp and sorts records by date. Therefore, two games in the same contest during
+the same minute resolve to one record at sync time.
 
 ## Why This Exists
 
@@ -81,5 +92,3 @@ The arrival of AI coding tools was too tempting, and this is the result.
 ### More info
 See [prompts](prompts.md) for the initial development logs.
 And [info](info.md) has AI genearted feature details.
-
-

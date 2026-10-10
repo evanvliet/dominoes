@@ -1,0 +1,116 @@
+n79
+
+n78
+
+	Import/export “funky”	First capture one failing example: expected result, actual result, and whether it’s clipboard export, paste, or import. The app exports Date,Player 1,Player 2 CSV, while README.md documents the older `Player 1
+
+Scene:
+new contest, with existing data on server. click backup.
+Expect:
+status: imported <n> scores.
+data: n scores added
+Get:
+no status
+
+Scene:
+existing data, cloud backup, import. paste data and click done
+Expect:
+status: imported <n> out of <all> scores <wait for checkmark or other action to clear status and text>
+data: n more scores on local and server updated with those scores as if they had been added manually
+Get:
+nothing
+Comment:
+implicit in this reorg of UI making the input text area a fixed part of the options tab:
+
+
+Contest
+p vs p dropdown
+
+Details
+
+top score / Backup replaced with a Local | Cloud toggle. 
+    If cloud selected, paste backup url in data box and ask for 
+    comfirnation in status box. Allow user to change data box
+    and specify other backup url for that contest. Confirm Cloud
+    choice if sucessful version stamp.
+Appearance Light Dark System
+Scores Export Import Clear
+
+Data
+<empty box>
+
+Status        <check>
+
+
+Idea is that all feedback, confirmation, suggestion goes in the Status box.
+Data box is used to paste scores for import, URL for backup, show scores for export, combobox for contest creation. relocarte  current popub combobx.
+player names for contest creation go here if "new" selected, with ok.
+
+
+
+2	Hide Backup URL	Specify whether “hide” means masked by default with a reveal control, or omitted from the UI unless backup settings are expanded. Keep the saved URL usable; don’t clear it or disable backup when hidden.
+
+when user selects backup, if url not set, prompt for it to be pasted into data, and only enable if url provices a version stamp. once enabled place note with url in status box.
+
+3	Copy URL from clipboard at init	Browsers generally block reading the clipboard on page load. Specify this as a user-initiated Paste action (or paste into a focused URL field), with permission/error feedback—not silent clipboard access during initialization. Decide whether this should replace or supplement manual entry.
+
+as for 2 above
+
+4	Check automatic daily import	A once-per-24-hours cloud merge already appears to exist in index.html, but define the intended trigger: app startup, returning to the app, or contest selection. Specify per-contest behavior, no duplicates/overwrites, and user-visible success/failure status.
+
+intended trigger is checksum mismatch. so on app startup, get version stamp and checksum. It not last, sync scores. Sync consists of union of local and server scores with duplicates removed. Comparison of time stamps sufficient for duplicate detection.
+
+5	Stats “funky”	Include a screenshot or example dataset and say what the graph should show. Current margin histogram uses eight bins scaled to the data maximum; with only one game, its margin lands in the last bin, which may look misleading. Specify expected behavior for zero, one, and several games, including the three player-1/player-2/all views.
+
+import data from te30, check Stats
+shows 0 gmes won for Peter and Eric, should be 16 14
+games graph looks like a straight line
+histogram shows no win margins for Peter and totals are same as eric, should have distinct
+diplays for bars for number of wins with a particualr margin.
+
+views:   Peter.  Eric.  All
+0 games: blank for all
+1 games: only score for the one winner and only one margin all all
+severla games:  one tick for each win of margin set. so all would have sum of ticks in each player.
+games and points should reflect actual total number of games played (or won)
+
+new contest, let A win by 51, then B by 51
+games graph is straight line, should up then down
+
+
+6	Split into manageable files	Make this a separate cleanup after the fixes. Keep the app deployable on GitHub Pages without a build step unless you explicitly want to introduce one; define a smoke-test checklist so the move doesn’t change behavior.
+
+separte files for:
+css
+html
+javascript for each tab
+jabascript for data
+javascript for cloud
+consider dart
+
+Other issues:
+consistent display and erasure of commehts on options page. start with clearing data and status boxes after user action
+on new game, click domino before player, gets into bad state, should disable domino tile until player select
+
+
+Working spec — cloud backup and modular direction
+
+Cloud merge:
+- Cloud backup is per contest. On startup, check the cloud revision for each configured cloud-backed contest. Fetch and merge that contest only when its revision differs from the last revision recorded locally.
+- A completed game is identified by contest plus its normalized timestamp, at minute precision. A contest may have at most one game per minute. Reject/report a second game at the same contest timestamp rather than silently merging or overwriting it. If a timestamp collision has different scores, surface it for explicit resolution; neither copy wins automatically.
+- Merge is a union by that identity. Never overwrite an existing game's scores during routine sync. Push local-only games to the server and add cloud-only games locally. Report the number added and any conflicts in Status.
+- The cloud API must expose a per-contest revision that changes after every add, clear, or other data mutation. Compute it from a canonical, consistently sorted representation of the contest's normalized timestamps and scores. A successful fetch or upload returns the revision the client can store for its next comparison. Keep API/script version validation separate from this data revision.
+- Clear on a cloud-backed contest is a reset on both local and cloud storage. The cloud reset advances a contest generation/reset marker. A client that observes a newer reset marker replaces its local contest history with the post-reset cloud history instead of unioning stale games back in. Require confirmation and report success/failure; do not claim a clear succeeded unless both sides confirm it.
+
+Cloud setup and Options feedback:
+- Keep the backup URL saved per contest. Selecting Cloud with no URL enters URL-entry mode in Data; validate the URL with the API version check before enabling Cloud. Show the selected mode and saved URL in Status after success. A failed check leaves the contest local and reports the error.
+- Clipboard access is user-initiated: the user pastes into the focused Data field (or uses an explicit Paste action). Do not read the clipboard during app initialization.
+- Data is a shared control with an explicit mode/label for URL entry, score import, score export, or new-contest player names. Switching modes must not submit or reinterpret existing text. Clear Data and Status consistently after the action completes; keep actionable errors visible until the next action.
+- Import reports how many records were accepted out of how many were supplied, and identifies timestamp conflicts without overwriting existing games. Export reports completion and leaves the exported text available to copy.
+
+Modularity:
+- Fix backup/import and statistics behavior before restructuring files.
+- Keep the app deployable on GitHub Pages without a build step. Prefer native ES modules for code organization; treat adopting Dart or a build tool as a separate decision.
+- Separate game/contest rules and score history from storage/sync adapters and UI views. Local storage and cloud backup should be replaceable adapters; scoring views should not own game rules.
+- Represent turn order and start-player conventions as rules, not UI assumptions. Keep the game model open to scoring formats beyond two domino scores (for example pool scores or bead/string scoring).
+- After the refactor, smoke-test contest creation/selection, score entry and domino completion, import/export/clear, cloud setup and two-way sync, offline/local-only use, theme settings, and all statistics views.

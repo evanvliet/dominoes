@@ -1,0 +1,70 @@
+n78
+
+	Import/export “funky”	First capture one failing example: expected result, actual result, and whether it’s clipboard export, paste, or import. The app exports Date,Player 1,Player 2 CSV, while README.md documents the older `Player 1
+
+Scene:
+new contest, with existing data on server. click backup.
+Expect:
+status: imported <n> scores.
+data: n scores added
+Get:
+no status
+
+Scene:
+existing data, cloud backup, import. paste data and click done
+Expect:
+status: imported <n> out of <all> scores <wait for checkmark or other action to clear status and text>
+data: n more scores on local and server updated with those scores as if they had been added manually
+Get:
+nothing
+Comment:
+implicit in this reorg of UI making the input text area a fixed part of the options tab:
+Contest
+p vs p dropdown
+
+Details
+top score / Backup
+Appearance ...
+Scores Export Import Clear
+
+Data
+<empty box>
+
+Status        <check>
+
+
+Idea is that all feedback, confirmation, choice stuff goes in the Status box
+Data box is used to paste scores for import, URL for backup, show scores for export.
+
+
+
+
+2	Hide Backup URL	Specify whether “hide” means masked by default with a reveal control, or omitted from the UI unless backup settings are expanded. Keep the saved URL usable; don’t clear it or disable backup when hidden.
+
+when user selects backup, if url not set, prompt for it to be pasted into data, and only enable if url provices a version stamp. once enabled place note with url in status box.
+
+3	Copy URL from clipboard at init	Browsers generally block reading the clipboard on page load. Specify this as a user-initiated Paste action (or paste into a focused URL field), with permission/error feedback—not silent clipboard access during initialization. Decide whether this should replace or supplement manual entry.
+
+as for 2 above
+
+4	Check automatic daily import	A once-per-24-hours cloud merge already appears to exist in index.html, but define the intended trigger: app startup, returning to the app, or contest selection. Specify per-contest behavior, no duplicates/overwrites, and user-visible success/failure status.
+
+intended trigger is checksum mismatch. so on app startup, get version stamp and checksum. It not last, sync scores. Sync consists of union of local and server scores with duplicates removed. Comparison of time stamps sufficient for duplicate detection.
+
+5	Stats “funky”	Include a screenshot or example dataset and say what the graph should show. Current margin histogram uses eight bins scaled to the data maximum; with only one game, its margin lands in the last bin, which may look misleading. Specify expected behavior for zero, one, and several games, including the three player-1/player-2/all views.
+
+views:   Peter.  Eric.  All
+0 games: blank for all
+1 games: only score for the one winner and only one margin all all
+severla games:  one tick for each win of margin set. so all would have sum of ticks in each player.
+games and points should reflect actual total number of games played (or won)
+
+6	Split into manageable files	Make this a separate cleanup after the fixes. Keep the app deployable on GitHub Pages without a build step unless you explicitly want to introduce one; define a smoke-test checklist so the move doesn’t change behavior.
+
+separte files for:
+css
+html
+javascript for each tab
+jabascript for data
+javascript for cloud
+consider dart

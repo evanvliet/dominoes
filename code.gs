@@ -1,4 +1,4 @@
-var SCRIPT_VERSION = 'gs.2.3';
+var SCRIPT_VERSION = 'gs.2.4';
 
 function doPost(e) {
   var lock = LockService.getScriptLock();
@@ -7,31 +7,38 @@ function doPost(e) {
     var payload = JSON.parse(e.postData.contents);
     lock.waitLock(30000);
     locked = true;
-    var sheet = getContestSheet(payload.contest);
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var name = sheetName(payload.contest);
+    var sheet = ss.getSheetByName(name);
     var names = Array.isArray(payload.names) ? payload.names : [];
 
     if (payload.mode === 'clear') {
-      var ss = SpreadsheetApp.getActiveSpreadsheet();
       if (sheet) {
         try {
           ss.deleteSheet(sheet);
         } catch (e) {
           sheet.clearContents();
-          ensureHeader(sheet, names);
         }
       }
       return jsonOutput({"status": "success", "cleared": true, "script_version": SCRIPT_VERSION});
     }
 
+    sheet = sheet || ss.insertSheet(name);
     ensureHeader(sheet, names);
-    var ss = SpreadsheetApp.getActiveSpreadsheet();
     var tz = ss.getSpreadsheetTimeZone();
     var values = sheet.getDataRange().getValues();
     var rows = Array.isArray(payload.games) ? payload.games : [payload];
-    var seen = {};
+    var gamesByTimestamp = {};
     var added = 0;
+    var replaced = 0;
+    var duplicates = 0;
     for (var i = 1; i < values.length; i++) {
-      seen[gameKey(formatRowDate(values[i][0], tz), values[i][1], values[i][2])] = true;
+      var existingDate = formatRowDate(values[i][0], tz);
+      if (!existingDate) continue;
+      var existingKey = timestampKey(existingDate);
+      if (!gamesByTimestamp[existingKey]) {
+        gamesByTimestamp[existingKey] = [existingDate, Number(values[i][1]), Number(values[i][2])];
+      }
     }
     for (var j = 0; j < rows.length; j++) {
       var game = rows[j];
@@ -39,14 +46,26 @@ function doPost(e) {
       var p1 = Number(game.p1_score);
       var p2 = Number(game.p2_score);
       if (!date || !isFinite(p1) || !isFinite(p2)) continue;
-      var key = gameKey(date, p1, p2);
-      if (seen[key]) continue;
-      sheet.appendRow([date, p1, p2]);
-      seen[key] = true;
-      added++;
+      var key = timestampKey(date);
+      var current = gamesByTimestamp[key];
+      if (!current) {
+        added++;
+      } else if (Number(current[1]) === p1 && Number(current[2]) === p2) {
+        duplicates++;
+        continue;
+      } else {
+        replaced++;
+      }
+      gamesByTimestamp[key] = [key, p1, p2];
     }
-    sortContestSheet(sheet);
-    return jsonOutput({"status": "success", "added": added, "duplicates": rows.length - added, "script_version": SCRIPT_VERSION});
+    var canonicalGames = Object.keys(gamesByTimestamp).sort(compareDateStrings).map(function(key) {
+      var game = gamesByTimestamp[key];
+      return [key, Number(game[1]), Number(game[2])];
+    });
+    var lastRow = sheet.getLastRow();
+    if (lastRow > 1) sheet.getRange(2, 1, lastRow - 1, 3).clearContent();
+    if (canonicalGames.length) sheet.getRange(2, 1, canonicalGames.length, 3).setValues(canonicalGames);
+    return jsonOutput({"status": "success", "added": added, "replaced": replaced, "duplicates": duplicates, "script_version": SCRIPT_VERSION});
   } catch(error) {
     return jsonOutput({"status": "error", "message": error.toString()});
   } finally {
@@ -54,8 +73,10 @@ function doPost(e) {
   }
 }
 
-function gameKey(date, p1, p2) {
-  return String(date) + '|' + Number(p1) + '|' + Number(p2);
+function timestampKey(date) {
+  var value = String(date || '').trim();
+  var match = value.match(/^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2})/);
+  return match ? match[1] : value;
 }
 
 function compareDateStrings(a, b) {
@@ -63,24 +84,6 @@ function compareDateStrings(a, b) {
   var bNum = Date.parse(String(b));
   if (!isNaN(aNum) && !isNaN(bNum)) return aNum - bNum;
   return String(a).localeCompare(String(b));
-}
-
-function sortContestSheet(sheet) {
-  var values = sheet.getDataRange().getValues();
-  if (!values || values.length <= 1) return;
-  var rows = [];
-  for (var i = 1; i < values.length; i++) {
-    if (!values[i] || values[i].length < 3 || !values[i][0]) continue;
-    rows.push([String(values[i][0]), Number(values[i][1]) || 0, Number(values[i][2]) || 0]);
-  }
-  if (!rows.length) return;
-  rows.sort(function(a, b) {
-    return compareDateStrings(a[0], b[0]);
-  });
-  sheet.getRange(2, 1, sheet.getLastRow() - 1, 3).clearContent();
-  if (rows.length > 0) {
-    sheet.getRange(2, 1, rows.length, 3).setValues(rows);
-  }
 }
 
 function doGet(e) {
@@ -139,12 +142,6 @@ function formatRowDate(val, tz) {
     return Utilities.formatDate(val, tz, "yyyy-MM-dd'T'HH:mm");
   }
   return String(val).trim();
-}
-
-function getContestSheet(contest) {
-  var spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
-  var name = sheetName(contest);
-  return spreadsheet.getSheetByName(name) || spreadsheet.insertSheet(name);
 }
 
 function sheetName(contest) {

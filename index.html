@@ -225,7 +225,7 @@ textarea.export-area{width:100%;height:145px;font-size:12px;font-family:monospac
 <body>
 <div class="app" id="app"></div>
 <script>
-const APP_VERSION = 'v2.0.6';
+const APP_VERSION = 'v2.0.7g';
 const BACKUP_URL_KEY = 'dom_backup_url';
 const BACKUP_ENABLED_KEY = 'dom_backup_enabled';
 const PENDING_SYNC_KEY = 'pending_sync_games_v2';
@@ -247,8 +247,12 @@ function getClearEpoch(contest){
 
 function gameKey(game){
   const date = normalizeGameDate(game.date || game.time || '').date;
+  return date;
+}
+
+function gameScores(game){
   const scores = Array.isArray(game.scores) ? game.scores : [game.p1_score, game.p2_score];
-  return `${date}|${Number(scores[0])}|${Number(scores[1])}`;
+  return [Number(scores[0]), Number(scores[1])];
 }
 
 function mergeGameLists(existing, incoming){
@@ -347,8 +351,7 @@ function setBackupEnabled(enabled){
   save();render();
   if(S.backupEnabled){
     fetchScriptVersion();
-    syncPendingGames();
-    syncContestFromCloud(S.names);
+    syncActiveContest();
   }
 }
 
@@ -389,8 +392,7 @@ function saveBackupUrl(value){
   else localStorage.removeItem(BACKUP_URL_KEY);
   if(url && S.backupEnabled){
     fetchScriptVersion();
-    syncPendingGames();
-    syncContestFromCloud(S.names);
+    syncActiveContest();
   } else if(!url) {
     S.scriptVersion = '';
     save();
@@ -464,9 +466,10 @@ async function syncPendingGames(){
 async function syncPendingGamesOnce(){
   const url=getBackupUrl();
   if(!S.backupEnabled || !url)return;
+  const activeContest = getContestKey(S.names);
   const attempted = new Set();
   while(true){
-    const game = readPendingGames().find(item => !attempted.has(`${item.contest}|${gameKey(item)}`));
+    const game = readPendingGames().find(item => item.contest === activeContest && !attempted.has(`${item.contest}|${gameKey(item)}`));
     if(!game) break;
     attempted.add(`${game.contest}|${gameKey(game)}`);
     await withContestLock(game.contest, async () => {
@@ -474,10 +477,11 @@ async function syncPendingGamesOnce(){
       try{
         const response=await fetch(url,{method:'POST',mode:'cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(game)});
         const result=await response.json();
-        if(result.status==='success'){
-          writePendingGames(readPendingGames().filter(item => !(item.contest === game.contest && gameKey(item) === gameKey(game))));
-        }
-      }catch(e){}
+        if(result.status!=='success') throw new Error(result.message || 'Cloud upload failed');
+        writePendingGames(readPendingGames().filter(item => !(item.contest === game.contest && gameKey(item) === gameKey(game))));
+      }catch(e){
+        if(game.contest === getContestKey(S.names)) setStatus(`Cloud upload failed: ${e.message || e}`, 7000);
+      }
     });
   }
 }
@@ -498,18 +502,15 @@ async function loadCloudGamesForContest(names = S.names) {
   const contestKey = getContestKey(names);
   const url = getBackupUrl();
   if (!S.backupEnabled || !url) return null;
-  try {
-    const response = await fetch(`${url}?contest=${encodeURIComponent(contestKey)}`,{mode:'cors'});
-    const result = await response.json();
-    if (result.status !== 'success') throw new Error(result.message || 'Cloud import failed');
-    return (result.games || []).map(game => ({
-      date: normalizeGameDate(game.date).date,
-      time: normalizeGameDate(game.date).time,
-      scores: [Number(game.p1_score || 0), Number(game.p2_score || 0)]
-    }));
-  } catch (e) {
-    return null;
-  }
+  const response = await fetch(`${url}?contest=${encodeURIComponent(contestKey)}`,{mode:'cors', cache:'no-store'});
+  if(!response.ok) throw new Error(`Cloud fetch failed (${response.status})`);
+  const result = await response.json();
+  if (result.status !== 'success') throw new Error(result.message || 'Cloud import failed');
+  return (result.games || []).map(game => ({
+    date: normalizeGameDate(game.date).date,
+    time: normalizeGameDate(game.date).time,
+    scores: [Number(game.p1_score || 0), Number(game.p2_score || 0)]
+  }));
 }
 
 async function syncContestFromCloud(names){
@@ -517,30 +518,69 @@ async function syncContestFromCloud(names){
   const contestKey = getContestKey(contestNames);
   const url = getBackupUrl();
   const lastSyncKey = CLOUD_SYNC_PREFIX + contestKey;
-  if(!S.backupEnabled || !url || Date.now() - Number(localStorage.getItem(lastSyncKey) || 0) < 86400000) return;
+  if(!S.backupEnabled || !url || getContestKey(S.names) !== contestKey ||
+      Date.now() - Number(localStorage.getItem(lastSyncKey) || 0) < 86400000) return;
   const clearEpoch = getClearEpoch(contestKey);
-  const cloudGames = await loadCloudGamesForContest(contestNames);
-  if(!cloudGames || clearEpoch !== getClearEpoch(contestKey)) return;
-  await withContestLock(contestKey, () => {
-    if(clearEpoch !== getClearEpoch(contestKey)) return;
-    const current = S.contests[contestKey];
-    const existing = mergeGameLists(readStoredContestGames(contestKey), current ? current.pastGames : (getContestKey(S.names) === contestKey ? S.pastGames : []));
-    const merged = mergeGameLists(existing, cloudGames);
-    const added = merged.length - (existing || []).length;
-    if(current){
-      current.pastGames = merged;
-    }else if(getContestKey(S.names) === contestKey){
-      S.contests[contestKey] = {names: contestNames, pastGames: merged};
-    }
-    if(getContestKey(S.names) === contestKey) S.pastGames = merged;
-    localStorage.setItem(lastSyncKey, String(Date.now()));
-    if(added > 0 && getContestKey(S.names) === contestKey){
-      localStorage.setItem(CLOUD_RECENT_PREFIX + contestKey, JSON.stringify({count: added, time: Date.now()}));
+  try{
+    await withContestLock(contestKey, async () => {
+      if(clearEpoch !== getClearEpoch(contestKey) || getContestKey(S.names) !== contestKey) return;
+      const cloudGames = await loadCloudGamesForContest(contestNames);
+      if(!cloudGames || clearEpoch !== getClearEpoch(contestKey) || getContestKey(S.names) !== contestKey) return;
+
+      const current = S.contests[contestKey];
+      const existing = mergeGameLists(current ? current.pastGames : S.pastGames, readStoredContestGames(contestKey));
+      const merged = mergeGameLists(existing, cloudGames);
+      const localByTimestamp = new Map(existing.map(game => [gameKey(game), game]));
+      const cloudByTimestamp = new Map();
+      const cloudCounts = new Map();
+      cloudGames.forEach(game => {
+        const key = gameKey(game);
+        cloudCounts.set(key, (cloudCounts.get(key) || 0) + 1);
+        if(!cloudByTimestamp.has(key)) cloudByTimestamp.set(key, game);
+      });
+      const toUpload = merged.filter(game => {
+        const key = gameKey(game);
+        const cloudGame = cloudByTimestamp.get(key);
+        const scores = gameScores(game);
+        const cloudScores = cloudGame && gameScores(cloudGame);
+        const localGame = localByTimestamp.get(key);
+        return !cloudGame ||
+          (localGame === game && (scores[0] !== cloudScores[0] || scores[1] !== cloudScores[1])) ||
+          cloudCounts.get(key) > 1;
+      });
+      const added = merged.length - existing.length;
+      if(current) current.pastGames = merged;
+      S.pastGames = merged;
+      updateContest();
       save();
-    }else if(current){
-      save();
-    }
-  });
+      render();
+
+      if(toUpload.length){
+        const response = await fetch(url,{method:'POST',mode:'cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({
+          contest: contestKey,
+          names: contestNames,
+          games: toUpload.map(game => {
+            const scores = gameScores(game);
+            return {date: gameKey(game), p1_score: scores[0], p2_score: scores[1]};
+          })
+        })});
+        if(!response.ok) throw new Error(`Cloud upload failed (${response.status})`);
+        const result = await response.json();
+        if(result.status !== 'success') throw new Error(result.message || 'Cloud upload failed');
+      }
+      localStorage.setItem(lastSyncKey, String(Date.now()));
+      if(added > 0) localStorage.setItem(CLOUD_RECENT_PREFIX + contestKey, JSON.stringify({count: added, time: Date.now()}));
+      const uploaded = toUpload.length;
+      setStatus(`Cloud sync complete: ${added} imported, ${uploaded} uploaded.`, 5000);
+    });
+  }catch(error){
+    if(getContestKey(S.names) === contestKey) setStatus(`Cloud sync failed: ${error.message || error}`, 7000);
+  }
+}
+
+async function syncActiveContest(){
+  await syncPendingGames();
+  await syncContestFromCloud(S.names);
 }
 
 function openImport(){
@@ -745,6 +785,18 @@ async function performClearScores(){
     render();
     return;
   }
+  const url = getBackupUrl();
+  if(url){
+    try{
+      const response = await withContestLock(contest, () => fetch(url,{method:'POST',mode:'cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({mode:'clear',contest,names})}));
+      if(!response.ok) throw new Error(`Cloud clear failed (${response.status})`);
+      const result = await response.json();
+      if(result.status !== 'success' || result.cleared !== true) throw new Error(result.message || 'Cloud clear failed');
+    }catch(e){
+      setStatus(`Could not clear cloud scores: ${e.message || e}`, 7000);
+      return;
+    }
+  }
   localStorage.setItem(CLEAR_EPOCH_PREFIX + contest, String(getClearEpoch(contest) + 1));
   writePendingGames(readPendingGames().filter(game => game.contest !== contest));
   S.names = ['', ''];
@@ -768,20 +820,6 @@ async function performClearScores(){
   delete S.contests[contest];
   save();
   render();
-  const url = getBackupUrl();
-  if(url){
-    try{
-      const checkResponse = await fetch(`${url}?contest=${encodeURIComponent(contest)}`,{mode:'cors'});
-      const checkResult = await checkResponse.json();
-      if(checkResult.api_version !== 2) throw new Error('Update the Apps Script deployment before clearing cloud scores.');
-      const response = await withContestLock(contest, () => fetch(url,{method:'POST',mode:'cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({mode:'clear',contest,names})}));
-      const result = await response.json();
-      if(result.status !== 'success' || result.cleared !== true) throw new Error(result.message || 'Clear failed');
-    }catch(e){
-      setStatus('Scores cleared here, but the server could not be cleared.', 7000);
-      return;
-    }
-  }
   setStatus(url ? 'Contest scores cleared.' : 'Local contest scores cleared.', 3000);
 }
 
@@ -1180,14 +1218,14 @@ function copyExport(){
   if(taEl){taEl.value = S.exportText;}
   if(navigator.clipboard&&navigator.clipboard.writeText){
     navigator.clipboard.writeText(data).then(()=>{
-      setStatus(`${count} games exported to clipboard`, 3000);
+      setStatus(`${count} records exported to clipboard`, 3000);
     }).catch(()=>{
       if(taEl){taEl.focus();taEl.select();}
-      setStatus('Export text is ready to copy', 3000);
+      setStatus(`${count} records ready to copy`, 3000);
     });
   } else {
     if(taEl){taEl.focus();taEl.select();}
-    setStatus('Export text is ready to copy', 3000);
+    setStatus(`${count} records ready to copy`, 3000);
   }
 }
 
@@ -1314,12 +1352,19 @@ async function doImport(){
     }
     const contest = getContestKey(S.names);
     const importEpoch = getClearEpoch(contest);
-    const additions = await withContestLock(contest, () => {
+    const importResult = await withContestLock(contest, () => {
       if(importEpoch !== getClearEpoch(contest)) return null;
       const isActive = getContestKey(S.names) === contest;
-      const previous = mergeGameLists(readStoredContestGames(contest), isActive ? (S.pastGames || []) : []);
-      const previousKeys = new Set(previous.map(game => gameKey(game)));
-      const added = uniqueGames.filter(game => !previousKeys.has(gameKey(game)));
+      const previous = mergeGameLists(isActive ? (S.pastGames || []) : [], readStoredContestGames(contest));
+      const previousByTimestamp = new Map(previous.map(game => [gameKey(game), game]));
+      const added = uniqueGames.filter(game => !previousByTimestamp.has(gameKey(game)));
+      const conflicts = uniqueGames.filter(game => {
+        const current = previousByTimestamp.get(gameKey(game));
+        if(!current) return false;
+        const existingScores = gameScores(current);
+        const importedScores = gameScores(game);
+        return existingScores[0] !== importedScores[0] || existingScores[1] !== importedScores[1];
+      }).length;
       const merged = mergeGameLists(previous, uniqueGames);
       if(isActive) S.pastGames = merged;
       if(S.contests[contest]) S.contests[contest].pastGames = merged;
@@ -1329,19 +1374,22 @@ async function doImport(){
       S.importText = '';
       save();
       render();
-      return added;
+      return {added, conflicts};
     });
-    if(additions === null){setStatus('Import canceled because contest scores were cleared.', 5000);return;}
-    if (S.backupEnabled && getBackupUrl() && additions.length) {
-      const synced = await appendContestDataToCloud(additions, names, importEpoch);
+    if(importResult === null){setStatus('Import canceled because contest scores were cleared.', 5000);return;}
+    if (S.backupEnabled && getBackupUrl() && importResult.added.length) {
+      const synced = await appendContestDataToCloud(importResult.added, names, importEpoch);
       if(synced === null){setStatus('Scores were cleared before cloud sync completed.', 5000);return;}
       if(!synced){setStatus('Scores added locally, but cloud sync failed.', 5000);return;}
     }
     if(importEpoch !== getClearEpoch(contest)){setStatus('Scores were cleared before import completed.', 5000);return;}
     S.importAreaVisible = false;
     S.importText = '';
-    const submitted = uniqueGames.length;
-    S.importStatus = `Added ${additions.length} of ${submitted} score${submitted === 1 ? '' : 's'}.`;
+    const submitted = Math.max(0, rawLines.length - 1);
+    const invalidRows = submitted - games.length;
+    S.importStatus = `Added ${importResult.added.length} of ${submitted} score${submitted === 1 ? '' : 's'}.` +
+      (importResult.conflicts ? ` Kept ${importResult.conflicts} existing local timestamp conflict${importResult.conflicts === 1 ? '' : 's'}.` : '') +
+      (invalidRows > 0 ? ` Ignored ${invalidRows} invalid row${invalidRows === 1 ? '' : 's'}.` : '');
     save();
     render();
     setStatus(S.importStatus, 3000);
@@ -1429,7 +1477,7 @@ function switchContest(newNames, skipCurrentUpdate = false) {
   applyTheme();
   save();
   render();
-  if(S.backupEnabled) syncContestFromCloud(S.names);
+  if(S.backupEnabled) syncActiveContest();
 }
 
 function setTab(t){
@@ -1828,7 +1876,7 @@ function render(){
 }
 
 load();
-if(S.backupEnabled){syncPendingGames();syncContestFromCloud(S.names);}
+if(S.backupEnabled) syncActiveContest();
 document.addEventListener('keydown', event => {
   if(event.metaKey || event.ctrlKey || event.altKey || event.shiftKey) return;
   const target = event.target;
