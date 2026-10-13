@@ -292,6 +292,12 @@ function gameScores(game){
   return [Number(scores[0]), Number(scores[1])];
 }
 
+function gameWinnerIdx(game){
+  const [score1, score2] = gameScores(game);
+  if(Number.isFinite(score1) && Number.isFinite(score2)) return score1 >= score2 ? 0 : 1;
+  return game.winnerIdx === 1 ? 1 : 0;
+}
+
 function mergeGameLists(existing, incoming){
   const seen = new Set();
   return [...(existing || []), ...(incoming || [])].filter(game => {
@@ -717,11 +723,16 @@ async function loadCloudGamesForContest(names = S.names) {
   if(!response.ok) throw new Error(`Cloud fetch failed (${response.status})`);
   const result = await response.json();
   if (result.status !== 'success') throw new Error(result.message || 'Cloud import failed');
-  return (result.games || []).map(game => ({
-    date: normalizeGameDate(game.date).date,
-    time: normalizeGameDate(game.date).time,
-    scores: [Number(game.p1_score || 0), Number(game.p2_score || 0)]
-  }));
+  return (result.games || []).map(game => {
+    const scores = [Number(game.p1_score || 0), Number(game.p2_score || 0)];
+    const normalizedDate = normalizeGameDate(game.date);
+    return {
+      date: normalizedDate.date,
+      time: normalizedDate.time,
+      scores,
+      winnerIdx: scores[0] >= scores[1] ? 0 : 1
+    };
+  });
 }
 
 async function syncContestFromCloud(names){
@@ -877,17 +888,27 @@ function load(){
     S.clearConfirm=null;
     S.status='';
     S.statusUntil=0;
+    let repairedGameWinners = false;
+    const repairGameWinners = games => (games || []).forEach(g => {
+      const winnerIdx = gameWinnerIdx(g);
+      if(g.winnerIdx !== winnerIdx){
+        g.winnerIdx = winnerIdx;
+        repairedGameWinners = true;
+      }
+    });
     (S.pastGames || []).forEach(g => {
       const norm = normalizeGameDate(g.date || g.time);
       if(!g.date) g.date = norm.date;
       if(!g.time) g.time = norm.time;
     });
+    repairGameWinners(S.pastGames);
     Object.values(S.contests || {}).forEach(c => {
       (c.pastGames || []).forEach(g => {
         const norm = normalizeGameDate(g.date || g.time);
         if(!g.date) g.date = norm.date;
         if(!g.time) g.time = norm.time;
       });
+      repairGameWinners(c.pastGames);
     });
     if(!S.contests) S.contests = {};
     S.contests = migrateContestKeys(S.contests);
@@ -924,6 +945,7 @@ function load(){
     S.backupEnabled=backupConfig.enabled;
     S.scriptVersion=backupConfig.scriptVersion;
     if (backupConfig.url && backupConfig.enabled) fetchScriptVersion();
+    if(repairedGameWinners) save();
   }catch(e){}
 }
 
@@ -1929,12 +1951,13 @@ function render(){
     const guestMargins = [];
 
     games.slice().reverse().forEach(g => {
-      wins[g.winnerIdx]++;
+      const winnerIdx = gameWinnerIdx(g);
+      wins[winnerIdx]++;
       totals[0] += g.scores[0];
       totals[1] += g.scores[1];
       const diff = Math.abs(g.scores[0] - g.scores[1]);
       margins.push(diff);
-      if (g.winnerIdx === 0) hostMargins.push(diff);
+      if (winnerIdx === 0) hostMargins.push(diff);
       else guestMargins.push(diff);
     });
 
@@ -1964,7 +1987,7 @@ function render(){
     let runningPointsHost = 0;
     let runningPointsGuest = 0;
     games.forEach(g => {
-      if (g.winnerIdx === 0) runningWinsHost++;
+      if (gameWinnerIdx(g) === 0) runningWinsHost++;
       else runningWinsGuest++;
       cumulativeWinsHost.push(runningWinsHost);
       cumulativeWinsGuest.push(runningWinsGuest);
