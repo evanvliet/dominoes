@@ -76,7 +76,7 @@ html,body{height:100%;background:var(--color-background-tertiary);font-family:va
 .key.del{font-size:18px;color:var(--color-text-secondary);}
 .key.disabled{background:var(--color-background-secondary);color:var(--color-text-tertiary);cursor:default;}
 .status-bar{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:7px 8px;margin:8px 0;min-height:64px;}
-.status-text{font-size:13px;color:var(--color-text-secondary);line-height:1.35;flex:1;font-weight:400;}
+.status-text{font-size:15px;color:var(--color-text-secondary);line-height:1.35;flex:1;font-weight:400;}
 .status-text.empty{color:transparent;}
 .domino-icon{width:62px;height:44px;transform:rotate(90deg);display:block;}
 .domino-key{font-size:0;}
@@ -89,12 +89,12 @@ html,body{height:100%;background:var(--color-background-tertiary);font-family:va
 .scard:active{transform:scale(0.97);}
 .scard.pending-setup{border:2.5px solid var(--color-border-secondary);}
 .scard.first-player{border:2px solid #1D9E75;box-shadow:inset 0 0 0 1px rgba(29,158,117,0.15);}
-.scard .pname{font-size:14px;color:var(--color-text-secondary);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.scard .pname{font-size:15px;color:var(--color-text-secondary);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .scard .first-player-indicator{display:none;}
 .score-pair{display:flex;align-items:baseline;justify-content:center;}
 .score-hand{font-size:16px;font-weight:500;color:#1D9E75;line-height:1;}
 .score-slash{font-size:15px;font-weight:300;color:var(--color-text-tertiary);margin:0 3px;line-height:1;}
-.score-total{font-size:22px;font-weight:500;color:var(--color-text-primary);line-height:1;}
+.score-total{font-size:24px;font-weight:500;color:var(--color-text-primary);line-height:1;}
 .score-labels{display:flex;justify-content:center;margin-top:2px;}
 .score-lbl-hand{font-size:8px;color:#1D9E75;width:24px;text-align:right;}
 .score-lbl-sep{font-size:8px;color:transparent;margin:0 3px;}
@@ -125,14 +125,14 @@ html,body{height:100%;background:var(--color-background-tertiary);font-family:va
 
 /* mini history */
 .hist-mini{flex:1;overflow:hidden;height:98px;min-height:98px;max-height:98px;display:flex;flex-direction:column;justify-content:flex-end;gap:3px;position:relative;contain:paint layout;}
-.hist-mini-row{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--color-text-secondary);min-height:22px;max-height:22px;height:22px;opacity:1;transform:translateY(0);will-change:transform,opacity,max-height,margin;transition:transform 0.28s cubic-bezier(0.16,1,0.3,1),opacity 0.24s ease-out,max-height 0.28s cubic-bezier(0.16,1,0.3,1),min-height 0.28s cubic-bezier(0.16,1,0.3,1),height 0.28s cubic-bezier(0.16,1,0.3,1),margin 0.28s cubic-bezier(0.16,1,0.3,1),padding 0.28s cubic-bezier(0.16,1,0.3,1);}
+.hist-mini-row{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--color-text-secondary);min-height:22px;max-height:22px;height:22px;opacity:1;transform:translateY(0);will-change:transform,opacity,max-height,margin;transition:transform 0.28s cubic-bezier(0.16,1,0.3,1),opacity 0.24s ease-out,max-height 0.28s cubic-bezier(0.16,1,0.3,1),min-height 0.28s cubic-bezier(0.16,1,0.3,1),height 0.28s cubic-bezier(0.16,1,0.3,1),margin 0.28s cubic-bezier(0.16,1,0.3,1),padding 0.28s cubic-bezier(0.16,1,0.3,1);}
 .hist-mini-row.entering{transform:translateY(18px);opacity:0;max-height:22px;min-height:22px;}
 .hist-mini-row.enter-active{transform:translateY(0);opacity:1;max-height:22px;min-height:22px;}
 .hist-mini-row.exiting-top{transform:translateY(-20px);opacity:0;max-height:0 !important;min-height:0 !important;height:0 !important;margin-top:-3px !important;margin-bottom:0 !important;padding:0 !important;pointer-events:none;}
 .hist-mini-row.removing{transform:translateX(24px);opacity:0;max-height:0 !important;min-height:0 !important;height:0 !important;margin-top:-3px !important;margin-bottom:0 !important;padding:0 !important;pointer-events:none;}
-.hist-mini-x{color:#D85A30;font-size:12px;cursor:pointer;padding:2px 5px;border-radius:4px;line-height:1;display:inline-flex;align-items:center;justify-content:center;transition:background 0.15s,transform 0.1s;}
+.hist-mini-x{color:#D85A30;font-size:14px;cursor:pointer;padding:2px 5px;border-radius:4px;line-height:1;display:inline-flex;align-items:center;justify-content:center;transition:background 0.15s,transform 0.1s;}
 .hist-mini-x:active{background:rgba(216,90,48,0.15);transform:scale(0.88);}
-.hist-mini-pts{font-weight:600;color:var(--color-text-primary);min-width:24px;text-align:right;font-variant-numeric:tabular-nums;}
+.hist-mini-pts{font-weight:600;color:var(--color-text-primary);min-width:24px;text-align:right;font-variant-numeric:tabular-nums;font-size:15px;}
 .hist-mini-name{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 
 .stats-box-data{display:flex;flex-direction:column;gap:6px;margin-top:8px;}
@@ -259,7 +259,7 @@ textarea.export-area{width:100%;height:145px;font-size:12px;font-family:monospac
 <body>
 <div class="app" id="app"></div>
 <script>
-const APP_VERSION = 'v2.0.7g';
+const APP_VERSION = 'v2.0.8g';
 const BACKUP_URL_KEY = 'dom_backup_url';
 const BACKUP_ENABLED_KEY = 'dom_backup_enabled';
 const BACKUP_CONFIG_KEY = 'dom_backup_config_v1';
@@ -1417,8 +1417,6 @@ function patchMiniHistory(recentScores) {
   });
 
   const targetIds = new Set(recentScores.map(r => r.id));
-
-  // 1. Mark and remove rows that are no longer in recentScores (e.g. pushed off top or deleted)
   existingRowMap.forEach((row, id) => {
     if (!targetIds.has(id)) {
       if (!row.classList.contains('removing') && !row.classList.contains('exiting-top')) {
@@ -1430,36 +1428,40 @@ function patchMiniHistory(recentScores) {
     }
   });
 
-  // 2. Insert new rows or update existing rows
-  recentScores.forEach(rec => {
+  const nextRows = recentScores.map(rec => {
     let row = existingRowMap.get(rec.id);
-    if (row) {
-      if (!row.classList.contains('removing') && !row.classList.contains('exiting-top')) {
-        const ptsEl = row.querySelector('.hist-mini-pts');
-        const nameEl = row.querySelector('.hist-mini-name');
-        if (ptsEl && ptsEl.textContent !== String(rec.pts)) ptsEl.textContent = rec.pts;
-        if (nameEl && nameEl.textContent !== S.names[rec.who]) nameEl.textContent = escapeHTML(S.names[rec.who]);
-      }
-    } else {
+    if (!row) {
       row = document.createElement('div');
       row.className = 'hist-mini-row entering';
-      row.dataset.scoreId = rec.id;
+      row.dataset.scoreId = String(rec.id);
       row.innerHTML = `
         <span class="hist-mini-x" onclick="event.stopPropagation();deleteScore(${rec.id})">&#10005;</span>
-        <span class="hist-mini-pts">${rec.pts}</span>
-        <span class="hist-mini-name">${escapeHTML(S.names[rec.who])}</span>
       `;
-      list.appendChild(row);
+      const ptsEl = document.createElement('span');
+      ptsEl.className = 'hist-mini-pts';
+      ptsEl.textContent = String(rec.pts);
+      const nameEl = document.createElement('span');
+      nameEl.className = 'hist-mini-name';
+      nameEl.textContent = S.names[rec.who] || '';
+      row.appendChild(ptsEl);
+      row.appendChild(nameEl);
 
-      // Force synchronous reflow to register initial state
       void row.offsetHeight;
-
       requestAnimationFrame(() => {
         row.classList.remove('entering');
         row.classList.add('enter-active');
       });
+    } else {
+      row.classList.remove('removing', 'exiting-top');
+      const ptsEl = row.querySelector('.hist-mini-pts');
+      const nameEl = row.querySelector('.hist-mini-name');
+      if (ptsEl) ptsEl.textContent = String(rec.pts);
+      if (nameEl) nameEl.textContent = S.names[rec.who] || '';
     }
+    return row;
   });
+
+  list.replaceChildren(...nextRows);
 }
 
 function startEdit(idx){

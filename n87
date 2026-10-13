@@ -1,0 +1,8 @@
+n87
+
+scores tab, bottom panel
+displays recent scores and allows deletion
+somewhat flaky animation and scores not displayed in correct order
+switch focus and return, scores painted in correct order.
+
+increase font size on scores page
