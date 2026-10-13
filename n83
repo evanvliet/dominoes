@@ -1,0 +1,22 @@
+n83
+
+PARAMETERS:  <lose the Player vs Player  in upper left>
+
+players, oprtion and scorees should like up vertically:
+
+P      <combo
+Opt.    Cloud     Dard.   Top>
+Scores. Import.   Export. Erase
+
+Data - should start out blank, no "Chooose ..."
+
+Bottom box Should have STATUS lave like DATA and PARAMETERS
+Check / question should be just a small box up upper left,
+as on the status page for scores tab
+And text and spacing should be like that also.
+
+Keep size so fits on iphone 13 mini
+
+Add the version easter egg: double cliock the Status area to get version info printed.
+
+and any suggestions on a better domino.svg icon?

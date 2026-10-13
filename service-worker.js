@@ -1,4 +1,4 @@
-const CACHE_NAME = 'dominoes-scorer-v7';
+const CACHE_NAME = 'dominoes-scorer-v8';
 const APP_SHELL = [
   './',
   './index.html',

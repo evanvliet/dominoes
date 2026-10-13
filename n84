@@ -1,0 +1,16 @@
+n84
+
+check mark still not like scores tab - should be in uppoer right
+buttons in Prameters still not lined up vertically - need to widen Scores buttons pand Paleers combo box
+Change Top to Max
+
+Heading of DATA should not change, and remove Buttons or additional directon in data area unless specified for particular action. So press Import
+then lablel stays DATA
+Data block stays blank. no Cancel button
+Status area message:
+"Paste scores into Data and press Import again to add scores. Make button green but just Import not Import now
+
+Export:
+DATA labell stays the same, no <select scores> or Done bubttons
+Status is <nn> scores on in data, copy and paste to save
+

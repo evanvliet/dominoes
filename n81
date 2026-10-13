@@ -1,0 +1,69 @@
+n81
+
+simplify options
+
+one box of parameters
+
+one box of text for copy / paste
+
+one box for status / info / confirmation
+
+parameters:
+    players
+    top score
+    cloud url
+    dark mode
+    data:
+        erase
+        import
+        export
+
+text box
+    resets dynamically, often has scores
+    also backup url
+    user names
+
+info
+    has checkmark to clear
+    updated after UI click
+    typically ephemeral, cleared by check
+
+on start:
+    display parameters in one box, akin to
+    what we have now, but in one box
+
+on paramater click:
+    invoke UI to update parameter, e.g. specify
+    player names, backup url if needed. for each
+    parameter as follows:
+        players: put up two text boxes for names of players
+            and add "Add" button. into text box. add "Enter player
+            names and press Add" into info box.
+            top score has number input control as now
+        cloud url. just a toggle to turn on. also
+            when turned on, display url in text area. with "Update"
+            button. user can edit url, press Update to try connection.
+            Only change after successful connection.
+            if no url, "Paste backup URL" into status. Add "Check"
+            button, only set url if success. Display "Checking ..."
+            or "Failed" or "Success". set toggle to on.
+            when turned off, stop cloud sync. Keep track of last
+            successfully connected url, and use it by default on new
+            contests.
+        dark mode: for black, if off, use system
+        data:
+            import:
+                "Paste data into text area and click import again."
+                <user clicks import> add any new scores. update cloud
+                and set status area with "<n> out of <m> scores added"
+            export:
+                put all scores in text area. update status: 
+                "copy scores from text above"
+            erase:
+                erase both local and server records of current contest
+
+misc:
+    double click text to get version displayed in status,
+    clears on checkmark, other click (easter egg)
+
+    like to have a better icon, dominoes.svg too primitive.

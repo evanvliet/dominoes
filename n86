@@ -1,0 +1,7 @@
+n86
+
+import should always work - does not depend on current contest. if new data create
+new contest, the way it worked before.
+
+and if no users, have a local cloud vs guest one. right now selecting new with
+no users does not provide usable ui for entering player names.

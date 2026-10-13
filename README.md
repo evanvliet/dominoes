@@ -31,7 +31,7 @@ Screenshots:
 | :--- | :--- |
 | <img src="screenshots/stats.png" alt="Statistics tab" height="350"> | <img src="screenshots/options.png" alt="Options tab" height="350"> |
 
-Last is Options: set up separate contests labeled by player names. Click on the CONTEST dropdown and select **New...** to set the players. You can also configure top score, dark mode, and import/export of data.
+Last is Options: set up separate contests labeled by player names. Choose **New contest...** or use **Players**, then enter both player names in the Data box. The Parameters box also configures top score, cloud backup, and dark mode. Scores can be imported or exported with the shared Data and Status boxes.
 
 ### Web App
 
@@ -44,27 +44,32 @@ the bottom of the screen, and select Add to Home Screen.
 
 ### Data
 
-The options tab includes Data buttons for Export, Import, and Clear.
-* *Export* pastes current contest as plain ascii into the clipboard: 
+Options has one shared Data box for player names, import/export data, and a cloud backup URL.
+The three score actions operate on the selected contest.
+* *Export* shows current contest data in the Data box and copies it to the clipboard:
 
     ```text
-    Host | Guest 
-    5/31 09:33 40 50
-    5/31 09:32 51 45
+    Date,Host,Guest
+    1978-01-02T18:00,51,49
+    1978-01-03T18:00,54,31
     ```
 
-First player names, followed by date, time and player scores for each completed game. You have to paste the clipboard data into a mail message or web document to save it.
-* *Import* opens an edit control; paste data in above format to add scores. It
- adds scores to the contest per the first line. If a timestamp already exists, the existing
- local score is kept. The status reports how many records were added out of those supplied.
- If no such contest exists, it creates a new one. For testing, you can import 75 scores from [test75](test75).
-* *Clear* deletes the contest, both scores and players, from this device and, when configured,
- from the cloud.
+First player names header, followed by date, time and player scores for each completed game. You have to paste the clipboard data into a mail message or web document to save it.
+* *Import* first switches Data to score-entry mode. Paste data and select Import again to add
+  scores to the currently selected contest. If a timestamp already exists, the existing local
+  score is kept. Status reports how many records were added out of those supplied. For testing,
+  you can import 75 scores from [test75](test75).
+* *Erase* deletes the selected contest's scores from this device and, when cloud backup is on,
+  from the server, after confirmation.
 
-To use cloud backup, deploy the current [code.gs](code.gs) as an Apps Script web app, set its
-`/exec` URL in Options, and turn Backup on. Completed
-games are uploaded when possible; the active contest is reconciled with the server at startup
-or when selected, at most once per day. Sync merges by contest and minute-level timestamp:
+To use cloud backup for a contest, deploy the current [code.gs](code.gs) as an Apps Script web app
+and switch on **Cloud backup** in that contest's Parameters. The saved URL (or the last verified
+URL) appears in Data; select Check/Update, then confirm the successful connection in Status.
+Each contest remembers its own Local/Cloud choice and URL. Newly created contests start in Local
+mode and can reuse the last verified URL when Cloud is enabled. Existing app-wide backup settings
+are copied to existing contests the first time the updated app loads.
+Completed games are uploaded when possible; the active cloud-backed contest is reconciled with
+the server at startup or when selected, at most once per day. Sync merges by contest and minute-level timestamp:
 local scores win timestamp conflicts, cloud-only scores are added locally, and local-only or
 conflicting local scores are sent to the server. The server keeps at most one score record per
 contest timestamp and sorts records by date. Therefore, two games in the same contest during
