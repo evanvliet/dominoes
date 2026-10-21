@@ -8,7 +8,7 @@ Visit:
 
 https://evanvliet.github.io/dominoes
 
-You will see the main scoring tab, note status advising to click on highest double. This is for play where who goes first alternates on each hand, the one with the highest double starts.
+You will see the main scoring tab. At the start of a game, tap the player who has the highest double; that player starts. Type `?` (or tap the help icon) for instructions. Help and status messages use larger text for readability. Who starts alternates on each hand.
 
 <img src="screenshots/first_screen.png" alt="First run screen" width="300">
 
@@ -23,7 +23,7 @@ After a domino, the player with the most points above the top score wins.
 The status area shows the winner. Tap the player
 with the highest double to begin the next game.
 
-The middle tab is STATS; it has three sections: numric data, graphs, and histograms. Click on the first to cycle through points, averages, and games. The middle toggles between graphs of point and game scores. The third has three histograms, click to see winning margins for each player, and another for both. 
+The middle tab is STATS; it has a year filter (All or a year with recorded games) and three sections: numeric data, graphs, and histograms. Use the arrows to move through years; the year field also accepts a year with recorded games. Click the first section to cycle through points, averages, and games. The middle toggles between graphs of point and game scores. The third has three histograms, click to see winning margins for each player, and another for both.
 
 Screenshots: 
 

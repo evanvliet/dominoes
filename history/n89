@@ -1,0 +1,58 @@
+n89
+
+like to review text, list all user feedback messages, where and when displayed
+
+remove "Click player ..." message, on scores tab
+just blank. user can type ? to get help
+
+add year filter to stats tab:
+only include years that have scores
+put at tab three controls:
+back.  <year>  next
+year starts out as all.
+next -> if last selects and sets year to all
+  if all selects first
+  if other selects next
+back -> if first sets year to all
+  if all selects last
+  if other selects previous
+year -> make up down number controls
+then update stacs with socres from just that year
+
+json editor: take all settings on optons page
+turn into one json struct
+display on text controls
+
+add update / cancel buttons
+
+on update:
+- check supplied text, and advise of any inconsistencies
+- else update settings for current contest
+- reject if any issue but report issue
+
+on cancel:
+- refrest control with current settings
+
+printable pages:
+- versions of stats pages but laid out on 8 to the inch
+  graph paper, one horozontal space for game numbert
+  and one vertical space for score, game
+  as on history/games.jpg and points.jpg
+  plus a historgram one with one vertical square
+  as in history/hist.jpg
+  for each game one horzontal column for each margin
+  and one multiclolumn of each game score
+  as on history/points.jpg
+  this feature could be implemented in Google Sheets
+  directly, no need to be in the web app
+
+larger font:
+  Peter often uses a magnifying glass and has large
+  font selected on his phone. like to accomodate
+  weak eyesight. most crucial would be help / info
+  text
+
+stuck state - one case: game end, delete a score
+with red x before clicking user, no longer usable until restarting or clicking options. fix: do not accept red x. Or blank scores at game end.
+
+
