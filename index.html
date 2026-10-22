@@ -75,9 +75,11 @@ html,body{height:100%;background:var(--color-background-tertiary);font-family:va
 .key:active{background:var(--color-border-tertiary);transform:scale(0.95);}
 .key.del{font-size:18px;color:var(--color-text-secondary);}
 .key.disabled{background:var(--color-background-secondary);color:var(--color-text-tertiary);cursor:default;}
+.domino-key.disabled img{opacity:0.4;}
 .status-bar{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:7px 8px;margin:8px 0;min-height:64px;}
-.status-text{font-size:18px;color:var(--color-text-secondary);line-height:1.35;flex:1;font-weight:400;}
+.status-text{font-size:18px;color:var(--color-text-secondary);line-height:1.35;flex:1;min-width:0;overflow:hidden;font-weight:400;}
 .status-text.empty{color:transparent;}
+.score-status{height:118px;max-height:118px;overflow:hidden;}
 .domino-icon{width:62px;height:44px;transform:rotate(90deg);display:block;}
 .domino-key{font-size:0;}
 .status-icon{width:18px;height:18px;min-width:18px;font-size:12px;text-align:center;line-height:1;color:var(--color-text-tertiary);align-self:flex-start;display:flex;align-items:center;justify-content:center;border:0.5px solid var(--color-border-tertiary);border-radius:50%;background:transparent;padding:0;flex-shrink:0;}
@@ -88,13 +90,12 @@ html,body{height:100%;background:var(--color-background-tertiary);font-family:va
 .scard{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:7px 7px 6px;text-align:center;cursor:pointer;position:relative;user-select:none;min-height:74px;display:flex;flex-direction:column;justify-content:center;align-items:center;}
 .scard:active{transform:scale(0.97);}
 .scard.pending-setup{border:2.5px solid var(--color-border-secondary);}
-.scard.first-player{border:2px solid #1D9E75;box-shadow:inset 0 0 0 1px rgba(29,158,117,0.15);}
-.scard .pname{font-size:15px;color:var(--color-text-secondary);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.scard .pname{font-size:22px;color:var(--color-text-secondary);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .scard .first-player-indicator{display:none;}
 .score-pair{display:flex;align-items:baseline;justify-content:center;}
 .score-hand{font-size:16px;font-weight:500;color:#1D9E75;line-height:1;}
 .score-slash{font-size:15px;font-weight:300;color:var(--color-text-tertiary);margin:0 3px;line-height:1;}
-.score-total{font-size:22px;font-weight:500;color:var(--color-text-primary);line-height:1;}
+.score-total{font-size:15px;font-weight:500;color:var(--color-text-primary);line-height:1;}
 .score-labels{display:flex;justify-content:center;margin-top:2px;}
 .score-lbl-hand{font-size:8px;color:#1D9E75;width:24px;text-align:right;}
 .score-lbl-sep{font-size:8px;color:transparent;margin:0 3px;}
@@ -107,11 +108,17 @@ html,body{height:100%;background:var(--color-background-tertiary);font-family:va
 .stats-year-filter input{width:112px;height:40px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);background:var(--color-background-secondary);color:var(--color-text-primary);font:inherit;font-size:18px;text-align:center;}
 .stats-year-error{font-size:18px;color:#D85A30;text-align:center;}
 .stats-box{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:14px;cursor:pointer;min-height:132px;display:flex;flex-direction:column;justify-content:center;transition:box-shadow 0.2s,transform 0.2s;}
+.stats-lead-box{min-height:134px;}
 .stats-box:hover{box-shadow:0 4px 10px rgba(0,0,0,0.08);transform:translateY(-1px);}
 .stats-box-title{font-size:12px;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;text-align:left;}
 .stats-box-value{font-size:28px;font-weight:700;color:var(--color-text-primary);text-align:center;line-height:1.1;margin-bottom:6px;}
 .stats-box-label{font-size:13px;color:var(--color-text-secondary);text-align:center;}
 .stats-box-detail{font-size:12px;color:var(--color-text-tertiary);text-align:center;}
+.stats-recent{width:100%;font-family:monospace;font-size:11px;line-height:1.2;overflow:hidden;}
+.stats-recent-row{display:grid;grid-template-columns:minmax(0,1fr) 34px 34px;gap:4px;white-space:nowrap;color:var(--color-text-primary);}
+.stats-recent-row span:first-child{overflow:hidden;text-overflow:clip;}
+.stats-recent-head{color:var(--color-text-secondary);border-bottom:0.5px solid var(--color-border-tertiary);padding-bottom:3px;margin-bottom:3px;}
+.stats-recent-row span:not(:first-child){text-align:right;overflow:hidden;}
 
 .setup-hint{background:#E1F5EE;border:0.5px solid #9FE1CB;border-radius:var(--border-radius-md);padding:10px 15px;font-size:14px;color:#0F6E56;text-align:center;margin-bottom:12px;line-height:1.6;}
 
@@ -187,6 +194,7 @@ html,body{height:100%;background:var(--color-background-tertiary);font-family:va
   .chart-container{margin-top:12px;padding:8px;}
   .chart-title{margin-bottom:8px;font-size:11px;}
   .status-bar{min-height:118px;padding:8px 10px;}
+  .score-status{height:118px;max-height:118px;}
   .hist-mini{height:98px;min-height:98px;gap:3px;}
   .hist-mini-row{gap:6px;font-size:12.5px;height:22px;min-height:22px;}
   .radio-group label{min-height:36px;padding:6px 4px;}
@@ -198,8 +206,9 @@ html,body{height:100%;background:var(--color-background-tertiary);font-family:va
 @media (max-width: 375px) {
   .scoreboard{gap:6px;}
   .scard{padding:7px 6px 6px;min-height:76px;}
-  .scard .pname{font-size:14px;}
+  .score-total{font-size:14px;}
   .status-bar{min-height:116px;padding:7px 8px;}
+  .score-status{height:116px;max-height:116px;}
   .hist-mini{height:96px;min-height:96px;gap:2px;}
   .hist-mini-row{font-size:12px;height:21px;min-height:21px;}
 }
@@ -263,7 +272,7 @@ textarea.export-area{width:100%;height:145px;font-size:12px;font-family:monospac
 <body>
 <div class="app" id="app"></div>
 <script>
-const APP_VERSION = 'v2.0.10g';
+const APP_VERSION = 'v2.0.11g';
 const BACKUP_URL_KEY = 'dom_backup_url';
 const BACKUP_ENABLED_KEY = 'dom_backup_enabled';
 const BACKUP_CONFIG_KEY = 'dom_backup_config_v1';
@@ -372,6 +381,7 @@ const S={
   statsYear:'all',
   statsYearError:'',
   gameEndMessage:'',
+  lastGameEndStatus:'',
   clearConfirm:null,
   backupEnabled:false,
   optionsDataMode:'empty',
@@ -1001,6 +1011,7 @@ function updateContest() {
     pendingWin: S.pendingWin,
     starterSelection: S.starterSelection,
     highestDoublePlayer: S.highestDoublePlayer,
+    lastGameEndStatus: S.lastGameEndStatus,
     theme: S.theme
   };
 }
@@ -1022,6 +1033,7 @@ function createEmptyContest(names) {
     pendingWin:false,
     starterSelection:true,
     highestDoublePlayer:-1,
+    lastGameEndStatus:'',
     theme:S.theme || 'system'
   };
 }
@@ -1105,6 +1117,7 @@ async function performClearScores(){
   S.records = [];
   S.gameOver = false;
   S.pendingWin = false;
+  S.lastGameEndStatus = '';
   S.phase = 'start';
   S.handNum = 0;
   S.firstPlayer = -1;
@@ -1144,8 +1157,22 @@ function highDoublePrompt(){
   return 'Click player with high double to start a new game.';
 }
 
+function lastGameStatusMessage(){
+  if(S.lastGameEndStatus) return S.lastGameEndStatus;
+  const games = (S.pastGames || []).slice().sort((a,b) => gameKey(a).localeCompare(gameKey(b)));
+  const game = games[games.length - 1];
+  if(!game) return highDoublePrompt();
+  const scores = gameScores(game);
+  if(scores[0] === scores[1]){
+    return `The last game was tied ${scores[0]} to ${scores[1]}.\nClick user with high double to start a new game.`;
+  }
+  const winner = scores[0] > scores[1] ? 0 : 1;
+  const winnerName = (game.names && game.names[winner]) || S.names[winner];
+  return `${winnerName} won the last game ${scores[0]} to ${scores[1]}.\nClick user with high double to start a new game.`;
+}
+
 function notifyHighDoublePrompt(){
-  setStatus(highDoublePrompt(), 30000);
+  setStatus(waitingForHighDouble() ? lastGameStatusMessage() : highDoublePrompt(), 0);
 }
 
 function clearHelp(){
@@ -1188,7 +1215,7 @@ function resetForNewGame(){
   S.starterSelection=true;
   S.firstPlayer=-1;S.handFirstPlayer=-1;S.handNum=0;
   S.lastAdded=['',''];S.showFirstPlayer=false;S.editingIdx=-1;
-  S.status='';S.statusUntil=0;S.gameEndMessage='';S.highestDoublePlayer=-1;S.tab=0;
+  S.status='';S.statusUntil=0;S.gameEndMessage='';S.lastGameEndStatus='';S.highestDoublePlayer=-1;S.tab=0;
   save();render();
 }
 
@@ -1221,6 +1248,7 @@ function delKey(){
 }
 
 function tapPlayer(i){
+  const startingNewGame = S.phase==='end';
   clearPlayerHighlights();
   if (S.phase==='end') {
     S.scores = [0, 0];
@@ -1241,6 +1269,7 @@ function tapPlayer(i){
     S.statusUntil = 0;
     S.helpMessage = '';S.helpTab = -1;
     S.gameEndMessage = '';
+    S.lastGameEndStatus = '';
     S.highestDoublePlayer = -1;
     S.tab = 0;
   }
@@ -1265,7 +1294,8 @@ function tapPlayer(i){
     }
     S.display='';S.phase='play';
     S.status='';S.statusUntil=0;S.helpMessage='';S.helpTab=-1;
-    save();render();return;
+    if(startingNewGame) S.lastGameEndStatus='';
+    setStatus(`${S.names[starter]} has the highest double, ${S.names[1-starter]} will start the next hand.`,15000);return;
   }
   if(pts<=0){
     S.display='';
@@ -1285,6 +1315,7 @@ function tapPlayer(i){
 }
 
 function callDomino(){
+  if(waitingForHighDouble()) return;
   clearStarterSelection();
   if(S.phase!=='play'||S.gameOver){
     setStatus(highDoublePrompt());
@@ -1309,7 +1340,7 @@ function callDomino(){
     handMsg = `A ${handTotals[0]} ${handTotals[1]} tied hand`;
   } else {
     const handWinner = handTotals[0] > handTotals[1] ? 0 : 1;
-    const handWinnerName = escapeHTML(S.names[handWinner]);
+    const handWinnerName = S.names[handWinner];
     handMsg = `${handWinnerName} won that hand ${Math.max(handTotals[0], handTotals[1])} ${Math.min(handTotals[0], handTotals[1])}`;
   }
   
@@ -1323,11 +1354,12 @@ function callDomino(){
     if (S.scores[0] !== S.scores[1]) {
       // Game winner
       const gameWinner = S.scores[0] > S.scores[1] ? 0 : 1;
-      const handWinner = handTotals[0] > handTotals[1] ? 0 : (handTotals[0] === handTotals[1] ? -1 : 1);
-      const gameWinnerName = escapeHTML(S.names[gameWinner]);
-      const connector = (handWinner === gameWinner) ? ' and ' : ' but ';
-      msg = handMsg + connector + gameWinnerName + ' wins the game.\nClick player with high double to start new game.';
+      const gameWinnerName = S.names[gameWinner];
+      const winnerScore = S.scores[gameWinner];
+      const loserScore = S.scores[1 - gameWinner];
+      msg = `${gameWinnerName} wins ${winnerScore} to ${loserScore} on a ${handTotals[0]} ${handTotals[1]} hand.`;
       S.gameEndMessage = msg;
+      S.lastGameEndStatus = `${gameWinnerName} won the last game ${winnerScore} to ${loserScore}.\nClick user with high double to start a new game.`;
       
       // Record and save game end
       S.records.push({
@@ -1345,8 +1377,9 @@ function callDomino(){
       S.showFirstPlayer = false;
     } else {
       // Game is tied
-      msg = handMsg + ' and the game is tied.\nClick player with high double to start new game.';
+      msg = `The game is tied ${S.scores[0]} to ${S.scores[1]} on a ${handTotals[0]} ${handTotals[1]} hand.`;
       S.gameEndMessage = msg;
+      S.lastGameEndStatus = `The last game was tied ${S.scores[0]} to ${S.scores[1]}.\nClick user with high double to start a new game.`;
       S.gameOver = true;
       S.phase = 'end';
       S.showFirstPlayer = false;
@@ -1358,6 +1391,7 @@ function callDomino(){
     S.firstPlayer = nextStarter;
     S.handNum++;
     S.showFirstPlayer = true;
+    msg += `\n${S.names[nextStarter]} goes first.`;
   }
   
   // Always show the message
@@ -1783,6 +1817,7 @@ function switchContest(newNames, skipCurrentUpdate = false) {
     S.pendingWin = c.pendingWin;
     S.starterSelection = typeof c.starterSelection === 'boolean' ? c.starterSelection : c.phase === 'start';
     S.highestDoublePlayer = c.highestDoublePlayer;
+    S.lastGameEndStatus = c.lastGameEndStatus || '';
     S.theme = c.theme || 'system';
   } else {
     S.scores = [0, 0];
@@ -1798,6 +1833,7 @@ function switchContest(newNames, skipCurrentUpdate = false) {
     S.pendingWin = false;
     S.starterSelection = true;
     S.highestDoublePlayer = -1;
+    S.lastGameEndStatus = '';
   }
   S.names = [...newNames];
   S.statsYear = 'all';
@@ -1895,34 +1931,32 @@ function render(){
   const contestActive = (S.names[0] || S.names[1]) && hasContests;
   
   const tabbar=tabNames.map((n,i)=>{
-    const isDisabled = (i === 0 || i === 1) && !contestActive;
-    return `<div class="tbtab ${S.tab===i?'active':''} ${isDisabled?'disabled':''}" onclick="${isDisabled?'':'setTab('+i+')'}">${tabIcons[i]}<span>${n}</span></div>`;
+    const unavailable = (i === 0 || i === 1) && !contestActive;
+    return `<div class="tbtab ${S.tab===i?'active':''} ${unavailable?'disabled':''}" onclick="${unavailable?'':'setTab('+i+')'}">${tabIcons[i]}<span>${n}</span></div>`;
   }).join('');
   
   let defaultStartStatus = '';
   const activeHelpMessage = S.helpTab === S.tab ? S.helpMessage : '';
   if (!S.status && !activeHelpMessage) {
-    if (waitingForHighDouble() && S.tab === 0) {
-      defaultStartStatus = highDoublePrompt();
-    } else if (S.phase==='start' && S.tab === 2) {
+    if (S.phase==='start' && S.tab === 2) {
       if (S.showNewContestInputs && !S.hideNewContestHelp)       defaultStartStatus = 'Add player names and press Add.';
       else defaultStartStatus = '';
     }
   }
   const controlsDisabled = waitingForHighDouble();
-  const statusText = (S.tab === 0 ? S.gameEndMessage : '') || S.status || activeHelpMessage || defaultStartStatus;
+  const statusText = S.status || (S.tab === 0 ? S.gameEndMessage : '') || activeHelpMessage || defaultStartStatus;
   const isNewContestHelp = !S.status && !activeHelpMessage && defaultStartStatus === 'Add player names and press Add.';
-  const statusIcon = (S.status || activeHelpMessage || (S.tab === 0 && S.gameEndMessage)) ? '&#10003;' : '?';
-  const statusClick = (S.status || activeHelpMessage || (S.tab === 0 && S.gameEndMessage)) ? 'ackStatus()' : (isNewContestHelp ? 'S.hideNewContestHelp=true;render()' : 'showHelp()');
+  const statusIcon = (S.tab === 0 && waitingForHighDouble()) || S.status || activeHelpMessage || (S.tab === 0 && S.gameEndMessage) ? '&#10003;' : '?';
+  const statusClick = (S.tab === 0 && waitingForHighDouble()) || S.status || activeHelpMessage || (S.tab === 0 && S.gameEndMessage) ? 'ackStatus()' : (isNewContestHelp ? 'S.hideNewContestHelp=true;render()' : 'showHelp()');
   
   const recentScores = S.records.filter(r => r.type === 'score').slice(-4);
-  const showHistory = !S.status && !activeHelpMessage && (S.tab !== 0 || !S.gameEndMessage) && recentScores.length > 0;
+  const showHistory = !S.status && !activeHelpMessage && !waitingForHighDouble() && (S.tab !== 0 || !S.gameEndMessage) && recentScores.length > 0;
 
   // Targeted DOM update for Tab 0 if already mounted
   const isTab0Mounted = S.tab === 0 && appEl.dataset.tab === '0' && appEl.querySelector('.scoreboard');
   if (isTab0Mounted) {
     const isStart = S.phase === 'start';
-    const highlightPlayers = S.starterSelection || waitingForHighDouble();
+    const highlightPlayers = S.phase === 'start' || waitingForHighDouble();
 
     // 1. Display bar
     const displayEl = document.getElementById('display-bar');
@@ -1936,6 +1970,8 @@ function render(){
     keypadKeys.forEach(k => {
       if (k.classList.contains('domino-key')) {
         k.innerHTML = domTile();
+        if (controlsDisabled) k.classList.add('disabled');
+        else k.classList.remove('disabled');
       } else {
         if (controlsDisabled) k.classList.add('disabled');
         else k.classList.remove('disabled');
@@ -1947,7 +1983,7 @@ function render(){
     [0, 1].forEach(i => {
       const sc = scards[i];
       if (sc) {
-        sc.className = `scard ${highlightPlayers ? 'select-starter' : ''} ${(S.showFirstPlayer && S.firstPlayer === i) ? 'first-player' : ''}`;
+        sc.className = `scard ${highlightPlayers ? 'select-starter' : ''}`;
         const pname = sc.querySelector('.pname');
         const scoreTot = sc.querySelector('.score-total');
         if (pname && pname.textContent !== S.names[i]) pname.textContent = S.names[i];
@@ -1987,10 +2023,10 @@ function render(){
   let content = '';
   if(S.tab===0){
     const isStart=S.phase==='start';
-    const highlightPlayers = S.starterSelection || waitingForHighDouble();
+    const highlightPlayers = S.phase === 'start' || waitingForHighDouble();
     const displayClass=S.display?'display-bar':'display-bar dim';
     const cards=[0,1].map(i=>`
-      <div class="scard ${highlightPlayers?'select-starter':''} ${(S.showFirstPlayer && S.firstPlayer === i) ? 'first-player' : ''}" onclick="tapPlayer(${i})">
+      <div class="scard ${highlightPlayers?'select-starter':''}" onclick="tapPlayer(${i})">
         <div class="pname">${escapeHTML(S.names[i])}</div>
         <div class="score-total">${isStart ? 0 : S.scores[i]}</div>
       </div>`).join('');
@@ -2004,14 +2040,14 @@ function render(){
       <div class="numpad-wrap">
         <div id="display-bar" class="${displayClass}">${S.display||'0'}</div>
         <div class="keypad">
-          ${[1,2,3,4,5,6,7,8,9].map(n=>`<div class="key ${controlsDisabled?'disabled':''}" onclick="${controlsDisabled ? 'notifyHighDoublePrompt()' : 'pressKey(\''+n+'\')'}">${n}</div>`).join('')}
-          <div class="key del ${controlsDisabled?'disabled':''}" onclick="${controlsDisabled ? 'notifyHighDoublePrompt()' : 'delKey()'}">&#9003;</div>
-          <div class="key ${controlsDisabled?'disabled':''}" onclick="${controlsDisabled ? 'notifyHighDoublePrompt()' : 'pressKey(\'0\')'}">0</div>
-          <div class="key domino-key" onclick="callDomino()">${dominoLabel}</div>
+          ${[1,2,3,4,5,6,7,8,9].map(n=>`<div class="key ${controlsDisabled?'disabled':''}" onclick="pressKey('${n}')">${n}</div>`).join('')}
+          <div class="key del ${controlsDisabled?'disabled':''}" onclick="delKey()">&#9003;</div>
+          <div class="key ${controlsDisabled?'disabled':''}" onclick="pressKey('0')">0</div>
+          <div class="key domino-key ${controlsDisabled?'disabled':''}" onclick="callDomino()">${dominoLabel}</div>
         </div>
       </div>
       <div class="scoreboard">${cards}</div>
-      <div class="status-bar" onclick="${statusClick}">
+      <div class="status-bar score-status" onclick="${statusClick}">
         <div class="status-text ${(!statusText && !showHistory && !defaultStartStatus) ? 'empty' : ''}">
           ${statusInner}
         </div>
@@ -2107,8 +2143,12 @@ function render(){
     const gameLeads = cumulativeWinsHost.map((v,i)=> v - (cumulativeWinsGuest[i]||0));
     const pointLeads = cumulativePointsHost.map((v,i)=> v - (cumulativePointsGuest[i]||0));
     const leadSeries = S.statsBox2 === 0 ? gameLeads : pointLeads;
-    const leadTitle = S.statsBox2 === 0 ? 'GAMES' : 'POINTS';
+    const leadTitle = ['GAMES', 'POINTS', 'RECENT GAMES'][S.statsBox2] || 'GAMES';
     const leadPath = makeLinePath(leadSeries, {width:320,height:70,padding:16});
+    const recentGames = games
+      .slice()
+      .sort((a,b) => gameKey(a).localeCompare(gameKey(b)))
+      .slice(-4);
 
     const box3Titles = ['WIN MARGINS', `WIN MARGINS FOR ${p1Name.toUpperCase()}`, `WIN MARGINS FOR ${p2Name.toUpperCase()}`];
     const selectedMargins = S.statsBox3 === 0 ? margins : S.statsBox3 === 1 ? hostMargins : guestMargins;
@@ -2153,13 +2193,26 @@ function render(){
             </div>
           </div>
         </div>
-        <div class="stats-box" onclick="S.statsBox2=(S.statsBox2+1)%2;save();render();">
+        <div class="stats-box stats-lead-box" onclick="S.statsBox2=(S.statsBox2+1)%3;save();render();">
           <div class="stats-box-title">${leadTitle}</div>
-          <div class="chart-container" style="margin:0;padding:10px;border:none;">
-            <svg viewBox="0 0 360 90" preserveAspectRatio="none" width="100%" height="90">
-              <path d="${leadPath}" fill="none" stroke="#1D9E75" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-          </div>
+          ${S.statsBox2 === 2 ? `
+            <div class="stats-recent">
+              <div class="stats-recent-row stats-recent-head">
+                <span>Date</span><span>${p1Name}</span><span>${p2Name}</span>
+              </div>
+              ${recentGames.map(game => {
+                const norm = normalizeGameDate(game.date || game.time || '');
+                const scores = gameScores(game);
+                return `<div class="stats-recent-row"><span>${escapeHTML(norm.date)}</span><span>${scores[0]}</span><span>${scores[1]}</span></div>`;
+              }).join('')}
+            </div>
+          ` : `
+            <div class="chart-container" style="margin:0;padding:10px;border:none;">
+              <svg viewBox="0 0 360 90" preserveAspectRatio="none" width="100%" height="90">
+                <path d="${leadPath}" fill="none" stroke="#1D9E75" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </div>
+          `}
         </div>
         <div class="stats-box" onclick="S.statsBox3=(S.statsBox3+1)%3;save();render();">
           <div class="stats-box-title">${box3Titles[S.statsBox3]}</div>
@@ -2293,12 +2346,12 @@ document.addEventListener('keydown', event => {
   else if(event.key === 'o' || event.key === 'O') { event.preventDefault(); setTab(2); }
 });
 document.addEventListener('click', event => {
+  if(Date.now() - LAST_STATUS_SET < 150) return;
   if (S.tab === 0 && waitingForHighDouble() && !event.target.closest('.scard') && !event.target.closest('.tabbar') && !event.target.closest('.status-bar')) {
     notifyHighDoublePrompt();
     return;
   }
   if(!S.status && !S.gameEndMessage) return;
-  if(Date.now() - LAST_STATUS_SET < 150) return;
   if(event.target.closest('.status-bar')) return;
   clearStatus();
 });
