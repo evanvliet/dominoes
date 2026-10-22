@@ -1046,3 +1046,849 @@ If no contests:
 Have to have a contest to score, please add names of Players first.
 Else:
 Add names of Players to create a new contest.
+#### n60
+Act as an expert frontend engineer. We want to update our pure client-side
+HTML/JavaScript dominoes scoring web app to support a background cloud backup
+using a Google Apps Script Web App URL, while preserving our offline local storage architecture.
+
+Please review my index.html file and add the following functionality:
+
+1. App Settings Configuration:
+   - derive a backup db name from player1 vs player2: player1_player2
+   - store url for db in local storage,
+
+2. Background Sync Architecture:
+   - When a game is finalized and logged, append it to a queue array in localStorage
+   (e.g., 'pending_sync_games'). Each game payload should look like this:
+     {
+       date: ISO 8601,    /* YYYY-MM-DDTHH:MM minute precision */
+       p1_score: Number,
+       p2_score: Number
+     }
+   - Create an asynchronous function `syncPendingGames()` that reads the queue,
+     loops through each game, and sends a POST request via fetch() to the saved
+     Google Web App URL using 'cors' mode.
+   - If the Google Sheet returns a success status, remove that specific game
+     from the localStorage queue. If it fails or there is no network connection,
+     keep it safely in localStorage to try again later.
+   - dominoes scoring webapp url and deployment ID 
+ https://script.google.com/macros/s/AKfycbyxuBBODwP1r42jZnGxH8-M1S3qV_CPs8aoTkR2LkDOJxOvjQnDYZ585p5JNmvZ6dp-hw/exec 
+ AKfycbyxuBBODwP1r42jZnGxH8-M1S3qV_CPs8aoTkR2LkDOJxOvjQnDYZ585p5JNmvZ6dp-hw
+- code.gs running on server:
+see  code.gs here, need to iron out name of sheet
+
+3. UI Integration:
+   - on options page, next to top score, have Backup On/Off toggle.
+   - if off, no backup
+   - if on, call syncPendingGames on each game completion
+   - if on and backupdb exists, load all new scores into import area on import click
+   - screen records on import and skip duplicates (date and scores the same)
+
+
+Please provide the updated HTML, JavaScript, and CSS code matching our single-file layout, ensuring that swipe actions and core logic are unaffected.
+
+Here is some javascript for talking to Google:
+
+const APPS_SCRIPT_URL = "YOUR_COPIED_WEB_APP_URL_HERE";
+
+async function backupGameToCloud(gameData) {
+  // Example gameData shape:
+  // { date: "2026-08-30T15:34", p1_score: 250, p2_score: 180 }
+
+  try {
+    const response = await fetch(APPS_SCRIPT_URL, {
+      method: "POST",
+      mode: "cors", // Crucial for client-side pages
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(gameData)
+    });
+
+    const result = await response.json();
+    if (result.status === "success") {
+      console.log("Game successfully backed up to Google Sheets!");
+      // Pro-tip: Flag this game as "synced" in localStorage so you don't upload duplicates
+    } else {
+      console.error("Cloud backup failed:", result.message);
+    }
+  } catch (error) {
+    console.error("Network error trying to reach cloud backup:", error);
+  }
+}
+
+
+#### n61
+n61
+
+move backup button on same line with top score
+drop player names and derive from contest name
+sync backup is a collection of lists of records.
+the name of the list is the contest name  - the names of the players.
+the records are just scores and dates, no need for player names.
+make url import nicer, use import field.
+how to share spreadsheet.
+
+#### n62
+n62
+
+nice! But still some issues.
+
+1. Odd state at new game start. Believe it's after clicking on a non-player button on the score screen. Possible fix: disable all other controls except user tiles. Leave Click User Tile with high double message on in message area and clear after high double selected.
+
+2. Date format looks right on spreadsheet, but not on import / export. Please ensure same format on each, need to redo test sample and hisgtorical data to revlect addtion of ISO data format.
+
+3. cloud backup, On load, first download scores from server and merge with local data, i.e., no duplication. Display in data box and allow overwrite by pasting data from clipboard. On Ok, update local data and post data to server. On export, just write data to data block and clipboard with full ISO date format. Perhaps wasteful but small amount of data. No need for a Paste Clipboard button.
+
+4. on sheet, first row should have names of players, vs. p1_score...
+
+Clarification:
+
+1. can not now repro the odd state, looks like controls are now disabled. table this for now.
+
+2. I will redo historical and test data to have right data format, no need to change code to do so on the fly.
+
+3. Best next stop issues:
+
+    1. option A. contest sheet starts with names and then game rows
+
+    2. Option C. But, to be clear, on import, whatever the user puts into the text box, e.g. overwrites downloaded data, wins. what is sent back after import overwrites existing data on the server.
+
+4. Sheet schema should start with a contest header row with player names
+#### n63
+n63
+test latest google stuff
+fix tied score
+put up releases with ui tag
+figure out how to update two branches
+assign years to old scores
+redo with r2 vs google
+add instructions on pulishing sheet
+can you just copy a sheet?
+how do you github a google sheet
+
+https://script.google.com/macros/s/AKfycbzgtRjfdPA7NGSoKM6ErGr0I76bQfZf_lAHmI8ZcWinOJpg97QEkGkwYB1m8ZLAYX481Q/exec
+
+
+#### n64
+n64
+
+incorporate tied score handling from main branch - force winning hand
+need uniform date handling:
+<iso date with minute precision>, score1, score2
+data records for each game, contest name determines who gets score1 or score2
+data should show in box after export as well as copied to clipboard
+data import should grab data from box:
+  box initialized with data scores from server
+  user can modify replace, etc.
+  import adds but ignores duplicates.
+seems like a lot of extraneous data in local storage, please review
+
+Comments after N64 feedback
+
+the tie rule: in the event of a tie score, the game is not over, and continues with another hand. the tie is not saved as a game statistic.
+
+player ordering: exports and imports are contest specific. the sync of finished games should operate on one contest at a time. so the queue of finished games should be a dictionary of lists, one list per contest. each list would have scores for that contest. in either case, the player is specified by the name of the contest.
+
+Currently data box clears and shows number of records exported, not the actual records.
+
+No need for a migration plan for existing dom_v9 data, in fact just use a new label.
+
+scores should be ordered by date.
+
+idea is scores only get added. need to clear data and start from scratch to delete scores. so all sync operations should only add new (different) scores. amount of data is miniscule, two ints and a date per score. possible optimization is to remember time of last sync and
+only ask for later scores.
+
+#### n65
+n65
+
+Comments after N64 feedback
+
+the tie rule: in the event of a tie score, the game is not over, and
+continues with another hand. the tie is not saved as a game statistic.
+
+player ordering: exports and imports are contest specific. the sync of
+finished games should operate on one contest at a time. so the queue
+of finished games should be a dictionary of lists, one list per
+contest. each list would have scores for that contest. in either case,
+the player is specified by the name of the contest.
+
+Currently data box clears and shows number of records exported, not
+the actual records.
+
+No need for a migration plan for existing dom_v9
+data, in fact just use a new label.
+
+scores should be ordered by date.
+
+idea is scores only get added. need to clear data and start from
+scratch to delete scores. so all sync operations should only add new
+(different) scores. amount of data is miniscule, two ints and a date
+per score. possible optimization is to remember time of last sync and
+only ask for later scores.
+
+#### n66
+n66
+
+more on feedback
+
+Import can erase games: should only happen when the user presses the clear button. Else only adds games from the text box. Text box is only populated with new data from clipboard or server. so for cloud backup, each press of the import button downloads scores from the server and only adds new ones to the textbox. It then does the same from data on the clipboard. In either case put status result in info box at bottom:
+"87 game scores copied to clipboard"
+"34 new scores downloaded from server, 3 from clipboard"
+and do not overwrite score records in score box.
+
+Player-score order is defined by the name of the contest. Eric Peter is a separate contest from Peter Eric and scores follow order of names in conest name.
+
+Duplicate detection is only used to suppress addition of duplicates, never to delete. Two games in the same contest would not occur in the same minute.
+
+Tied games are games in progress, and not complete until a winning hand.
+
+
+#### n67
+n67
+
+Ordered contest identity is a requirement change. The current getContestKey() sorts names, so it treats “Eric Peter” and “Peter Eric” as the same contest. Preserve name order in the key and use that same order for score columns, queues, and sheet headers. Trim names consistently; encoding the pair as JSON avoids collisions if a name contains |. A new storage label is appropriate if old data is intentionally abandoned.
+
+- player names are letters only and single words
+
+Treat the text box as an append-only working set. Fetching from the server or pasting clipboard data should add unseen rows without clearing what is already there. Importing should add those rows to local history, also without replacing it. Only an explicit clear action should delete scores. Browser clipboard reads may require permission, so I recommend an explicit Paste action (or have the user paste into the box) rather than silently reading it during import.
+
+- just populate text box with new server data and allow user paste to add scores.
+
+Make counts describe the destination. “Copied to clipboard” is clear for export. For import, report how many new records were added from each source and, optionally, how many duplicates were skipped. Avoid saying “downloaded” if those records were actually added to local history.
+
+- on export:
+32 game scores copied to clipboard
+  on import:
+23 scores 
+just show in lower info box, leave text area alone. clear both when user clicks check
+mark in lower box or selects other action (new contest)
+
+Use one duplicate rule everywhere. Within an ordered contest, (ISO date to minute, score1, score2) is workable given your assumption that two games won’t occur in the same minute. Apply it consistently for local import, cloud append, and merging. Keep records sorted by date for display/export, not as a side effect of deduplication.
+
+- perfect
+
+Keep ordinary sync append-only. The current cloud endpoint supports duplicate suppression for individual posts, but bulk sync has a replace mode that clears the sheet. Remove replace from normal import/sync; make clearing a distinct, deliberate operation that clears both local and cloud data if that is what “start from scratch” means.
+Tied scores stay in progress. Don’t add a tie to completed-game history or the sync queue. Continue hands until there is a
+
+- perfect
+#### n68
+n68
+
+Import just adds scores from the text area.
+
+Change cloud sync processing as follows. Make indepondent of import, which is used as before
+to add scores. If cloud synd is enabled, just asynchronously (i.e. background) get all scores from server and add any it does not have. Do no more than once a day.
+
+When user clicks import button, info (bottom) text area says:
+<if cloud sync and nRecentImports> Found <nRecentImports> scores 3 days ago. 
+    set nRecentImports = 0
+Paste new scores above and press Done to
+update score history.
+<after user clicks done>
+Added 3 scores.
+and delete input area
+
+Clear deletes all scores from both local and server histories.
+
+I like Eric vs Peter for contest names, the vs a small bit of eye candy.
+#### n69
+n69
+
+yes all this is contest specific.
+
+yes, cloud updates not visible, and likely quite exceptional.
+
+I like your status wording, but like to keep it as a prefix, rather than a separate prompt. Only disply in hte exceptional case of discovering new scores on the server.
+
+yes Clear only deletes scores for the currnet contest, both server and client. Put a warning
+in the lower status box if any failure.
+
+Yes background sync can amend to history, ignoring duplicates. And the app appends scores on Import, also ignoring duplicates. Is there a race condition, do we need a lock or something?
+#### n70
+n70
+
+show the "upper text area" to show imported or exported scores,
+it disappears after click on check mark or other button.
+placed below the DETAILS box, above the status ? box
+
+Headers on server sheet are p1_score... should be player names
+
+I like Peter vs Eric style name for sheets. not Peter!Eric
+
+Adds scores ok, but Clear does not clear server scores.
+
+#### n71
+n71
+
+Clear does not work.
+User names do not appear in sheet header. Still shows p1_score ...
+How do I make sure I'm running against the latest code.gs and not somethoing cached.
+imported scores should add to server as well.
+#### n72
+n72
+
+still showing date	p1_score	p2_score, like to see Date Eric Peter
+clear still broken
+after import scores should be sorted by date
+need more space for version display, currently truncated after GS: CHECKING ...
+#### n73
+n73
+
+looks great! just a few things:
+change style of version stamp on options page, now small caps, prefer mixed case
+version stamp still shows earlier server version, but works ok
+after import, should show number of scores added out of number submitted.
+on clear, put confirmation text into lower box with cancel ok buttons
+on clear, if cleared, remove even context name and delete sheet on server.
+review stats. on new contest shows zero games but has non-negative win margins.
+after just one game, total points, games is ok but graph of cumulative points / games won is empty
+and histogram does not seem right, has entry for both me and peter, should onoly have one.
+
+#### n74
+n74
+
+still stuck on older version stamp, but if i run from python -m http.server get right stamp
+version still in small caps case
+import status feedback not visible
+
+#### n75
+n75
+
+can't create contest with names reversed,
+more testing on import export
+single game still shows no game or point history and shows histogram for both users should only show one
+import broken, create new contest, click import, says no games to import, regardless if backup is turned on. no way to paste data into box
+backup not working
+not seeing version stamp from sheet code.gs
+
+
+#### n76
+n76
+
+Idea is that Eric | Peter is a different contest than 
+Peter | Eric, so identtity should be stable. 
+
+Both players are active. after a single game one one of the players
+will have a win margin, the other none. But there are three "views" to click through, one for win margins for one player,
+one for margins for the other, and third for all margins.
+
+In case of version stamp failure, please provide good
+diagnostic feecback in lower box on options page.
+#### n77
+n77
+
+import export funky 
+hide backup url
+copy url from cliboard at init
+check auto daily import
+stats funky
+divvy up into manageable files
+#### n78
+n78
+
+	Import/export “funky”	First capture one failing example: expected result, actual result, and whether it’s clipboard export, paste, or import. The app exports Date,Player 1,Player 2 CSV, while README.md documents the older `Player 1
+
+Scene:
+new contest, with existing data on server. click backup.
+Expect:
+status: imported <n> scores.
+data: n scores added
+Get:
+no status
+
+Scene:
+existing data, cloud backup, import. paste data and click done
+Expect:
+status: imported <n> out of <all> scores <wait for checkmark or other action to clear status and text>
+data: n more scores on local and server updated with those scores as if they had been added manually
+Get:
+nothing
+Comment:
+implicit in this reorg of UI making the input text area a fixed part of the options tab:
+Contest
+p vs p dropdown
+
+Details
+top score / Backup
+Appearance ...
+Scores Export Import Clear
+
+Data
+<empty box>
+
+Status        <check>
+
+
+Idea is that all feedback, confirmation, choice stuff goes in the Status box
+Data box is used to paste scores for import, URL for backup, show scores for export.
+
+
+
+
+2	Hide Backup URL	Specify whether “hide” means masked by default with a reveal control, or omitted from the UI unless backup settings are expanded. Keep the saved URL usable; don’t clear it or disable backup when hidden.
+
+when user selects backup, if url not set, prompt for it to be pasted into data, and only enable if url provices a version stamp. once enabled place note with url in status box.
+
+3	Copy URL from clipboard at init	Browsers generally block reading the clipboard on page load. Specify this as a user-initiated Paste action (or paste into a focused URL field), with permission/error feedback—not silent clipboard access during initialization. Decide whether this should replace or supplement manual entry.
+
+as for 2 above
+
+4	Check automatic daily import	A once-per-24-hours cloud merge already appears to exist in index.html, but define the intended trigger: app startup, returning to the app, or contest selection. Specify per-contest behavior, no duplicates/overwrites, and user-visible success/failure status.
+
+intended trigger is checksum mismatch. so on app startup, get version stamp and checksum. It not last, sync scores. Sync consists of union of local and server scores with duplicates removed. Comparison of time stamps sufficient for duplicate detection.
+
+5	Stats “funky”	Include a screenshot or example dataset and say what the graph should show. Current margin histogram uses eight bins scaled to the data maximum; with only one game, its margin lands in the last bin, which may look misleading. Specify expected behavior for zero, one, and several games, including the three player-1/player-2/all views.
+
+views:   Peter.  Eric.  All
+0 games: blank for all
+1 games: only score for the one winner and only one margin all all
+severla games:  one tick for each win of margin set. so all would have sum of ticks in each player.
+games and points should reflect actual total number of games played (or won)
+
+6	Split into manageable files	Make this a separate cleanup after the fixes. Keep the app deployable on GitHub Pages without a build step unless you explicitly want to introduce one; define a smoke-test checklist so the move doesn’t change behavior.
+
+separte files for:
+css
+html
+javascript for each tab
+jabascript for data
+javascript for cloud
+consider dart
+
+#### n79
+n79
+
+n78
+
+	Import/export “funky”	First capture one failing example: expected result, actual result, and whether it’s clipboard export, paste, or import. The app exports Date,Player 1,Player 2 CSV, while README.md documents the older `Player 1
+
+Scene:
+new contest, with existing data on server. click backup.
+Expect:
+status: imported <n> scores.
+data: n scores added
+Get:
+no status
+
+Scene:
+existing data, cloud backup, import. paste data and click done
+Expect:
+status: imported <n> out of <all> scores <wait for checkmark or other action to clear status and text>
+data: n more scores on local and server updated with those scores as if they had been added manually
+Get:
+nothing
+Comment:
+implicit in this reorg of UI making the input text area a fixed part of the options tab:
+
+
+Contest
+p vs p dropdown
+
+Details
+
+top score / Backup replaced with a Local | Cloud toggle. 
+    If cloud selected, paste backup url in data box and ask for 
+    comfirnation in status box. Allow user to change data box
+    and specify other backup url for that contest. Confirm Cloud
+    choice if sucessful version stamp.
+Appearance Light Dark System
+Scores Export Import Clear
+
+Data
+<empty box>
+
+Status        <check>
+
+
+Idea is that all feedback, confirmation, suggestion goes in the Status box.
+Data box is used to paste scores for import, URL for backup, show scores for export, combobox for contest creation. relocarte  current popub combobx.
+player names for contest creation go here if "new" selected, with ok.
+
+
+
+2	Hide Backup URL	Specify whether “hide” means masked by default with a reveal control, or omitted from the UI unless backup settings are expanded. Keep the saved URL usable; don’t clear it or disable backup when hidden.
+
+when user selects backup, if url not set, prompt for it to be pasted into data, and only enable if url provices a version stamp. once enabled place note with url in status box.
+
+3	Copy URL from clipboard at init	Browsers generally block reading the clipboard on page load. Specify this as a user-initiated Paste action (or paste into a focused URL field), with permission/error feedback—not silent clipboard access during initialization. Decide whether this should replace or supplement manual entry.
+
+as for 2 above
+
+4	Check automatic daily import	A once-per-24-hours cloud merge already appears to exist in index.html, but define the intended trigger: app startup, returning to the app, or contest selection. Specify per-contest behavior, no duplicates/overwrites, and user-visible success/failure status.
+
+intended trigger is checksum mismatch. so on app startup, get version stamp and checksum. It not last, sync scores. Sync consists of union of local and server scores with duplicates removed. Comparison of time stamps sufficient for duplicate detection.
+
+5	Stats “funky”	Include a screenshot or example dataset and say what the graph should show. Current margin histogram uses eight bins scaled to the data maximum; with only one game, its margin lands in the last bin, which may look misleading. Specify expected behavior for zero, one, and several games, including the three player-1/player-2/all views.
+
+import data from te30, check Stats
+shows 0 gmes won for Peter and Eric, should be 16 14
+games graph looks like a straight line
+histogram shows no win margins for Peter and totals are same as eric, should have distinct
+diplays for bars for number of wins with a particualr margin.
+
+views:   Peter.  Eric.  All
+0 games: blank for all
+1 games: only score for the one winner and only one margin all all
+severla games:  one tick for each win of margin set. so all would have sum of ticks in each player.
+games and points should reflect actual total number of games played (or won)
+
+new contest, let A win by 51, then B by 51
+games graph is straight line, should up then down
+
+
+6	Split into manageable files	Make this a separate cleanup after the fixes. Keep the app deployable on GitHub Pages without a build step unless you explicitly want to introduce one; define a smoke-test checklist so the move doesn’t change behavior.
+
+separte files for:
+css
+html
+javascript for each tab
+jabascript for data
+javascript for cloud
+consider dart
+
+Other issues:
+consistent display and erasure of commehts on options page. start with clearing data and status boxes after user action
+on new game, click domino before player, gets into bad state, should disable domino tile until player select
+
+
+Working spec — cloud backup and modular direction
+
+Cloud merge:
+- Cloud backup is per contest. On startup, check the cloud revision for each configured cloud-backed contest. Fetch and merge that contest only when its revision differs from the last revision recorded locally.
+- A completed game is identified by contest plus its normalized timestamp, at minute precision. A contest may have at most one game per minute. Reject/report a second game at the same contest timestamp rather than silently merging or overwriting it. If a timestamp collision has different scores, surface it for explicit resolution; neither copy wins automatically.
+- Merge is a union by that identity. Never overwrite an existing game's scores during routine sync. Push local-only games to the server and add cloud-only games locally. Report the number added and any conflicts in Status.
+- The cloud API must expose a per-contest revision that changes after every add, clear, or other data mutation. Compute it from a canonical, consistently sorted representation of the contest's normalized timestamps and scores. A successful fetch or upload returns the revision the client can store for its next comparison. Keep API/script version validation separate from this data revision.
+- Clear on a cloud-backed contest is a reset on both local and cloud storage. The cloud reset advances a contest generation/reset marker. A client that observes a newer reset marker replaces its local contest history with the post-reset cloud history instead of unioning stale games back in. Require confirmation and report success/failure; do not claim a clear succeeded unless both sides confirm it.
+
+Cloud setup and Options feedback:
+- Keep the backup URL saved per contest. Selecting Cloud with no URL enters URL-entry mode in Data; validate the URL with the API version check before enabling Cloud. Show the selected mode and saved URL in Status after success. A failed check leaves the contest local and reports the error.
+- Clipboard access is user-initiated: the user pastes into the focused Data field (or uses an explicit Paste action). Do not read the clipboard during app initialization.
+- Data is a shared control with an explicit mode/label for URL entry, score import, score export, or new-contest player names. Switching modes must not submit or reinterpret existing text. Clear Data and Status consistently after the action completes; keep actionable errors visible until the next action.
+- Import reports how many records were accepted out of how many were supplied, and identifies timestamp conflicts without overwriting existing games. Export reports completion and leaves the exported text available to copy.
+
+Modularity:
+- Fix backup/import and statistics behavior before restructuring files.
+- Keep the app deployable on GitHub Pages without a build step. Prefer native ES modules for code organization; treat adopting Dart or a build tool as a separate decision.
+- Separate game/contest rules and score history from storage/sync adapters and UI views. Local storage and cloud backup should be replaceable adapters; scoring views should not own game rules.
+- Represent turn order and start-player conventions as rules, not UI assumptions. Keep the game model open to scoring formats beyond two domino scores (for example pool scores or bead/string scoring).
+- After the refactor, smoke-test contest creation/selection, score entry and domino completion, import/export/clear, cloud setup and two-way sync, offline/local-only use, theme settings, and all statistics views.
+#### n80
+n80
+
+only check cloud sync for one active contest, only once per day,
+at startup or contest change
+
+completed game identified by timestamp. two games with same timestamp will be pruned at sync time, with local taking precedence.
+
+merge overwrites existing entries, local winning. 
+
+cloud api need only provide complete list of all scores for a given contest. and accept new scores to
+add to cloud version, and keep them sorted by date.
+
+so cloud sync gets all scores, updates local, and sends back any scores in local version not on server. cloud deletes any scores on server that have conflict
+with timestamp of posted scores.
+
+clear does reset both local and server. 
+
+import reports scores accepted and supplied, and resolves all conflicts by local coopy winning. Export shows nuimber of records in status and score data in data block
+
+revsist modularity later.
+
+#### n81
+n81
+
+simplify options
+
+one box of parameters
+
+one box of text for copy / paste
+
+one box for status / info / confirmation
+
+parameters:
+    players
+    top score
+    cloud url
+    dark mode
+    data:
+        erase
+        import
+        export
+
+text box
+    resets dynamically, often has scores
+    also backup url
+    user names
+
+info
+    has checkmark to clear
+    updated after UI click
+    typically ephemeral, cleared by check
+
+on start:
+    display parameters in one box, akin to
+    what we have now, but in one box
+
+on paramater click:
+    invoke UI to update parameter, e.g. specify
+    player names, backup url if needed. for each
+    parameter as follows:
+        players: put up two text boxes for names of players
+            and add "Add" button. into text box. add "Enter player
+            names and press Add" into info box.
+            top score has number input control as now
+        cloud url. just a toggle to turn on. also
+            when turned on, display url in text area. with "Update"
+            button. user can edit url, press Update to try connection.
+            Only change after successful connection.
+            if no url, "Paste backup URL" into status. Add "Check"
+            button, only set url if success. Display "Checking ..."
+            or "Failed" or "Success". set toggle to on.
+            when turned off, stop cloud sync. Keep track of last
+            successfully connected url, and use it by default on new
+            contests.
+        dark mode: for black, if off, use system
+        data:
+            import:
+                "Paste data into text area and click import again."
+                <user clicks import> add any new scores. update cloud
+                and set status area with "<n> out of <m> scores added"
+            export:
+                put all scores in text area. update status: 
+                "copy scores from text above"
+            erase:
+                erase both local and server records of current contest
+
+misc:
+    double click text to get version displayed in status,
+    clears on checkmark, other click (easter egg)
+
+    like to have a better icon, dominoes.svg too primitive.
+#### n82
+n82
+
+remove contest combo
+make Players the combo control
+top score should shorter
+lose url buttron, replace with activation by turning clould backup on.
+have top score, cloud, and dark on same line
+prefilx import ... buttons with Scores label
+upshot:
+
+Paramenters   <drop upper right label>
+
+Players  <combobox
+Options  Cloud    Dark   Top Score
+Scores   Import  Export  Erase
+
+Data
+
+Status
+
+Data and status to stay clear.
+Selecting new puts up player names in data
+and an Add button
+and a "add player neames and press Add" in info
+
+Click Cloud: if enabled, turn off
+else show backup url if previously set with OK button
+put "edit to change url"
+else leave black with disbaled set button
+status says "enter url for cloud backup and press Set.
+
+If new url, put "Backup updated", else "Backup enabled".
+
+Else put "unable to contact server".
+
+Click Dark: set dark mode
+
+Click Top score: put Top Scoree <edit control> in Info.
+And "update max score" in status.
+
+Scores:
+on Import put "put scores in data area first." followed by
+Import button.
+On Export "copy NN scores from data"
+On Erase put "Press OK to remove all data for the xx vs yy contest. followed by OK button.
+
+the three buittons should be on a line same size, etc.
+
+Status area:
+Make checkmark queston mark button min widtth. now forcing 
+all status to be one character per line.
+#### n83
+n83
+
+PARAMETERS:  <lose the Player vs Player  in upper left>
+
+players, oprtion and scorees should like up vertically:
+
+P      <combo
+Opt.    Cloud     Dard.   Top>
+Scores. Import.   Export. Erase
+
+Data - should start out blank, no "Chooose ..."
+
+Bottom box Should have STATUS lave like DATA and PARAMETERS
+Check / question should be just a small box up upper left,
+as on the status page for scores tab
+And text and spacing should be like that also.
+
+Keep size so fits on iphone 13 mini
+
+Add the version easter egg: double cliock the Status area to get version info printed.
+
+and any suggestions on a better domino.svg icon?
+#### n84
+n84
+
+check mark still not like scores tab - should be in uppoer right
+buttons in Prameters still not lined up vertically - need to widen Scores buttons pand Paleers combo box
+Change Top to Max
+
+Heading of DATA should not change, and remove Buttons or additional directon in data area unless specified for particular action. So press Import
+then lablel stays DATA
+Data block stays blank. no Cancel button
+Status area message:
+"Paste scores into Data and press Import again to add scores. Make button green but just Import not Import now
+
+Export:
+DATA labell stays the same, no <select scores> or Done bubttons
+Status is <nn> scores on in data, copy and paste to save
+
+
+#### n85
+n85
+
+n84
+
+check mark still not like scores tab - should be in uppoer right
+if awkward for some technical reason, just make it the same as the
+bottom panel of the scores tab, check mark in upper right, no STATUS label
+
+buttons in Prameters still not lined up vertically - need to widen Scores
+buttons and Players combo box
+make all controls buttons and combo box same height
+
+
+
+#### n86
+n86
+
+import should always work - does not depend on current contest. if new data create
+new contest, the way it worked before.
+
+and if no users, have a local cloud vs guest one. right now selecting new with
+no users does not provide usable ui for entering player names.
+#### n87
+n87
+
+scores tab, bottom panel
+displays recent scores and allows deletion
+somewhat flaky animation and scores not displayed in correct order
+switch focus and return, scores painted in correct order.
+
+increase font size on scores page
+#### n88
+n88
+
+help on scores page: start out blank.
+  remove "Click player ..." message, just blank. user can type ? to
+  get help
+advise on json config idea - replace all options with simple textbox
+  displays all config settings in json
+  updates settings from json
+have seen but can not repro a stuck state on the scores tab
+  perhaps fluke key press at game start. any way to exercise?
+produce pages like the current scores we could just tape on
+  to our old sheets. see photos in history
+like to review text, list all user feedback messages, where and when displayed
+add years filter selection on stats page by year or all
+increase font on user messages
+
+
+
+
+#### n89
+n89
+
+keep lower box on scores tab same size
+
+remove hightlighting of users, just have text message saying who goes first
+
+game end: message format:
+Peter wins 52 to 47 on a 4 6 hand. 
+allow to go blank with check
+highlight users in this case.
+disallow any controls
+any non-user click, clear scores from user tiles, show:
+Peter won the last gaeme 52 to 47. 
+Click user with high double to start a new game.
+Keep users highlit until click to start game.
+
+on stats page, add a third view for another click on the second tab, got graphs for points, games. Add tail
+of recent games scores with time stamps.
+
+increase font size of player names on scores tab
+
+
+#### n90
+n90
+
+“Lower box”: Do you mean the status/history box on the Score tab? Should it keep its current height even when messages or recent scores change?
+
+  max size needed but no bigger than can fit on iphone se
+
+Player highlighting: Should the starter’s highlight disappear during normal play, but both players highlight after the game ends? That seems to reconcile “remove highlighting” with “keep users highlit.”
+
+  hightlight players iff waiting for who got highest double.
+
+Game-end flow: Confirm the exact message format and whether tapping the checkmark hides the message without unlocking the game. Specify which controls are disabled and whether tapping anywhere other than a player card leaves the end state unchanged.
+
+  Peter wins 54 to 48 on a 5 3 hand. If starting a new game, click on the player with the highest double.
+
+  tapping check just clears box.
+
+  but any user click outside a user tile does not change game state but does causes following in status:
+
+    Peter won the last gaeme 52 to 47. 
+    Click user with high double to start a new game.
+  
+  Keep users highlit until click to start game.
+
+
+Recent games: Specify how many games to show, whether newest comes first, and the timestamp format.
+
+  like the scores control on the scores tab, 4 or 5 whatever fits in current size box, newest last, same format
+  as export on options.
+
+
+Player-name font: Give a target size, or say “increase from the current 14px mobile / 15px desktop.” 
+
+  Swap size with score
+#### n91
+n91
+
+need recent games to be same size as graphs so doesn't jump around
+need text color of recent games to be white, or just like font color for total points
+
+when disabling input waiting for highest double, still allow stats Options clicks, but return to scores tab in same state where players are highlit and other controls disabled.
+
+
+
+#### n92
+n92
+
+text / help changes:
+
+    remove If starting new game ...
+
+    Peter goes first -> Peter has the highest double, Eric will start the next hand.
+
+    Eric goes first next hand. -> Eric goes first.
+
+Bug:
+
+    Options | New... is broken, can't create new contest.
+

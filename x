@@ -1,1 +1,0 @@
-Idea is that Eric | Peter is a different contest than Peter | Eric, so identtity should be stable. 
