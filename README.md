@@ -12,7 +12,7 @@ You will see the main scoring tab. At the start of a game, tap the player who ha
 
 <img src="screenshots/first_screen.png" alt="Score screen waiting for selection of the player with the highest double" width="300">
 
-At the start of a game, both player tiles are highlighted until you select who has the highest double. The status box confirms who goes first. After selecting the starting player, add scores by entering a number and clicking on the scorer.
+At the start of a game, both player tiles are highlighted until you select who has the highest double. The keypad is disabled until you select a player. The status box confirms who goes first. After selecting the starting player, add scores by entering a number and clicking on the scorer.
 After some play, the status lists recent scores.
 Click the red **X** to delete a score, and possibly replace by adding another score.
 
@@ -21,7 +21,7 @@ Click the red **X** to delete a score, and possibly replace by adding another sc
 When a player *dominoes* (plays all their tiles), the hand ends. First, enter any score from that play, then tap the domino tile below the **9** to mark the hand complete. The status area reports hand totals and who goes first next; player tiles are not highlighted during play.
 After a domino, the player with the most points above the top score wins. The status area reports the winner and final score. Tap its checkmark to clear the message, then tap the player with the highest double to begin the next game.
 
-The middle tab is STATS; it has a year filter (All or a year with recorded games) and three sections: numeric data, graphs/recent games, and histograms. Use the arrows to move through years; the year field also accepts a year with recorded games. Click the first section to cycle through points, averages, and games. The middle cycles through graphs of game and point scores, then the four most recent games in export date-and-score format. The third has three histograms; click to see winning margins for each player, and another for both.
+The middle tab is STATS; when games span at least three distinct years, it has a year filter (All or a year with recorded games). Use the arrows to move through years; the year field also accepts a year with recorded games. Click the first section to cycle through points, averages, and games. The middle cycles through graphs of game and point scores, then all completed games in chronological date-and-score order. The history opens at the latest game; press `k` to scroll toward the past and `j` toward the future. The third has three histograms; click to see winning margins for each player, and another for both.
 
 Screenshots: 
 

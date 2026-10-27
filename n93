@@ -1,0 +1,15 @@
+n93
+
+stats: spacing of titles, boxes should all be same height
+recent games , other titles also, all should be alligned same distance below the tob og their respective boxes
+stats: if fewer than three years of games, omit top year filter on stats page
+stats: RECENT GAMES -> SCORES and display all scores in date order but starting with latest at the bottom. allow scrolling: like vi, k for into the pastand j for down into future. I know, easter eggy.
+
+disable keybpad while waiting for first double.
+    starting from scratch was able to enter score without text alert.
+    should be like game end / waiting for click of user with high double
+
+new game - while waiting for first player, 
+    click in status should should warning if blank
+    user scores should be reset to zero
+

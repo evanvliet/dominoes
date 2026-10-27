@@ -1,0 +1,15 @@
+n94 
+
+Game start: disable keypad means: disabled number entry, delete, and
+the domino key all until a player is tapped.
+The status-bar warning text is unchanged: "Click player with high double to start a new game"
+
+Stats layout: all stats cards have equal heights and their titles
+share a consistent top inset, even when card contents differ.
+If the number of distinct years in the score history is less than 4,
+suppress the year history dialog, it is overkill in this case.
+
+Scores history: Current format is fine, showing dates and scores, with
+headers for date and players, but, like the export feature
+on the options page, displaying all scores, latest last and at the bottom,
+visible in the box. j/k only scrolls this particular list.
