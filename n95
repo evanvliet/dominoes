@@ -1,5 +1,10 @@
 n95
 
-create new contest, goto scores, get big text. expect: no text. Only after click on anything bug player tile, thendisplay help text.
+create new contest, goto scores, get help text. expect: no text. Only after click on anything but player tile, then display help text.
 
+tied game: have hand end tied 54. treats as game over. game should continue until hand
+ends with a winner.
 
+at game end, sores persist on player tiles until new game. Please reset scores
+sooner, set to 0 after displaying message "Click user..." (or any other message)
+in status area.

@@ -274,7 +274,7 @@ textarea.export-area{width:100%;height:145px;font-size:12px;font-family:monospac
 <body>
 <div class="app" id="app"></div>
 <script>
-const APP_VERSION = 'v2.0.13g';
+const APP_VERSION = 'v2.0.14g';
 const BACKUP_URL_KEY = 'dom_backup_url';
 const BACKUP_ENABLED_KEY = 'dom_backup_enabled';
 const BACKUP_CONFIG_KEY = 'dom_backup_config_v1';
@@ -394,6 +394,13 @@ const S={
   pendingBackupScriptVersion:''
 };
 let LAST_STATUS_SET=0;
+// Final scores shown on the tiles after a game ends, until the next click anywhere.
+let END_SCORE_HOLD = null;
+document.addEventListener('click', () => {
+  if(!END_SCORE_HOLD) return;
+  END_SCORE_HOLD = null;
+  setTimeout(render, 0);
+}, true);
 
 function readBackupConfigs(){
   try{
@@ -1337,7 +1344,7 @@ function callDomino(){
     return;
   }
   
-  const gameEnds = S.pendingWin;
+  const gameEnds = S.pendingWin && S.scores[0] !== S.scores[1];
   const handTotals = [S.handScores[0], S.handScores[1]];
   
   // Record the domino call
@@ -1390,6 +1397,8 @@ function callDomino(){
       S.gameOver = true;
       S.phase = 'end';
       S.showFirstPlayer = false;
+      END_SCORE_HOLD = [S.scores[0], S.scores[1]];
+      S.scores = [0, 0];
     } else {
       // Game is tied
       msg = `The game is tied ${S.scores[0]} to ${S.scores[1]} on a ${handTotals[0]} ${handTotals[1]} hand.`;
@@ -1854,6 +1863,8 @@ function switchContest(newNames, skipCurrentUpdate = false) {
   S.statsYear = 'all';
   S.statsYearError = '';
   S.newNames = ['', ''];
+  S.helpMessage = '';
+  S.helpTab = -1;
   S.gameEndMessage = '';
   S.status = '';
   S.statusUntil = 0;
@@ -1877,6 +1888,10 @@ function switchContest(newNames, skipCurrentUpdate = false) {
 function setTab(t){
   S.editingIdx=-1;
   S.tab=t;
+  if(t === 0 && S.phase === 'start' && S.status.startsWith('Contest selected:')){
+    S.status='';
+    S.statusUntil=0;
+  }
   if (t === 2 && (S.names[0] || S.names[1])) {
     S.showNewContestInputs = false;
   }
@@ -1964,7 +1979,7 @@ function render(){
   const statusText = S.status || (S.tab === 0 ? S.gameEndMessage : '') || activeHelpMessage || defaultStartStatus;
   const isNewContestHelp = !S.status && !activeHelpMessage && defaultStartStatus === 'Add player names and press Add.';
   const statusIcon = (S.tab === 0 && waitingForHighDouble()) || S.status || activeHelpMessage || (S.tab === 0 && S.gameEndMessage) ? '&#10003;' : '?';
-  const statusClick = (S.tab === 0 && S.phase === 'start' && !S.status && !activeHelpMessage) ? 'notifyStarterPrompt()' : ((S.tab === 0 && waitingForHighDouble()) || S.status || activeHelpMessage || (S.tab === 0 && S.gameEndMessage) ? 'ackStatus()' : (isNewContestHelp ? 'S.hideNewContestHelp=true;render()' : 'showHelp()'));
+  const statusClick = (S.tab === 0 && S.phase === 'start' && !S.status && !activeHelpMessage) ? 'showHelp()' : ((S.tab === 0 && waitingForHighDouble()) || S.status || activeHelpMessage || (S.tab === 0 && S.gameEndMessage) ? 'ackStatus()' : (isNewContestHelp ? 'S.hideNewContestHelp=true;render()' : 'showHelp()'));
   
   const recentScores = S.records.filter(r => r.type === 'score').slice(-4);
   const showHistory = !S.status && !activeHelpMessage && !waitingForHighDouble() && (S.tab !== 0 || !S.gameEndMessage) && recentScores.length > 0;
@@ -2004,7 +2019,7 @@ function render(){
         const pname = sc.querySelector('.pname');
         const scoreTot = sc.querySelector('.score-total');
         if (pname && pname.textContent !== S.names[i]) pname.textContent = S.names[i];
-        const val = String(isStart ? 0 : S.scores[i]);
+        const val = String(END_SCORE_HOLD ? END_SCORE_HOLD[i] : (isStart ? 0 : S.scores[i]));
         if (scoreTot && scoreTot.textContent !== val) scoreTot.textContent = val;
       }
     });
@@ -2045,7 +2060,7 @@ function render(){
     const cards=[0,1].map(i=>`
       <div class="scard ${highlightPlayers?'select-starter':''}" onclick="tapPlayer(${i})">
         <div class="pname">${escapeHTML(S.names[i])}</div>
-        <div class="score-total">${isStart ? 0 : S.scores[i]}</div>
+        <div class="score-total">${END_SCORE_HOLD ? END_SCORE_HOLD[i] : (isStart ? 0 : S.scores[i])}</div>
       </div>`).join('');
     const dominoLabel=domTile();
 
