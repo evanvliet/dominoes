@@ -1,0 +1,12 @@
+n101
+
+next steps
+modularize, per tab? per db, ui, options functionality? per javascript, css, html?
+create options just read / write json
+check accuracy of graphs, stats, methodically add scores and check images, stats
+create alternate cloud backup using oracle or cloudflare
+check dominoes scores for alternate rules and implement as options
+create local only version
+cleanup readme
+simplify url setting
+

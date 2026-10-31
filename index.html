@@ -274,7 +274,7 @@ textarea.export-area{width:100%;height:145px;font-size:12px;font-family:monospac
 <body>
 <div class="app" id="app"></div>
 <script>
-const APP_VERSION = 'v2.0.14g';
+const APP_VERSION = 'v2.0.15g';
 const BACKUP_URL_KEY = 'dom_backup_url';
 const BACKUP_ENABLED_KEY = 'dom_backup_enabled';
 const BACKUP_CONFIG_KEY = 'dom_backup_config_v1';
@@ -2100,6 +2100,7 @@ function render(){
     const games = S.statsYear === 'all'
       ? allGames
       : allGames.filter(game => gameYear(game) === Number(S.statsYear));
+    const orderedGames = games.slice().sort((a,b) => gameKey(a).localeCompare(gameKey(b)));
     const totalGames = games.length;
     const wins = [0, 0];
     const totals = [0, 0];
@@ -2107,12 +2108,13 @@ function render(){
     const hostMargins = [];
     const guestMargins = [];
 
-    games.slice().reverse().forEach(g => {
+    games.forEach(g => {
       const winnerIdx = gameWinnerIdx(g);
+      const scores = gameScores(g);
       wins[winnerIdx]++;
-      totals[0] += g.scores[0];
-      totals[1] += g.scores[1];
-      const diff = Math.abs(g.scores[0] - g.scores[1]);
+      totals[0] += scores[0];
+      totals[1] += scores[1];
+      const diff = Math.abs(scores[0] - scores[1]);
       margins.push(diff);
       if (winnerIdx === 0) hostMargins.push(diff);
       else guestMargins.push(diff);
@@ -2143,13 +2145,14 @@ function render(){
     let runningWinsGuest = 0;
     let runningPointsHost = 0;
     let runningPointsGuest = 0;
-    games.forEach(g => {
+    orderedGames.forEach(g => {
+      const scores = gameScores(g);
       if (gameWinnerIdx(g) === 0) runningWinsHost++;
       else runningWinsGuest++;
       cumulativeWinsHost.push(runningWinsHost);
       cumulativeWinsGuest.push(runningWinsGuest);
-      runningPointsHost += g.scores[0];
-      runningPointsGuest += g.scores[1];
+      runningPointsHost += scores[0];
+      runningPointsGuest += scores[1];
       cumulativePointsHost.push(runningPointsHost);
       cumulativePointsGuest.push(runningPointsGuest);
     });
@@ -2181,7 +2184,7 @@ function render(){
     const leadSeries = S.statsBox2 === 0 ? gameLeads : pointLeads;
     const leadTitle = ['GAMES', 'POINTS', 'SCORES'][S.statsBox2] || 'GAMES';
     const leadPath = makeLinePath(leadSeries, {width:320,height:70,padding:16});
-    const scoreHistory = games.slice().sort((a,b) => gameKey(a).localeCompare(gameKey(b)));
+    const scoreHistory = orderedGames;
 
     const box3Titles = ['WIN MARGINS', `WIN MARGINS FOR ${p1Name.toUpperCase()}`, `WIN MARGINS FOR ${p2Name.toUpperCase()}`];
     const selectedMargins = S.statsBox3 === 0 ? margins : S.statsBox3 === 1 ? hostMargins : guestMargins;

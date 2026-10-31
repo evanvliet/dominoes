@@ -1753,9 +1753,6 @@ Data block stays blank. no Cancel button
 Status area message:
 "Paste scores into Data and press Import again to add scores. Make button green but just Import not Import now
 
-Export:
-DATA labell stays the same, no <select scores> or Done bubttons
-Status is <nn> scores on in data, copy and paste to save
 
 
 #### n85
@@ -1892,3 +1889,55 @@ Bug:
 
     Options | New... is broken, can't create new contest.
 
+#### n93
+n93
+
+stats: spacing of titles, boxes should all be same height
+recent games , other titles also, all should be aligned same distance below the top of their respective boxes
+stats: if fewer than three years of games, omit top year filter on stats page
+stats: RECENT GAMES -> SCORES and display all scores in date order but starting with latest at the bottom. allow scrolling: like vi, k for into the past and j for down into future. I know, easter eggy.
+
+disable keypad while waiting for first double.
+    starting from scratch was able to enter score without text alert.
+    should be like game end / waiting for click of user with high double
+
+new game - while waiting for first player, 
+    click in status should should warning if blank
+    user scores should be reset to zero
+
+
+#### n94
+n94 
+
+Game start: disable keypad means: disabled number entry, delete, and
+the domino key all until a player is tapped.
+The status-bar warning text is unchanged: "Click player with high double to start a new game"
+
+Stats layout: all stats cards have equal heights and their titles
+share a consistent top inset, even when card contents differ.
+If the number of distinct years in the score history is less than 4,
+suppress the year history dialog, it is overkill in this case.
+
+Scores history: Current format is fine, showing dates and scores, with
+headers for date and players, but, like the export feature
+on the options page, displaying all scores, latest last and at the bottom,
+visible in the box. j/k only scrolls this particular list.
+
+#### n95
+n95
+
+create new contest, goto scores, get help text. expect: no text. Only after click on anything but player tile, then display help text.
+
+tied game: have hand end tied 54. treats as game over. game should continue until hand
+ends with a winner.
+
+at game end, sores persist on player tiles until new game. Please reset scores
+sooner, set to 0 after displaying message "Click user..." (or any other message)
+in status area.
+
+#### n96
+n96
+
+at game end leave scores on user tiles until subsequent user click, do
+display the host wins x to y on a s s hand message but leave score totals
+on user tiles. Clear them to zero after any subsequent user click.
