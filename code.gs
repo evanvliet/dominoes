@@ -1,4 +1,4 @@
-var SCRIPT_VERSION = 'gs.2.8';
+var SCRIPT_VERSION = 'gs.2.9';
 
 function doPost(e) {
   var lock = LockService.getScriptLock();

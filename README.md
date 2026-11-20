@@ -54,8 +54,9 @@ The three score actions operate on the selected contest.
 
 First player names header, followed by date, time and player scores for each completed game. You have to paste the clipboard data into a mail message or web document to save it.
 * *Import* first switches Data to score-entry mode. Paste data and select Import again to add
-  scores to the currently selected contest. If a timestamp already exists, the existing local
-  score is kept. Status reports how many records were added out of those supplied. For testing,
+  scores to the contest named in the data header; that contest becomes active after import. If a
+  timestamp already exists, the existing local score is kept. Status reports how many records
+  were added out of those supplied. For testing,
   you can import 75 scores from [test75](test75).
 * *Erase* removes the selected contest and its cloud link from this device after confirmation. It does not erase the server copy; use **Download...** with the sheet name and both player names to restore a local copy.
 

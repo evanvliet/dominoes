@@ -68,7 +68,7 @@ html,body{height:100%;background:var(--color-background-tertiary);font-family:va
 
 /* numpad */
 .numpad-wrap{background:var(--color-background-primary);border-radius:var(--border-radius-lg);border:0.5px solid var(--color-border-tertiary);padding:8px;margin-bottom:8px;}
-.display-bar{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:8px 14px;text-align:right;font-size:30px;font-weight:500;color:var(--color-text-primary);margin-bottom:6px;min-height:54px;display:flex;align-items:center;justify-content:flex-end;letter-spacing:2px;}
+.display-bar{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:8px 14px;text-align:right;font-size:30px;font-weight:500;color:var(--color-text-primary);margin:8px 0 6px;min-height:54px;display:flex;align-items:center;justify-content:flex-end;letter-spacing:2px;}
 .display-bar.dim{color:var(--color-text-tertiary);}
 .keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;}
 .key{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);font-size:36px;font-weight:400;color:var(--color-text-primary);height:60px;display:flex;align-items:center;justify-content:center;cursor:pointer;user-select:none;transition:background 0.1s,transform 0.08s;}
@@ -235,7 +235,8 @@ textarea.export-area{width:100%;height:145px;font-size:12px;font-family:monospac
 .clear-confirm-actions .action-btn{margin-bottom:0;flex:1;max-width:110px;}
 .backup-mode{flex:1;}
 .backup-mode .action-btn{min-width:0;}
-.data-panel{display:flex;flex-direction:column;gap:8px;height:300px;overflow-y:auto;}
+.data-panel{display:flex;flex-direction:column;gap:8px;height:180px;overflow-y:auto;}
+@media (max-width: 375px) {.data-panel{height:150px;}}
 .data-panel > *{flex-shrink:0;}
 .data-mode-label{font-size:12px;color:var(--color-text-secondary);}
 .data-actions{display:flex;gap:8px;}
@@ -276,8 +277,8 @@ textarea.export-area{width:100%;height:145px;font-size:12px;font-family:monospac
 <body>
 <div class="app" id="app"></div>
 <script>
-const APP_VERSION = 'v2.0.21g';
-const CLOUD_API_URL = 'https://script.google.com/macros/s/AKfycbwyNSciL9ape1mkZXTzBVp3zsALa3BaOdEP-dJYBV7jflZjMQfOMxYFmoyoAo3Wzs4/exec';
+const APP_VERSION = 'v2.0.22g';
+const CLOUD_API_URL = 'https://script.google.com/macros/s/AKfycbzyjYicf2IUriYpP7JGWohViqjpI4zd_atBDm4j69PlkMOiGH5csVCrMdLSEVLbtmA/exec';
 const BACKUP_URL_KEY = 'dom_backup_url';
 const BACKUP_ENABLED_KEY = 'dom_backup_enabled';
 const BACKUP_CONFIG_KEY = 'dom_backup_config_v1';
@@ -1874,6 +1875,8 @@ async function doImport(){
       return {added, conflicts};
     });
     if(importResult === null){setStatus('Import canceled because contest scores were cleared.', 5000);return;}
+    S.showNewContestInputs=false;
+    switchContest(targetNames);
     if (getBackupConfig(contest).enabled && getBackupUrl(contest) && importResult.added.length) {
       const synced = await appendContestDataToCloud(importResult.added, targetNames, importEpoch);
       if(synced === null){setStatus('Scores were cleared before cloud sync completed.', 5000);return;}
@@ -2222,8 +2225,8 @@ function render(){
       : (showHistory ? '<div class="hist-mini"></div>' : (defaultStartStatus ? escapeHTML(defaultStartStatus) : '&nbsp;'));
 
     content=`
+      <div class="scoreboard">${cards}</div>
       <div class="numpad-wrap">
-        <div id="display-bar" class="${displayClass}">${S.display||'0'}</div>
         <div class="keypad">
           ${[1,2,3,4,5,6,7,8,9].map(n=>`<div class="key ${controlsDisabled?'disabled':''}" onclick="pressKey('${n}')">${n}</div>`).join('')}
           <div class="key del ${controlsDisabled?'disabled':''}" onclick="delKey()">&#9003;</div>
@@ -2231,7 +2234,7 @@ function render(){
           <div class="key domino-key ${controlsDisabled?'disabled':''}" onclick="callDomino(event)">${dominoLabel}</div>
         </div>
       </div>
-      <div class="scoreboard">${cards}</div>
+      <div id="display-bar" class="${displayClass}">${S.display||'0'}</div>
       <div class="status-bar score-status" onclick="${statusClick}">
         <div class="status-text ${(!statusText && !showHistory && !defaultStartStatus) ? 'empty' : ''}">
           ${statusInner}

@@ -1,0 +1,26 @@
+n102
+
+reduce text messages to user, only display to provide help.
+
+after successful download, stay on options page with downloaded
+contest active 
+
+Do not display "xx has highest double ..." unless ? is clicked.
+
+Use green dot to indicate first player. Replace  "xx is first
+message" instead show green dot. extinguish after any click.
+
+Delete all hand ... text messages. Add a curreent hand subtotal to the score history:  format domino brick icon followed by hand totals, e.g. 12/2, followed by winner name or tied.
+
+replace game won message with flashing circle 3 times. and add message to score histor * 34/2 winner. Note game end produces
+two messages - first the hand score, then the game score.
+
+keep score history indefinitely, truncate as needed.
+
+on download and create specify just one name, used to identify
+scorekeeper, any string ok.
+
+add column with scorekeeper name to score sheet.
+
+implicit if scoreekeeper is blank asssume first player.
+
