@@ -1,0 +1,35 @@
+n98
+
+Year animation: The current year filter has an “All” placeholder and arrows; the available years are sorted oldest to newest in index.html. Specify what starts the cycle, its direction, and what “any click” means—anywhere in the app or only in the filter. Also clarify whether another double-click stops it; that seems to conflict with “any click returns to all.” Since “All” is currently a placeholder, a dedicated button or control may be clearer and more accessible.
++ animation starts on double click of "all" and goes forward from
+beginning
++ any click and double click etc stops animation at current
+spot 
++ an "easter egg" feature not needing a separate button
+
+
+Help versus game totals: The app already has context-dependent help text in index.html. Clarify whether “after domino clicked, showing hand or game totals” means automatically show a game-status message, or show help only if ? is tapped after a domino.
++ normally quiet, but show text at times when the scorekeeper
+would announce stats, in this case after each hand, e.g. domino
+click. This includes game ending. So always show text after
+domino click. but restore recnt scores display after any click.
+
+Green circle: I assume it replaces the player-tile highlight used when choosing who starts. Confirm what the circle means, which tile gets it, and when it appears.
++ just to replace current green border highlighting. Meaning,
+location, and timing identical.
+
+Cloud URL and sheet naming: In code.gs, the contest name determines a tab name; the endpoint URL itself does not identify a sheet. Decide whether this remains one spreadsheet with contest tabs, or whether each user/contest gets its own spreadsheet and URL. Hard-coding a URL in index.html would conflict with per-contest URLs unless it is only a default with an override.
++ sheet name replaces url in app. the url itselt is now
+hard coded in index.html. The "Players" option now includes
+both a "New" and now also a "Download" option. New as before. 
+Download prompts for name of sheet and player name. Server
+rejects if name is not a player of sheet. Else imports contest
+from named sheet. 
+The "cloud" option prompts for the name
+of the sheet and rejects if already used. Else server creates
+a new sheet with only 3 columns, for score data as current format. (spreadsheet max is in cells, not sheets) and with the user specified name, shold be personal
+so unlikely to be duplciated, e.g. inclues phone number or addreess. User can share scoring by giving out this name to other to download. Also delete after 500 scores. No nteed to
+prevent overuse, let google provide error if sheet can't be created.
+
+“Prevent overuse” and “truncate”: A 1,000-tab cap can limit tab creation, but it does not limit repeated writes or large requests. Define what you want to limit and what response the app should show when the limit is reached. Also clarify whether “three columns” means only keeping score data in columns A–C (what the code already writes in code.gs) or physically deleting all other columns—which could remove existing content.
+

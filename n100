@@ -1,0 +1,9 @@
+n100
+
++ show help at start for any click, even on disabled keypad
+
++ keep size of boxes on option page constant
+
++ curious bug: have three contests on sheet, two work, other seems to
+  connect but downloads zero scores. how to debug?
+

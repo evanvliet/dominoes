@@ -1,0 +1,2476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+<meta name="apple-mobile-web-app-title" content="Dominoes"/>
+<link rel="icon" type="image/svg+xml" href="domino.svg">
+<link rel="apple-touch-icon" href="domino.svg">
+<link rel="manifest" href="manifest.json">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' https://script.google.com https://script.googleusercontent.com; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;">
+<title>Dominoes Scorer</title>
+
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1c1c1e" media="(prefers-color-scheme: dark)">
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+:root, [data-theme="light"] {
+  --color-background-primary:#ffffff;
+  --color-background-secondary:#f2f2f7;
+  --color-background-tertiary:#e5e5ea;
+  --color-text-primary:#1c1c1e;
+  --color-text-secondary:#6e6e73;
+  --color-text-tertiary:#aeaeb2;
+  --color-border-tertiary:#d1d1d6;
+  --color-border-secondary:#c7c7cc;
+  --border-radius-lg:14px;
+  --border-radius-md:10px;
+  --font-sans:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;
+}
+@media(prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --color-background-primary:#1c1c1e;
+    --color-background-secondary:#2c2c2e;
+    --color-background-tertiary:#111111;
+    --color-text-primary:#ffffff;
+    --color-text-secondary:#aeaeb2;
+    --color-text-tertiary:#636366;
+    --color-border-tertiary:#3a3a3c;
+    --color-border-secondary:#48484a;
+  }
+}
+[data-theme="dark"]{
+  --color-background-primary:#1c1c1e;
+  --color-background-secondary:#2c2c2e;
+  --color-background-tertiary:#111111;
+  --color-text-primary:#ffffff;
+  --color-text-secondary:#aeaeb2;
+  --color-text-tertiary:#636366;
+  --color-border-tertiary:#3a3a3c;
+  --color-border-secondary:#48484a;
+}
+html,body{height:100%;background:var(--color-background-tertiary);font-family:var(--font-sans);}
+.app{max-width:430px;margin:0 auto;display:flex;flex-direction:column;height:100%;height:100dvh;}
+.tab-content{flex:1;overflow-y:auto;padding:10px 10px 4px;-webkit-overflow-scrolling:touch;}
+.tabbar{
+  display:flex;
+  background:var(--color-background-primary);
+  border-top:0.5px solid var(--color-border-tertiary);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+.tbtab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;color:var(--color-text-secondary);cursor:pointer;padding:10px 0 6px;}
+.tbtab.active{color:#1D9E75;}
+.tbtab.disabled{opacity:0.3;cursor:default;}
+.tbtab svg{width:24px;height:24px;}
+
+/* numpad */
+.numpad-wrap{background:var(--color-background-primary);border-radius:var(--border-radius-lg);border:0.5px solid var(--color-border-tertiary);padding:8px;margin-bottom:8px;}
+.display-bar{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:8px 14px;text-align:right;font-size:30px;font-weight:500;color:var(--color-text-primary);margin-bottom:6px;min-height:54px;display:flex;align-items:center;justify-content:flex-end;letter-spacing:2px;}
+.display-bar.dim{color:var(--color-text-tertiary);}
+.keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;}
+.key{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);font-size:36px;font-weight:400;color:var(--color-text-primary);height:60px;display:flex;align-items:center;justify-content:center;cursor:pointer;user-select:none;transition:background 0.1s,transform 0.08s;}
+.key:active{background:var(--color-border-tertiary);transform:scale(0.95);}
+.key.del{font-size:18px;color:var(--color-text-secondary);}
+.key.disabled{background:var(--color-background-secondary);color:var(--color-text-tertiary);cursor:default;}
+.domino-key.disabled img{opacity:0.4;}
+.status-bar{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:7px 8px;margin:8px 0;min-height:64px;}
+.status-text{font-size:18px;color:var(--color-text-secondary);line-height:1.35;flex:1;min-width:0;overflow:hidden;font-weight:400;}
+.status-text.empty{color:transparent;}
+.score-status{height:118px;max-height:118px;overflow:hidden;}
+.domino-icon{width:62px;height:44px;transform:rotate(90deg);display:block;}
+.domino-key{font-size:0;}
+.status-icon{width:18px;height:18px;min-width:18px;font-size:12px;text-align:center;line-height:1;color:var(--color-text-tertiary);align-self:flex-start;display:flex;align-items:center;justify-content:center;border:0.5px solid var(--color-border-tertiary);border-radius:50%;background:transparent;padding:0;flex-shrink:0;}
+.scard.select-starter{border:2px solid #1D9E75;box-shadow:0 0 0 1px rgba(29,158,117,0.12);}
+
+/* scorecards */
+.scoreboard{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px;min-height:92px;}
+.scard{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:7px 7px 6px;text-align:center;cursor:pointer;position:relative;user-select:none;min-height:74px;display:flex;flex-direction:column;justify-content:center;align-items:center;}
+.scard:active{transform:scale(0.97);}
+.scard.pending-setup{border:2.5px solid var(--color-border-secondary);}
+.scard .pname{font-size:22px;color:var(--color-text-secondary);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.scard .first-player-indicator{display:none;}
+.score-pair{display:flex;align-items:baseline;justify-content:center;}
+.score-hand{font-size:16px;font-weight:500;color:#1D9E75;line-height:1;}
+.score-slash{font-size:15px;font-weight:300;color:var(--color-text-tertiary);margin:0 3px;line-height:1;}
+.score-total{font-size:15px;font-weight:500;color:var(--color-text-primary);line-height:1;}
+.score-labels{display:flex;justify-content:center;margin-top:2px;}
+.score-lbl-hand{font-size:8px;color:#1D9E75;width:24px;text-align:right;}
+.score-lbl-sep{font-size:8px;color:transparent;margin:0 3px;}
+.score-lbl-tot{font-size:8px;color:var(--color-text-tertiary);width:24px;text-align:left;}
+
+.stats-grid{display:grid;gap:9px;margin-top:10px;}
+.stats-year-filter{display:flex;align-items:center;justify-content:center;gap:10px;background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:8px;}
+.stats-year-filter button{width:42px;height:40px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);background:var(--color-background-secondary);color:var(--color-text-primary);font:inherit;font-size:20px;cursor:pointer;}
+.stats-year-filter button:disabled{opacity:0.4;cursor:default;}
+.stats-year-filter input{width:112px;height:40px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);background:var(--color-background-secondary);color:var(--color-text-primary);font:inherit;font-size:18px;text-align:center;}
+.stats-year-error{font-size:18px;color:#D85A30;text-align:center;}
+.stats-box{height:164px;min-height:164px;box-sizing:border-box;background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:14px;cursor:pointer;display:flex;flex-direction:column;justify-content:flex-start;overflow:hidden;transition:box-shadow 0.2s,transform 0.2s;}
+.stats-box:hover{box-shadow:0 4px 10px rgba(0,0,0,0.08);transform:translateY(-1px);}
+.stats-box-title{font-size:12px;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:0.06em;margin:0 0 10px;text-align:left;flex:0 0 auto;}
+.stats-card-content{display:flex;align-items:center;justify-content:center;flex:1;min-height:0;width:100%;}
+.stats-box-value{font-size:28px;font-weight:700;color:var(--color-text-primary);text-align:center;line-height:1.1;margin-bottom:6px;}
+.stats-box-label{font-size:13px;color:var(--color-text-secondary);text-align:center;}
+.stats-box-detail{font-size:12px;color:var(--color-text-tertiary);text-align:center;}
+.stats-recent{width:100%;font-family:monospace;font-size:11px;line-height:1.2;overflow:hidden;}
+.stats-recent-row{display:grid;grid-template-columns:minmax(0,1fr) 34px 34px;gap:4px;white-space:nowrap;color:var(--color-text-primary);}
+.stats-recent-row span:first-child{overflow:hidden;text-overflow:clip;}
+.stats-recent-head{color:var(--color-text-secondary);border-bottom:0.5px solid var(--color-border-tertiary);padding-bottom:3px;margin-bottom:3px;}
+.stats-recent-row span:not(:first-child){text-align:right;overflow:hidden;}
+.stats-scores-history{display:flex;flex:1;flex-direction:column;align-items:stretch;justify-content:flex-start;overflow-y:auto;overscroll-behavior:contain;min-height:0;font-size:11px;line-height:1.25;}
+.stats-scores-history .stats-recent-head{position:sticky;top:0;background:var(--color-background-primary);}
+
+.setup-hint{background:#E1F5EE;border:0.5px solid #9FE1CB;border-radius:var(--border-radius-md);padding:10px 15px;font-size:14px;color:#0F6E56;text-align:center;margin-bottom:12px;line-height:1.6;}
+
+/* history */
+.hist-table{width:100%;border-collapse:collapse;font-size:14px;table-layout:fixed;}
+.hist-table th{text-align:center;padding:7px 8px;color:var(--color-text-secondary);font-weight:600;border-bottom:0.5px solid var(--color-border-tertiary);font-size:12px;text-transform:uppercase;}
+.hist-table td{padding:9px 8px;border-bottom:0.5px solid var(--color-border-tertiary);color:var(--color-text-primary);vertical-align:middle;text-align:center;}
+.hist-table th:first-child, .hist-table td:first-child{text-align:left;width:25%;}
+.hist-table th:last-child, .hist-table td:last-child{text-align:right;width:15%;}
+.hist-table tr.domino-row td{background:var(--color-background-secondary);color:#0F6E56;font-style:italic;font-size:13px;}
+.hist-table tr.gameover-row td{background:#E1F5EE;color:#0F6E56;font-weight:600;font-size:13px;}
+.del-btn{background:none;border:none;cursor:pointer;font-size:16px;padding:3px 7px;border-radius:4px;color:#D85A30;}
+.del-btn:active{opacity:0.6;}
+.pts-display{color:#1D9E75;font-weight:500;cursor:pointer;border-bottom:1px dashed #9FE1CB;display:inline-block;}
+.pts-input{width:60px;font-size:14px;font-weight:500;color:#1D9E75;border:1.5px solid #1D9E75;border-radius:5px;padding:3px 6px;background:var(--color-background-primary);color:#1D9E75;outline:none;font-family:inherit;}
+
+/* mini history */
+.hist-mini{flex:1;overflow:hidden;height:98px;min-height:98px;max-height:98px;display:flex;flex-direction:column;justify-content:flex-end;gap:3px;position:relative;contain:paint layout;}
+.hist-mini-row{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--color-text-secondary);min-height:22px;max-height:22px;height:22px;opacity:1;transform:translateY(0);will-change:transform,opacity,max-height,margin;transition:transform 0.28s cubic-bezier(0.16,1,0.3,1),opacity 0.24s ease-out,max-height 0.28s cubic-bezier(0.16,1,0.3,1),min-height 0.28s cubic-bezier(0.16,1,0.3,1),height 0.28s cubic-bezier(0.16,1,0.3,1),margin 0.28s cubic-bezier(0.16,1,0.3,1),padding 0.28s cubic-bezier(0.16,1,0.3,1);}
+.hist-mini-row.entering{transform:translateY(18px);opacity:0;max-height:22px;min-height:22px;}
+.hist-mini-row.enter-active{transform:translateY(0);opacity:1;max-height:22px;min-height:22px;}
+.hist-mini-row.exiting-top{transform:translateY(-20px);opacity:0;max-height:0 !important;min-height:0 !important;height:0 !important;margin-top:-3px !important;margin-bottom:0 !important;padding:0 !important;pointer-events:none;}
+.hist-mini-row.removing{transform:translateX(24px);opacity:0;max-height:0 !important;min-height:0 !important;height:0 !important;margin-top:-3px !important;margin-bottom:0 !important;padding:0 !important;pointer-events:none;}
+.hist-mini-x{color:#D85A30;font-size:14px;cursor:pointer;padding:2px 5px;border-radius:4px;line-height:1;display:inline-flex;align-items:center;justify-content:center;transition:background 0.15s,transform 0.1s;}
+.hist-mini-x:active{background:rgba(216,90,48,0.15);transform:scale(0.88);}
+.hist-mini-pts{font-weight:600;color:var(--color-text-primary);min-width:24px;text-align:right;font-variant-numeric:tabular-nums;font-size:15px;}
+.hist-mini-name{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+.stats-box-data{display:flex;flex-direction:column;gap:6px;margin-top:8px;}
+.stats-box-row{font-size:14px;font-weight:600;color:var(--color-text-primary);display:flex;justify-content:center;gap:12px;align-items:center;width:100%;}
+.stats-box-num{font-size:18px;font-weight:600;color:var(--color-text-primary);min-width:50px;text-align:right;}
+.stats-box-label{font-size:12px;color:var(--color-text-secondary);min-width:50px;text-align:left;}
+.stats-box-chart{display:flex;flex-direction:column;align-items:center;gap:8px;margin-top:8px;}
+.stats-box-chart svg{width:100%;height:90px;}
+.stats-box-legend{display:flex;justify-content:center;gap:10px;font-size:11px;color:var(--color-text-secondary);}
+.stats-box-legend-item{display:flex;align-items:center;gap:4px;}
+.stats-box-legend-dot{width:10px;height:10px;border-radius:50%;display:inline-block;}
+.stats-box-legend-item.host .stats-box-legend-dot{background:#1D9E75;}
+.stats-box-legend-item.guest .stats-box-legend-dot{background:#5A5AFF;}
+
+/* stats table */
+.stats-table{width:100%;border-collapse:collapse;margin-top:12px;font-size:14px;}
+.stats-table td{padding:11px 6px;border-bottom:0.5px solid var(--color-border-tertiary);}
+.stats-table tr:last-child td{border-bottom:none;}
+.stats-val{font-size:18px;font-weight:600;color:var(--color-text-primary);text-align:center;width:25%;}
+.stats-lbl{color:var(--color-text-secondary);font-size:13px;text-align:left;padding-left:11px;}
+.stats-header{font-size:15px;font-weight:600;color:var(--color-text-primary);text-align:center;padding-bottom:11px;}
+.chart-container{margin-top:22px;padding:11px;background:var(--color-background-primary);border-radius:var(--border-radius-lg);border:0.5px solid var(--color-border-tertiary);}
+.chart-title{font-size:12px;color:var(--color-text-secondary);font-weight:600;text-transform:uppercase;margin-bottom:13px;text-align:center;}
+
+
+/* options */
+.opt-section{background:var(--color-background-primary);border-radius:var(--border-radius-lg);border:0.5px solid var(--color-border-tertiary);padding:12px 14px;margin-bottom:12px;}
+.opt-label{font-size:11px;color:var(--color-text-secondary);margin-bottom:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;}
+.opt-row{display:flex;align-items:center;gap:11px;margin-bottom:10px;}
+.opt-row:last-child{margin-bottom:0;}
+.opt-row label{font-size:14px;color:var(--color-text-secondary);width:88px;flex-shrink:0;}
+.opt-row input[type=text],.opt-row input[type=url]{flex:1;font-size:15px;font-weight:500;padding:7px 11px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);background:var(--color-background-secondary);color:var(--color-text-primary);font-family:inherit;}
+.opt-row input[type=number]{width:88px;height:40px;font-size:15px;padding:7px 11px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);background:var(--color-background-secondary);color:var(--color-text-primary);font-family:inherit;}
+.action-btn{width:100%;background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);font-size:14px;color:var(--color-text-primary);padding:10px;cursor:pointer;text-align:center;margin-bottom:9px;display:block;font-family:inherit;}
+.action-btn:last-child{margin-bottom:0;}
+.action-btn:active{background:var(--color-border-tertiary);}
+.action-btn.primary{background:#1D9E75;color:#ffffff;border-color:#1D9E75;font-weight:700;}
+.action-btn.highlight{background:var(--color-background-tertiary);font-weight:700;}
+.action-btn.danger{color:#D85A30;}
+/* Compact mobile adjustments (fits iPhone 13 mini) */
+@media (max-width: 390px) {
+  .stats-table{font-size:13px;margin-top:8px;}
+  .stats-table td{padding:6px 4px;}
+  .stats-val{font-size:16px;}
+  .stats-lbl{font-size:12px;padding-left:8px;}
+  .stats-header{font-size:14px;padding-bottom:6px;}
+  .chart-container{margin-top:12px;padding:8px;}
+  .chart-title{margin-bottom:8px;font-size:11px;}
+  .status-bar{min-height:118px;padding:8px 10px;}
+  .score-status{height:118px;max-height:118px;}
+  .hist-mini{height:98px;min-height:98px;gap:3px;}
+  .hist-mini-row{gap:6px;font-size:12.5px;height:22px;min-height:22px;}
+  .radio-group label{min-height:36px;padding:6px 4px;}
+  .action-btn{padding:8px;font-size:13px;margin-bottom:8px;}
+  textarea.export-area{height:120px;padding:7px;}
+  .help-text{line-height:1.35;margin-bottom:8px;}
+}
+
+@media (max-width: 375px) {
+  .scoreboard{gap:6px;}
+  .scard{padding:7px 6px 6px;min-height:76px;}
+  .score-total{font-size:14px;}
+  .status-bar{min-height:116px;padding:7px 8px;}
+  .score-status{height:116px;max-height:116px;}
+  .hist-mini{height:96px;min-height:96px;gap:2px;}
+  .hist-mini-row{font-size:12px;height:21px;min-height:21px;}
+}
+.copy-status{font-size:12px;color:#1D9E75;text-align:center;margin-top:5px;min-height:18px;}
+textarea.export-area{width:100%;height:145px;font-size:12px;font-family:monospace;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:9px;background:var(--color-background-secondary);color:var(--color-text-secondary);resize:none;margin-top:9px;-webkit-user-select:text;user-select:text;}
+.help-text{font-size:13px;color:var(--color-text-secondary);line-height:1.5;margin-bottom:11px;padding:0 5px;}
+.contest-select{width:100%;padding:11px;font-size:18px;font-weight:500;border-radius:var(--border-radius-md);background:var(--color-background-secondary);color:var(--color-text-primary);border:0.5px solid var(--color-border-tertiary);font-family:inherit;}
+.radio-group{display:flex;background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:3px;gap:3px;flex:1;}
+.radio-group label{flex:1;display:flex;align-items:center;justify-content:center;text-align:center;font-size:13px;color:var(--color-text-secondary);cursor:pointer;border-radius:8px;transition:background 0.2s,color 0.2s;width:auto;min-height:40px;}
+.radio-group input{display:none;}
+.radio-group input:checked + span{background:var(--color-background-primary);color:var(--color-text-primary);box-shadow:0 1px 3px rgba(0,0,0,0.1);}
+.radio-group span{display:flex;align-items:center;justify-content:center;width:100%;height:100%;border-radius:8px;}
+.action-group{display:flex;background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:3px;gap:3px;}
+.action-group .action-btn{flex:1;margin-bottom:0;border:none;background:none;font-size:13px;color:var(--color-text-secondary);padding:10px 0;border-radius:8px;font-weight:400;height:40px;min-height:40px;}
+.action-group .action-btn.highlight{background:var(--color-background-primary);color:var(--color-text-primary);box-shadow:0 1px 3px rgba(0,0,0,0.1);font-weight:700;}
+.action-group .action-btn:disabled{opacity:0.5;}
+.opt-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;}
+.opt-version{font-size:11px;font-weight:600;color:var(--color-text-tertiary);font-variant:normal;text-transform:none;letter-spacing:0;flex:1;text-align:right;white-space:normal;overflow-wrap:anywhere;word-break:break-word;min-width:0;}
+.clear-confirm{display:block;min-height:auto;}
+.clear-confirm .status-text{display:flex;flex-direction:column;align-items:stretch;gap:10px;}
+.clear-confirm-actions{display:flex;gap:8px;justify-content:flex-end;}
+.clear-confirm-actions .action-btn{margin-bottom:0;flex:1;max-width:110px;}
+.backup-mode{flex:1;}
+.backup-mode .action-btn{min-width:0;}
+.settings{display:flex;flex-direction:column;}
+.settings .opt-label{margin-bottom:4px;}
+.setting-row{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:48px;font-size:16px;color:var(--color-text-primary);}
+.setting-row + .setting-row{border-top:0.5px solid var(--color-border-tertiary);}
+.setting-stack{flex-direction:column;align-items:stretch;justify-content:center;gap:6px;padding:8px 0;}
+.setting-input,.player-select,.setting-number{height:40px;min-height:40px;padding:0 10px;border-radius:var(--border-radius-md);background:var(--color-background-secondary);color:var(--color-text-primary);border:0.5px solid var(--color-border-tertiary);font:inherit;font-size:16px;}
+.setting-input,.player-select{width:100%;}
+.setting-number{width:88px;text-align:center;}
+.setting-row input[type=checkbox]{width:22px;height:22px;accent-color:#1D9E75;margin:0;flex:0 0 auto;}
+.setting-note{font-size:12px;color:var(--color-text-secondary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin:-2px 0 8px;}
+.setting-action{width:auto;min-width:72px;height:36px;min-height:36px;margin:0;padding:0 12px;}
+.data-mode-label{font-size:12px;color:var(--color-text-secondary);}
+.data-actions{display:flex;gap:8px;margin-top:8px;}
+.data-actions .action-btn{margin:0;flex:1;}
+.settings textarea.export-area{height:120px;margin-top:0;font-size:13px;}
+.option-status .status-text{overflow-wrap:anywhere;}
+.status-box-header{display:flex;align-items:center;gap:8px;margin-bottom:4px;min-height:18px;}
+.status-box-icon{width:14px;height:14px;min-width:14px;font-size:12px;line-height:1;color:var(--color-text-secondary);display:flex;align-items:center;justify-content:center;border:0.5px solid var(--color-border-tertiary);border-radius:4px;background:var(--color-background-secondary);padding:0;margin-left:auto;}
+.status-label{display:inline-block;letter-spacing:0.08em;font-size:11px;margin:0;margin-right:auto;}
+.data-action-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px;}
+.data-action-row .action-btn{margin:0;padding:10px 8px;font-size:15px;}
+.inline-confirm{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:13px;color:var(--color-text-secondary);}
+.inline-confirm .action-btn{width:auto;margin:0;padding:7px 10px;}
+.option-status{min-height:58px;padding:7px 8px;}
+.option-status .clear-confirm-actions{margin-top:8px;}
+.option-status .clear-confirm-actions .action-btn{max-width:none;}
+</style>
+</head>
+<body>
+<div class="app" id="app"></div>
+<script>
+const APP_VERSION = 'v2.0.17g';
+const BACKUP_URL_KEY = 'dom_backup_url';
+const BACKUP_ENABLED_KEY = 'dom_backup_enabled';
+const BACKUP_CONFIG_KEY = 'dom_backup_config_v1';
+const BACKUP_CONFIG_MIGRATED_KEY = 'dom_backup_config_migrated_v1';
+const LAST_BACKUP_URL_KEY = 'dom_last_backup_url';
+const PENDING_SYNC_KEY = 'pending_sync_games_v2';
+const CLOUD_SYNC_PREFIX = 'dom_cloud_sync:';
+const CLEAR_EPOCH_PREFIX = 'dom_clear_epoch:';
+const CLOUD_RECENT_PREFIX = 'dom_recent_cloud_import:';
+let pendingSyncPromise = null;
+
+function withContestLock(contest, callback){
+  if(navigator.locks && navigator.locks.request){
+    return navigator.locks.request(`dominoes:${contest}`, callback);
+  }
+  return callback();
+}
+
+function getClearEpoch(contest){
+  return Number(localStorage.getItem(CLEAR_EPOCH_PREFIX + contest) || 0);
+}
+
+function gameKey(game){
+  const date = normalizeGameDate(game.date || game.time || '').date;
+  return date;
+}
+
+function gameScores(game){
+  const scores = Array.isArray(game.scores) ? game.scores : [game.p1_score, game.p2_score];
+  return [Number(scores[0]), Number(scores[1])];
+}
+
+function gameWinnerIdx(game){
+  const [score1, score2] = gameScores(game);
+  if(Number.isFinite(score1) && Number.isFinite(score2)) return score1 >= score2 ? 0 : 1;
+  return game.winnerIdx === 1 ? 1 : 0;
+}
+
+function mergeGameLists(existing, incoming){
+  const seen = new Set();
+  return [...(existing || []), ...(incoming || [])].filter(game => {
+    const key = gameKey(game);
+    if(seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  }).sort((a, b) => gameKey(a).localeCompare(gameKey(b)));
+}
+
+function readStoredContestGames(contest){
+  try{
+    const stored = JSON.parse(localStorage.getItem(SK) || '{}');
+    const record = stored.contests && stored.contests[contest];
+    if(record && Array.isArray(record.pastGames)) return record.pastGames;
+    return getContestKey(stored.names || []) === contest ? (stored.pastGames || []) : [];
+  }catch(e){return [];}
+}
+
+function escapeHTML(str) {
+  if (!str) return '';
+  return String(str).replace(/[&<>"']/g, function(m) {
+    return {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#039;'
+    }[m];
+  });
+}
+const SK='dom_v10';
+const S={
+  names:['',''],
+  contests:{},
+  scores:[0,0],
+  handScores:[0,0],
+  display:'',
+  records:[],
+  pastGames:[],
+  target:50,
+  gameOver:false,
+  tab:0,
+  phase:'start',
+  firstPlayer:-1,
+  handFirstPlayer:-1,
+  handNum:0,
+  lastAdded:['',''],
+  showFirstPlayer:false,
+  pendingWin:false,
+  starterSelection:true,
+  nextScoreRowId:1,
+  editingIdx:-1,
+  status:'',
+  statusUntil:0,
+  scriptVersion:'',
+  helpMessage:'',
+  helpTab:-1,
+  highestDoublePlayer:-1,
+  theme:'system',
+  showNewContestInputs:false,
+  hideNewContestHelp:false,
+  lastNames:['',''],
+  newNames:['',''],
+  statsBox1:0,
+  statsBox2:0,
+  statsBox3:0,
+  statsYear:'all',
+  statsYearError:'',
+  gameEndMessage:'',
+  lastGameEndStatus:'',
+  clearConfirm:null,
+  backupEnabled:false,
+  optionsDataMode:'empty',
+  optionsDataText:'',
+  backupUrlConfirm:false,
+  pendingBackupUrl:'',
+  pendingBackupContest:'',
+  pendingBackupScriptVersion:''
+};
+let LAST_STATUS_SET=0;
+// Final scores shown on the tiles after a game ends, until the next click anywhere.
+let END_SCORE_HOLD = null;
+document.addEventListener('click', () => {
+  if(!END_SCORE_HOLD) return;
+  END_SCORE_HOLD = null;
+  setTimeout(render, 0);
+}, true);
+
+function readBackupConfigs(){
+  try{
+    const configs=JSON.parse(localStorage.getItem(BACKUP_CONFIG_KEY) || '{}');
+    return configs && typeof configs === 'object' && !Array.isArray(configs) ? configs : {};
+  }catch(error){
+    return {};
+  }
+}
+
+function getBackupConfig(contest=getContestKey(S.names)){
+  const config=readBackupConfigs()[contest] || {};
+  const url=String(config.url || '');
+  return {
+    url,
+    enabled:config.enabled === true && Boolean(url),
+    scriptVersion:String(config.scriptVersion || '')
+  };
+}
+
+function setBackupConfig(contest, updates){
+  const configs=readBackupConfigs();
+  configs[contest]={...getBackupConfig(contest),...updates};
+  localStorage.setItem(BACKUP_CONFIG_KEY,JSON.stringify(configs));
+}
+
+function getBackupUrl(contest=getContestKey(S.names)){
+  return getBackupConfig(contest).url;
+}
+
+function migrateBackupConfigs(){
+  if(localStorage.getItem(BACKUP_CONFIG_MIGRATED_KEY)==='true') return;
+  const configs=readBackupConfigs();
+  const legacy={
+    url:localStorage.getItem(BACKUP_URL_KEY) || '',
+    enabled:localStorage.getItem(BACKUP_ENABLED_KEY)==='true' && Boolean(localStorage.getItem(BACKUP_URL_KEY)),
+    scriptVersion:String(S.scriptVersion || '')
+  };
+  const contestKeys=new Set(Object.keys(S.contests || {}));
+  const activeContest=getContestKey(S.names);
+  if(activeContest) contestKeys.add(activeContest);
+  contestKeys.forEach(contest=>{
+    if(!configs[contest]) configs[contest]={...legacy};
+  });
+  localStorage.setItem(BACKUP_CONFIG_KEY,JSON.stringify(configs));
+  localStorage.setItem(BACKUP_CONFIG_MIGRATED_KEY,'true');
+  if(legacy.url && !localStorage.getItem(LAST_BACKUP_URL_KEY)){
+    localStorage.setItem(LAST_BACKUP_URL_KEY,legacy.url);
+  }
+  S.backupEnabled=getBackupConfig(activeContest).enabled;
+  if(getBackupConfig(activeContest).scriptVersion) S.scriptVersion=getBackupConfig(activeContest).scriptVersion;
+}
+
+function readPendingGames(){
+  try{return JSON.parse(localStorage.getItem(PENDING_SYNC_KEY) || '[]');}catch(e){return [];}
+}
+
+function writePendingGames(games){
+  try{localStorage.setItem(PENDING_SYNC_KEY,JSON.stringify(games));}catch(e){}
+}
+
+function setBackupEnabled(enabled){
+  const contest=getContestKey(S.names);
+  if(!contest){
+    setStatus('Select or create a contest before choosing backup mode.');
+    return;
+  }
+  if(!enabled){
+    S.backupEnabled=false;
+    setBackupConfig(contest,{enabled:false});
+    S.optionsDataMode='empty';
+    S.optionsDataText='';
+    S.backupUrlConfirm=false;
+    S.pendingBackupUrl='';
+    S.pendingBackupContest='';
+    S.pendingBackupScriptVersion='';
+    save();
+    render();
+    setStatus('Cloud backup is off for this contest. The verified URL is saved.',0);
+    return;
+  }
+  const savedUrl=getBackupUrl(contest);
+  if(S.backupEnabled && savedUrl){
+    setStatus('Cloud backup is already enabled for this contest.');
+    return;
+  }
+  const urlToCheck=savedUrl || localStorage.getItem(LAST_BACKUP_URL_KEY) || '';
+  S.optionsDataMode='backup-url';
+  S.optionsDataText=urlToCheck;
+  S.pendingBackupContest=contest;
+  S.pendingBackupUrl='';
+  S.pendingBackupScriptVersion='';
+  S.backupUrlConfirm=false;
+  save();
+  render();
+  setStatus(urlToCheck
+    ? 'Enter URL for cloud backup and press Set.'
+    : 'Enter URL for cloud backup and press Set.',0);
+}
+
+function openBackupUrlEditor(){
+  const contest=getContestKey(S.names);
+  S.optionsDataMode='backup-url';
+  S.optionsDataText=getBackupUrl(contest) || localStorage.getItem(LAST_BACKUP_URL_KEY) || '';
+  S.backupUrlConfirm=false;
+  S.pendingBackupUrl='';
+  S.pendingBackupContest=contest;
+  S.pendingBackupScriptVersion='';
+  save();
+  render();
+  setStatus('Enter URL for cloud backup and press Set.');
+}
+
+async function verifyBackupUrlFromData(){
+  const field=document.getElementById('options-data');
+  if(field) S.optionsDataText=field.value;
+  await verifyBackupUrl(S.optionsDataText,S.pendingBackupContest || getContestKey(S.names));
+}
+
+async function verifyBackupUrl(value,contest=getContestKey(S.names)){
+  const url=String(value || '').trim();
+  if(!/^https:\/\/script\.google\.com\/macros\/s\/.+\/exec$/.test(url)){
+    setStatus('Enter a valid Apps Script /exec URL.');
+    return;
+  }
+  if(contest!==getContestKey(S.names)){
+    setStatus('Contest changed. Select Cloud for the intended contest and try again.');
+    return;
+  }
+  setStatus('Checking backup URL...');
+  try{
+    const response=await fetch(`${url}?check=version`,{mode:'cors',cache:'no-store'});
+    if(!response.ok) throw new Error(`Version check failed (${response.status})`);
+    const result=await response.json();
+    if(result.status!=='success' || !result.script_version) throw new Error(result.message || 'The URL did not return a valid version stamp.');
+    if(contest!==getContestKey(S.names)) throw new Error('The selected contest changed during the check.');
+    S.pendingBackupUrl=url;
+    S.pendingBackupContest=contest;
+    S.pendingBackupScriptVersion=String(result.script_version);
+    S.backupUrlConfirm=true;
+    save();
+    render();
+    setStatus(`Connection verified for ${url}. Confirm to save it${getBackupConfig(contest).enabled?' as the new URL':' and enable Cloud backup'}.`,0);
+  }catch(error){
+    S.backupUrlConfirm=false;
+    S.pendingBackupUrl='';
+    S.pendingBackupContest='';
+    S.pendingBackupScriptVersion='';
+    setStatus(`Backup URL check failed: ${error.message || error}`,0);
+  }
+}
+
+function confirmBackupUrl(){
+  if(!S.backupUrlConfirm || !S.pendingBackupUrl) return;
+  const contest=S.pendingBackupContest;
+  if(!contest || contest!==getContestKey(S.names)){
+    cancelBackupUrlConfirmation();
+    setStatus('Contest changed. No backup settings were changed.');
+    return;
+  }
+  const scriptVersion=S.pendingBackupScriptVersion;
+  setBackupConfig(contest,{url:S.pendingBackupUrl,enabled:true,scriptVersion});
+  localStorage.setItem(LAST_BACKUP_URL_KEY,S.pendingBackupUrl);
+  S.backupEnabled=true;
+  S.scriptVersion=scriptVersion;
+  const savedUrl=S.pendingBackupUrl;
+  S.pendingBackupUrl='';
+  S.pendingBackupContest='';
+  S.pendingBackupScriptVersion='';
+  S.backupUrlConfirm=false;
+  S.optionsDataMode='empty';
+  S.optionsDataText='';
+  save();
+  render();
+  setStatus(`Cloud backup enabled for this contest: ${savedUrl}`,0);
+  syncActiveContest();
+}
+
+function cancelBackupUrlConfirmation(){
+  S.pendingBackupUrl='';
+  S.pendingBackupContest='';
+  S.pendingBackupScriptVersion='';
+  S.backupUrlConfirm=false;
+  S.optionsDataMode='empty';
+  S.optionsDataText='';
+  save();
+  render();
+  setStatus('Backup URL change canceled. Previous settings are unchanged.',0);
+}
+
+function beginPlayerEntry(){
+  S.lastNames=[...S.names];
+  S.showNewContestInputs=true;
+  S.optionsDataMode='new-contest';
+  S.optionsDataText='';
+  save();
+  render();
+  setStatus('Add player names and press Add.',0);
+}
+
+function showVersionStamp(){
+  const config=getBackupConfig();
+  setStatus(`${APP_VERSION}${config.scriptVersion ? ` � ${config.scriptVersion}` : ''}`,0);
+}
+
+function toggleDarkMode(enabled){
+  S.theme=enabled?'dark':'system';
+  applyTheme();
+  save();
+  render();
+  setStatus(enabled?'Dark mode on.':'Using system appearance.',0);
+}
+
+function getVersionStamp(){
+  const scriptVersion=getBackupConfig().scriptVersion || S.scriptVersion;
+  return scriptVersion ? `${scriptVersion} ${APP_VERSION}` : APP_VERSION;
+}
+
+async function fetchScriptVersion(){
+  const contest=getContestKey(S.names);
+  const url = getBackupUrl(contest);
+  if(!url) {
+    S.scriptVersion = '';
+    save();
+    render();
+    return;
+  }
+  try {
+    const response = await fetch(`${url}?check=version`, {mode:'cors', cache:'no-store'});
+    const result = await response.json();
+    if (result && result.script_version) {
+      const scriptVersion=String(result.script_version);
+      setBackupConfig(contest,{scriptVersion});
+      if(getContestKey(S.names)===contest) S.scriptVersion=scriptVersion;
+    } else {
+      if(getContestKey(S.names)===contest) S.scriptVersion='';
+    }
+  } catch (e) {
+    if(getContestKey(S.names)===contest) S.scriptVersion='';
+  }
+  save();
+  render();
+}
+
+function formatIsoDate(d = new Date()) {
+  const pad = n => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+function normalizeGameDate(input) {
+  if (!input) {
+    const now = new Date();
+    return { date: formatIsoDate(now), time: ds(now) };
+  }
+  let d = null;
+  if (typeof input === 'string') {
+    const s = input.trim();
+    const mdMatch = s.match(/^(\d{1,2})\/(\d{1,2})(?:\/(\d{2,4}))?(?:\s+(\d{1,2}):(\d{2})(?::\d{2})?(?:\s*(AM|PM))?)?$/i);
+    if (mdMatch) {
+      const month = parseInt(mdMatch[1], 10) - 1;
+      const day = parseInt(mdMatch[2], 10);
+      let year = mdMatch[3] ? parseInt(mdMatch[3], 10) : new Date().getFullYear();
+      if (year < 100) year += 2000;
+      let hour = mdMatch[4] ? parseInt(mdMatch[4], 10) : 0;
+      const min = mdMatch[5] ? parseInt(mdMatch[5], 10) : 0;
+      if (mdMatch[7]) {
+        const ampm = mdMatch[7].toUpperCase();
+        if (ampm === 'PM' && hour < 12) hour += 12;
+        if (ampm === 'AM' && hour === 12) hour = 0;
+      }
+      d = new Date(year, month, day, hour, min);
+    } else {
+      const parsed = new Date(s);
+      if (!isNaN(parsed.getTime())) {
+        d = parsed;
+      }
+    }
+  } else if (input instanceof Date) {
+    d = input;
+  }
+  if (d && !isNaN(d.getTime())) {
+    return { date: formatIsoDate(d), time: ds(d) };
+  }
+  return { date: String(input), time: String(input) };
+}
+
+function queueFinishedGame(dateObj = new Date()){
+  const contestKey = getContestKey(S.names);
+  const games = readPendingGames();
+  const game = {
+    date: formatIsoDate(dateObj),
+    contest: contestKey,
+    p1_score: S.scores[0],
+    p2_score: S.scores[1]
+  };
+  if(!games.some(item => item.contest === contestKey && gameKey(item) === gameKey(game))) games.push(game);
+  writePendingGames(games);
+  if(S.backupEnabled) syncPendingGames();
+}
+
+async function syncPendingGames(){
+  if(pendingSyncPromise) return pendingSyncPromise;
+  pendingSyncPromise = syncPendingGamesOnce();
+  try{return await pendingSyncPromise;}finally{pendingSyncPromise = null;}
+}
+
+async function syncPendingGamesOnce(){
+  const activeContest = getContestKey(S.names);
+  const url=getBackupUrl(activeContest);
+  if(!getBackupConfig(activeContest).enabled || !url)return;
+  const attempted = new Set();
+  while(true){
+    const game = readPendingGames().find(item => item.contest === activeContest && !attempted.has(`${item.contest}|${gameKey(item)}`));
+    if(!game) break;
+    attempted.add(`${game.contest}|${gameKey(game)}`);
+    await withContestLock(game.contest, async () => {
+      if(!readPendingGames().some(item => item.contest === game.contest && gameKey(item) === gameKey(game))) return;
+      try{
+        const response=await fetch(url,{method:'POST',mode:'cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(game)});
+        const result=await response.json();
+        if(result.status!=='success') throw new Error(result.message || 'Cloud upload failed');
+        writePendingGames(readPendingGames().filter(item => !(item.contest === game.contest && gameKey(item) === gameKey(game))));
+      }catch(e){
+        if(game.contest === getContestKey(S.names)) setStatus(`Cloud upload failed: ${e.message || e}`, 7000);
+      }
+    });
+  }
+}
+
+function buildImportTextFromGames(games, names) {
+  const contestNames = (names || []).map(n => String(n || '').trim()).filter(Boolean);
+  const headerNames = contestNames.length >= 2 ? contestNames : [S.names[0], S.names[1]];
+  const lines = [`Date,${headerNames[0]},${headerNames[1]}`];
+  (games || []).forEach(game => {
+    const dateStr = normalizeGameDate(game.date || game.time || '').date;
+    const scores = Array.isArray(game.scores) ? game.scores : [Number(game.p1_score || 0), Number(game.p2_score || 0)];
+    lines.push(`${dateStr},${scores[0]},${scores[1]}`);
+  });
+  return lines.join('\n');
+}
+
+async function loadCloudGamesForContest(names = S.names) {
+  const contestKey = getContestKey(names);
+  const url = getBackupUrl(contestKey);
+  if (!getBackupConfig(contestKey).enabled || !url) return null;
+  const response = await fetch(`${url}?contest=${encodeURIComponent(contestKey)}`,{mode:'cors', cache:'no-store'});
+  if(!response.ok) throw new Error(`Cloud fetch failed (${response.status})`);
+  const result = await response.json();
+  if (result.status !== 'success') throw new Error(result.message || 'Cloud import failed');
+  return (result.games || []).map(game => {
+    const scores = [Number(game.p1_score || 0), Number(game.p2_score || 0)];
+    const normalizedDate = normalizeGameDate(game.date);
+    return {
+      date: normalizedDate.date,
+      time: normalizedDate.time,
+      scores,
+      winnerIdx: scores[0] >= scores[1] ? 0 : 1
+    };
+  });
+}
+
+async function syncContestFromCloud(names){
+  const contestNames = [...names];
+  const contestKey = getContestKey(contestNames);
+  const url = getBackupUrl(contestKey);
+  const lastSyncKey = CLOUD_SYNC_PREFIX + contestKey;
+  if(!getBackupConfig(contestKey).enabled || !url || getContestKey(S.names) !== contestKey ||
+      Date.now() - Number(localStorage.getItem(lastSyncKey) || 0) < 86400000) return;
+  const clearEpoch = getClearEpoch(contestKey);
+  try{
+    await withContestLock(contestKey, async () => {
+      if(clearEpoch !== getClearEpoch(contestKey) || getContestKey(S.names) !== contestKey) return;
+      const cloudGames = await loadCloudGamesForContest(contestNames);
+      if(!cloudGames || clearEpoch !== getClearEpoch(contestKey) || getContestKey(S.names) !== contestKey) return;
+
+      const current = S.contests[contestKey];
+      const existing = mergeGameLists(current ? current.pastGames : S.pastGames, readStoredContestGames(contestKey));
+      const merged = mergeGameLists(existing, cloudGames);
+      const localByTimestamp = new Map(existing.map(game => [gameKey(game), game]));
+      const cloudByTimestamp = new Map();
+      const cloudCounts = new Map();
+      cloudGames.forEach(game => {
+        const key = gameKey(game);
+        cloudCounts.set(key, (cloudCounts.get(key) || 0) + 1);
+        if(!cloudByTimestamp.has(key)) cloudByTimestamp.set(key, game);
+      });
+      const toUpload = merged.filter(game => {
+        const key = gameKey(game);
+        const cloudGame = cloudByTimestamp.get(key);
+        const scores = gameScores(game);
+        const cloudScores = cloudGame && gameScores(cloudGame);
+        const localGame = localByTimestamp.get(key);
+        return !cloudGame ||
+          (localGame === game && (scores[0] !== cloudScores[0] || scores[1] !== cloudScores[1])) ||
+          cloudCounts.get(key) > 1;
+      });
+      const added = merged.length - existing.length;
+      if(current) current.pastGames = merged;
+      S.pastGames = merged;
+      updateContest();
+      save();
+      render();
+
+      if(toUpload.length){
+        const response = await fetch(url,{method:'POST',mode:'cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({
+          contest: contestKey,
+          names: contestNames,
+          games: toUpload.map(game => {
+            const scores = gameScores(game);
+            return {date: gameKey(game), p1_score: scores[0], p2_score: scores[1]};
+          })
+        })});
+        if(!response.ok) throw new Error(`Cloud upload failed (${response.status})`);
+        const result = await response.json();
+        if(result.status !== 'success') throw new Error(result.message || 'Cloud upload failed');
+      }
+      localStorage.setItem(lastSyncKey, String(Date.now()));
+      if(added > 0) localStorage.setItem(CLOUD_RECENT_PREFIX + contestKey, JSON.stringify({count: added, time: Date.now()}));
+      const uploaded = toUpload.length;
+      setStatus(`Cloud sync complete (${url}): ${added} imported, ${uploaded} uploaded.`, 7000);
+    });
+  }catch(error){
+    if(getContestKey(S.names) === contestKey) setStatus(`Cloud sync failed: ${error.message || error}`, 7000);
+  }
+}
+
+async function syncActiveContest(){
+  await syncPendingGames();
+  await syncContestFromCloud(S.names);
+}
+
+function openImport(){
+  S.optionsDataMode='import';
+  S.optionsDataText='';
+  save();
+  render();
+  let prefix = '';
+  try{
+    const recentKey = CLOUD_RECENT_PREFIX + getContestKey(S.names);
+    const recent = JSON.parse(localStorage.getItem(recentKey) || 'null');
+    if(recent && recent.count){
+      prefix = `Found ${recent.count} new scores from server. `;
+      localStorage.removeItem(recentKey);
+    }
+  }catch(e){}
+  setStatus(`${prefix}Paste scores below and press Add scores.`,0);
+}
+
+function createContestFromData(){
+  const p1=document.getElementById('new-player-1');
+  const p2=document.getElementById('new-player-2');
+  let names;
+  if(p1 && p2){
+    names=[p1.value.trim(), p2.value.trim()];
+    if(!names[0] || !names[1]){
+      setStatus('Enter both player names.');
+      return;
+    }
+  } else {
+    const raw=String(S.optionsDataText || '').trim();
+    names=raw.includes('\n')
+      ? raw.split(/\r?\n/).map(name=>name.trim()).filter(Boolean)
+      : raw.split('|').map(name=>name.trim()).filter(Boolean);
+    if(names.length!==2 || !names[0] || !names[1]){
+      setStatus('Enter exactly two player names on separate lines (or separated by |).');
+      return;
+    }
+  }
+  S.showNewContestInputs=false;
+  S.optionsDataMode='empty';
+  S.optionsDataText='';
+  switchContest(names);
+  setStatus(`Contest selected: ${names[0]} vs ${names[1]}.`,0);
+}
+
+function cancelOptionsData(){
+  S.optionsDataMode='empty';
+  S.optionsDataText='';
+  S.backupUrlConfirm=false;
+  S.pendingBackupUrl='';
+  S.pendingBackupContest='';
+  S.pendingBackupScriptVersion='';
+  S.showNewContestInputs=false;
+  save();
+  render();
+  clearStatus();
+}
+
+function load(){
+  try{
+    const r=localStorage.getItem(SK);
+    if(!r) {
+      S.names=['Host','Guest'];
+      S.contests={};
+      S.scores=[0,0];
+      S.handScores=[0,0];
+      S.records=[];
+      S.pastGames=[];
+      S.target=50;
+      S.gameOver=false;
+      S.phase='start';
+      S.firstPlayer=-1;
+      S.handFirstPlayer=-1;
+      S.handNum=0;
+      S.lastAdded=['',''];
+      S.pendingWin=false;
+      S.highestDoublePlayer=-1;
+      S.tab=0;
+      S.showNewContestInputs=false;
+      updateContest();
+      migrateBackupConfigs();
+      save();
+      return;
+    }
+    const d=JSON.parse(r);
+    Object.assign(S, d);
+    S.optionsDataMode='empty';
+    S.optionsDataText='';
+    S.backupUrlConfirm=false;
+    S.pendingBackupUrl='';
+    S.pendingBackupContest='';
+    S.pendingBackupScriptVersion='';
+    S.clearConfirm=null;
+    S.status='';
+    S.statusUntil=0;
+    let repairedGameWinners = false;
+    const repairGameWinners = games => (games || []).forEach(g => {
+      const winnerIdx = gameWinnerIdx(g);
+      if(g.winnerIdx !== winnerIdx){
+        g.winnerIdx = winnerIdx;
+        repairedGameWinners = true;
+      }
+    });
+    (S.pastGames || []).forEach(g => {
+      const norm = normalizeGameDate(g.date || g.time);
+      if(!g.date) g.date = norm.date;
+      if(!g.time) g.time = norm.time;
+    });
+    repairGameWinners(S.pastGames);
+    Object.values(S.contests || {}).forEach(c => {
+      (c.pastGames || []).forEach(g => {
+        const norm = normalizeGameDate(g.date || g.time);
+        if(!g.date) g.date = norm.date;
+        if(!g.time) g.time = norm.time;
+      });
+      repairGameWinners(c.pastGames);
+    });
+    if(!S.contests) S.contests = {};
+    S.contests = migrateContestKeys(S.contests);
+    if(!S.theme) S.theme = 'system';
+    if(typeof S.helpMessage === 'undefined') S.helpMessage = '';
+    if(typeof S.helpTab === 'undefined') S.helpTab = -1;
+    if(typeof S.scriptVersion === 'undefined') S.scriptVersion = '';
+    if(typeof S.statsBox1 === 'undefined') S.statsBox1 = 0;
+    if(typeof S.statsBox2 === 'undefined') S.statsBox2 = 0;
+    if(typeof S.statsBox3 === 'undefined') S.statsBox3 = 0;
+    if(typeof S.statsYear === 'undefined') S.statsYear = 'all';
+    if(typeof S.statsYearError === 'undefined') S.statsYearError = '';
+    if(typeof S.nextScoreRowId === 'undefined') S.nextScoreRowId = 1;
+    if(typeof S.showFirstPlayer === 'undefined') S.showFirstPlayer = false;
+    if(typeof d.starterSelection === 'undefined') S.starterSelection = S.phase === 'start';
+    S.display='';S.editingIdx=-1;
+    applyTheme();
+    
+    const hasContests = Object.keys(S.contests).length > 0;
+    if(!hasContests && (!S.names[0] && !S.names[1])) {
+      S.names=['Host','Guest'];
+      S.tab = 2;
+      S.showNewContestInputs = true;
+      S.lastNames=[...S.names];
+      S.optionsDataMode='new-contest';
+      updateContest();
+    } else {
+      S.tab = 0;
+      if (!S.names[0] && !S.names[1] && hasContests) {
+        switchContest(S.contests[Object.keys(S.contests)[0]].names);
+      }
+    }
+    S.newNames = ['', ''];
+    migrateBackupConfigs();
+    const backupConfig=getBackupConfig();
+    S.backupEnabled=backupConfig.enabled;
+    S.scriptVersion=backupConfig.scriptVersion;
+    if (backupConfig.url && backupConfig.enabled) fetchScriptVersion();
+    if(repairedGameWinners) save();
+  }catch(e){}
+}
+
+function applyTheme() {
+  const root = document.documentElement;
+  if (S.theme === 'dark') root.dataset.theme = 'dark';
+  else if (S.theme === 'light') root.dataset.theme = 'light';
+  else delete root.dataset.theme;
+}
+
+function normalizeContestNames(names) {
+  return (Array.isArray(names) ? names : []).map(n => String(n || '').trim()).filter(Boolean);
+}
+
+function getContestKey(names) {
+  return normalizeContestNames(names).join(' vs ');
+}
+
+function migrateContestKeys(contests) {
+  const migrated = {};
+  Object.entries(contests || {}).forEach(([key, value]) => {
+    const sourceNames = Array.isArray(value && value.names) ? value.names : String(key || '').split('|').map(n => n.trim());
+    const migratedKey = getContestKey(sourceNames);
+    migrated[migratedKey || key] = { ...(value || {}), names: normalizeContestNames(sourceNames.length ? sourceNames : [key]) };
+  });
+  return migrated;
+}
+
+function updateContest() {
+  if (!S.names[0] && !S.names[1] && S.records.length === 0) return;
+  const key = getContestKey(S.names);
+  S.contests[key] = {
+    names: [...S.names],
+    scores: [...S.scores],
+    handScores: [...S.handScores],
+    records: [...S.records],
+    pastGames: [...S.pastGames],
+    target: S.target,
+    gameOver: S.gameOver,
+    phase: S.phase,
+    firstPlayer: S.firstPlayer,
+    handFirstPlayer: S.handFirstPlayer,
+    handNum: S.handNum,
+    lastAdded: [...S.lastAdded],
+    pendingWin: S.pendingWin,
+    starterSelection: S.starterSelection,
+    highestDoublePlayer: S.highestDoublePlayer,
+    lastGameEndStatus: S.lastGameEndStatus,
+    theme: S.theme
+  };
+}
+
+function createEmptyContest(names) {
+  return {
+    names:[...names],
+    scores:[0,0],
+    handScores:[0,0],
+    records:[],
+    pastGames:[],
+    target:50,
+    gameOver:false,
+    phase:'start',
+    firstPlayer:-1,
+    handFirstPlayer:-1,
+    handNum:0,
+    lastAdded:['',''],
+    pendingWin:false,
+    starterSelection:true,
+    highestDoublePlayer:-1,
+    lastGameEndStatus:'',
+    theme:S.theme || 'system'
+  };
+}
+
+function save(){
+  updateContest();
+  try{
+    localStorage.setItem(SK,JSON.stringify(S));
+  }catch(e){}
+}
+
+function ts(){return new Date().toLocaleTimeString([],{hour:'numeric',minute:'2-digit',hour12:false});}
+function ds(d=new Date()){
+  const date = (d.getMonth()+1)+'/'+d.getDate();
+  const time = d.toLocaleTimeString([],{hour:'numeric',minute:'2-digit',hour12:false});
+  return date + ' ' + time;
+}
+
+function domTile(){
+  return `<img src="domino.svg" class="domino-icon" alt="Domino icon"/>`;
+}
+
+function setStatus(msg,timeout=5000){
+  S.status=msg;S.statusUntil=timeout>0?Date.now()+timeout:0;LAST_STATUS_SET=Date.now();
+  if(msg && !msg.includes('Click here to reset')) S.lastStatus = msg;
+  save();render();
+}
+
+function clearStatus(){
+  S.status='';S.statusUntil=0;S.gameEndMessage='';save();render();
+}
+
+function beginClearConfirmation(){
+  const contest = getContestKey(S.names);
+  if (!contest) return;
+  S.optionsDataMode='empty';
+  S.optionsDataText='';
+  S.clearConfirm = { contest, names: [...S.names], cloud: S.backupEnabled };
+  save();
+  render();
+}
+
+function cancelClearConfirmation(){
+  S.clearConfirm = null;
+  save();
+  render();
+}
+
+async function performClearScores(){
+  const confirm = S.clearConfirm || { contest: getContestKey(S.names), names: [...S.names] };
+  const contest = confirm.contest || getContestKey(confirm.names || S.names);
+  const names = Array.isArray(confirm.names) && confirm.names.length ? confirm.names : [...S.names];
+  S.clearConfirm = null;
+  if (!contest) {
+    save();
+    render();
+    return;
+  }
+  const clearCloud = typeof confirm.cloud === 'boolean' ? confirm.cloud : S.backupEnabled;
+  const url = clearCloud ? getBackupUrl(contest) : '';
+  if(url){
+    try{
+      const response = await withContestLock(contest, () => fetch(url,{method:'POST',mode:'cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({mode:'clear',contest,names})}));
+      if(!response.ok) throw new Error(`Cloud clear failed (${response.status})`);
+      const result = await response.json();
+      if(result.status !== 'success' || result.cleared !== true) throw new Error(result.message || 'Cloud clear failed');
+    }catch(e){
+      setStatus(`Could not clear cloud scores: ${e.message || e}`, 7000);
+      return;
+    }
+  }
+  localStorage.setItem(CLEAR_EPOCH_PREFIX + contest, String(getClearEpoch(contest) + 1));
+  writePendingGames(readPendingGames().filter(game => game.contest !== contest));
+  S.names = ['', ''];
+  S.backupEnabled = false;
+  S.scriptVersion = '';
+  S.newNames = ['', ''];
+  S.pastGames = [];
+  S.scores = [0, 0];
+  S.handScores = [0, 0];
+  S.records = [];
+  S.gameOver = false;
+  S.pendingWin = false;
+  S.lastGameEndStatus = '';
+  S.phase = 'start';
+  S.handNum = 0;
+  S.firstPlayer = -1;
+  S.handFirstPlayer = -1;
+  S.highestDoublePlayer = -1;
+  S.lastAdded = ['', ''];
+  S.display = '';
+  S.showNewContestInputs = false;
+  S.optionsDataMode='empty';
+  S.optionsDataText='';
+  delete S.contests[contest];
+  save();
+  render();
+  setStatus(url ? 'Contest scores cleared.' : 'Local contest scores cleared.', 3000);
+}
+
+function clearScoreHistoryIfNoScores(){
+  if(S.scores[0]===0 && S.scores[1]===0){
+    S.records=[];
+  }
+}
+
+function waitingForHighDouble(){
+  return (S.phase==='end' && S.gameOver);
+}
+
+function clearStarterSelection(){
+  S.starterSelection = false;
+}
+
+function clearPlayerHighlights(){
+  S.starterSelection = false;
+  S.showFirstPlayer = false;
+}
+
+function highDoublePrompt(){
+  return 'Click player with high double to start a new game.';
+}
+
+function notifyStarterPrompt(){
+  setStatus('Click on user with high double to start game.', 0);
+}
+
+function lastGameStatusMessage(){
+  if(S.lastGameEndStatus) return S.lastGameEndStatus;
+  const games = (S.pastGames || []).slice().sort((a,b) => gameKey(a).localeCompare(gameKey(b)));
+  const game = games[games.length - 1];
+  if(!game) return highDoublePrompt();
+  const scores = gameScores(game);
+  if(scores[0] === scores[1]){
+    return `The last game was tied ${scores[0]} to ${scores[1]}.\nClick user with high double to start a new game.`;
+  }
+  const winner = scores[0] > scores[1] ? 0 : 1;
+  const winnerName = (game.names && game.names[winner]) || S.names[winner];
+  return `${winnerName} won the last game ${scores[0]} to ${scores[1]}.\nClick user with high double to start a new game.`;
+}
+
+function notifyHighDoublePrompt(){
+  setStatus(waitingForHighDouble() ? lastGameStatusMessage() : highDoublePrompt(), 0);
+}
+
+function clearHelp(){
+  S.helpMessage='';S.helpTab=-1;save();render();
+}
+
+function ackStatus(){
+  if(S.status === 'Click here to reset everything.'){
+    resetForNewGame();
+    return;
+  }
+  if(S.helpMessage && S.helpTab === S.tab){
+    clearHelp();
+    return;
+  }
+  S.gameEndMessage='';
+  clearStatus();
+}
+
+function showHelp(){
+  clearStatus();
+  S.helpTab = S.tab;
+  if (S.tab === 0) {
+    if (S.phase === 'play') {
+      S.helpMessage = `Enter number and click Player to add that to their score. Delete mistakes in recent scores by clicking red x. Replace by adding the correct score.`;
+    } else if (S.phase === 'start') {
+      S.helpMessage = `Click on player with highest double, then score by entering points and clicking on player tile.`;
+    } else {
+      S.helpMessage = `Game finished. ${highDoublePrompt()}`;
+    }
+  } else {
+    S.helpMessage = `Create a new contest by selecting New... from Players.\nOr import data from clipboard. Export data to see format.\nErase to clear contest and player names.`;
+  }
+  save();render();
+}
+
+function resetForNewGame(){
+  S.scores=[0,0];S.handScores=[0,0];S.display='';S.records=[];
+  S.gameOver=false;S.pendingWin=false;S.phase='start';
+  S.starterSelection=true;
+  S.firstPlayer=-1;S.handFirstPlayer=-1;S.handNum=0;
+  S.lastAdded=['',''];S.showFirstPlayer=false;S.editingIdx=-1;
+  S.status='';S.statusUntil=0;S.gameEndMessage='';S.lastGameEndStatus='';S.highestDoublePlayer=-1;S.tab=0;
+  save();render();
+}
+
+function pressKey(v){
+  if(S.phase==='start'){
+    notifyStarterPrompt();
+    return;
+  }
+  if(waitingForHighDouble()){
+    notifyHighDoublePrompt();
+    return;
+  }
+  if(S.gameOver||S.phase==='end')return;
+  if(S.display.length>=3)return;
+  const hadPlayerHighlight = S.starterSelection || S.showFirstPlayer;
+  clearPlayerHighlights();
+  S.display+=v;
+  if(hadPlayerHighlight){save();render();return;}
+  const el=document.getElementById('display-bar');
+  if(el){el.textContent=S.display;el.className='display-bar';}
+}
+
+function delKey(){
+  if(S.phase==='start'){
+    notifyStarterPrompt();
+    return;
+  }
+  if(waitingForHighDouble()){
+    notifyHighDoublePrompt();
+    return;
+  }
+  const hadPlayerHighlight = S.starterSelection || S.showFirstPlayer;
+  clearPlayerHighlights();
+  S.display=S.display.slice(0,-1);
+  if(hadPlayerHighlight){save();render();return;}
+  const el=document.getElementById('display-bar');
+  if(el){el.textContent=S.display||'0';el.className='display-bar'+(S.display?'':' dim');}
+}
+
+function tapPlayer(i){
+  const startingNewGame = S.phase==='end';
+  clearPlayerHighlights();
+  if (S.phase==='end') {
+    S.scores = [0, 0];
+    S.handScores = [0, 0];
+    clearScoreHistoryIfNoScores();
+    S.display = '';
+    S.gameOver = false;
+    S.pendingWin = false;
+    S.phase = 'start';
+    S.starterSelection = false;
+    S.firstPlayer = -1;
+    S.handFirstPlayer = -1;
+    S.handNum = 0;
+    S.lastAdded = ['', ''];
+    S.showFirstPlayer = false;
+    S.editingIdx = -1;
+    S.status = '';
+    S.statusUntil = 0;
+    S.helpMessage = '';S.helpTab = -1;
+    S.gameEndMessage = '';
+    S.lastGameEndStatus = '';
+    S.highestDoublePlayer = -1;
+    S.tab = 0;
+  }
+  if(S.gameOver)return;
+  const pts=S.phase==='start' ? 0 : parseInt(S.display)||0;
+  if(S.phase==='start'){
+    S.scores=[0,0];
+    S.handScores=[0,0];
+    clearScoreHistoryIfNoScores();
+    const starter=i;
+    S.highestDoublePlayer=i;
+    S.firstPlayer=starter;
+    S.handFirstPlayer=starter;
+    S.handNum=1;
+    S.showFirstPlayer=false;
+    if(pts>0){
+      S.scores[i]+=pts;S.handScores[i]+=pts;
+      S.lastAdded=['',''];S.lastAdded[i]='+'+pts;
+      const rowId = S.nextScoreRowId++;
+      S.records.push({id: rowId, who:i,pts,time:ts(),type:'score',hand:1,totalAfter:[S.scores[0],S.scores[1]]});
+      if(S.scores[i]>=S.target)S.pendingWin=true;
+    }
+    S.display='';S.phase='play';
+    S.status='';S.statusUntil=0;S.helpMessage='';S.helpTab=-1;
+    if(startingNewGame) S.lastGameEndStatus='';
+    setStatus(`${S.names[starter]} has the highest double, ${S.names[1-starter]} will start the next hand.`,15000);return;
+  }
+  if(pts<=0){
+    S.display='';
+    const el=document.getElementById('display-bar');
+    if(el){el.textContent='0';el.className='display-bar dim';}
+    return;
+  }
+  S.status='';S.statusUntil=0;S.helpMessage='';S.helpTab=-1;
+  S.showFirstPlayer = false;
+  S.scores[i]+=pts;S.handScores[i]+=pts;
+  S.lastAdded=['',''];S.lastAdded[i]='+'+pts;
+  const rowId = S.nextScoreRowId++;
+  S.records.push({id: rowId, who:i,pts,time:ts(),type:'score',hand:S.handNum,totalAfter:[S.scores[0],S.scores[1]]});
+  if(S.scores[i]>=S.target)S.pendingWin=true;
+  S.display='';
+  save();render();
+}
+
+function callDomino(){
+  if(S.phase==='start') return;
+  if(waitingForHighDouble()) return;
+  clearStarterSelection();
+  if(S.phase!=='play'||S.gameOver){
+    setStatus(highDoublePrompt());
+    return;
+  }
+  
+  const gameEnds = S.pendingWin && S.scores[0] !== S.scores[1];
+  const handTotals = [S.handScores[0], S.handScores[1]];
+  
+  // Record the domino call
+  S.records.push({
+    id: S.nextScoreRowId++,
+    who: -1, pts: 0, time: ts(), type: 'domino', hand: S.handNum,
+    totalAfter: [S.scores[0], S.scores[1]],
+    handTotals, gameEnds
+  });
+  S.shouldScrollHistory = true;
+  
+  // Build hand winner message
+  let handMsg = '';
+  if (handTotals[0] === handTotals[1]) {
+    handMsg = `A ${handTotals[0]} ${handTotals[1]} tied hand`;
+  } else {
+    const handWinner = handTotals[0] > handTotals[1] ? 0 : 1;
+    const handWinnerName = S.names[handWinner];
+    handMsg = `${handWinnerName} won that hand ${Math.max(handTotals[0], handTotals[1])} ${Math.min(handTotals[0], handTotals[1])}`;
+  }
+  
+  let msg = handMsg;
+  S.gameEndMessage = '';
+  
+  // If game is ending, add game info
+  if (gameEnds) {
+    S.pendingWin = false;
+    
+    if (S.scores[0] !== S.scores[1]) {
+      // Game winner
+      const gameWinner = S.scores[0] > S.scores[1] ? 0 : 1;
+      const gameWinnerName = S.names[gameWinner];
+      const winnerScore = S.scores[gameWinner];
+      const loserScore = S.scores[1 - gameWinner];
+      msg = `${gameWinnerName} wins ${winnerScore} to ${loserScore} on a ${handTotals[0]} ${handTotals[1]} hand.`;
+      S.gameEndMessage = msg;
+      S.lastGameEndStatus = `${gameWinnerName} won the last game ${winnerScore} to ${loserScore}.\nClick user with high double to start a new game.`;
+      
+      // Record and save game end
+      S.records.push({
+        who: -1, pts: 0, time: ts(), type: 'gameover',
+        finalScores: [S.scores[0], S.scores[1]], winnerIdx: gameWinner, winnerName: S.names[gameWinner]
+      });
+      const now = new Date();
+      S.pastGames.unshift({
+        time: ds(now), date: formatIsoDate(now), names: [S.names[0], S.names[1]],
+        scores: [S.scores[0], S.scores[1]], winnerIdx: gameWinner
+      });
+      queueFinishedGame(now);
+      S.gameOver = true;
+      S.phase = 'end';
+      S.showFirstPlayer = false;
+      END_SCORE_HOLD = [S.scores[0], S.scores[1]];
+      S.scores = [0, 0];
+    } else {
+      // Game is tied
+      msg = `The game is tied ${S.scores[0]} to ${S.scores[1]} on a ${handTotals[0]} ${handTotals[1]} hand.`;
+      S.gameEndMessage = msg;
+      S.lastGameEndStatus = `The last game was tied ${S.scores[0]} to ${S.scores[1]}.\nClick user with high double to start a new game.`;
+      S.gameOver = true;
+      S.phase = 'end';
+      S.showFirstPlayer = false;
+    }
+  } else {
+    // Next hand always alternates starter, regardless of who scored
+    const nextStarter = S.handFirstPlayer === 0 ? 1 : 0;
+    S.handFirstPlayer = nextStarter;
+    S.firstPlayer = nextStarter;
+    S.handNum++;
+    S.showFirstPlayer = true;
+    msg += `\n${S.names[nextStarter]} goes first.`;
+  }
+  
+  // Always show the message
+  S.handScores = [0, 0];
+  S.lastAdded = ['', ''];
+  S.display = '';
+  S.helpContext = 'play';
+  setStatus(msg, 15000);
+  save();
+  render();
+}
+
+function recalcTotals(){
+  const running=[0,0];
+  for(const rec of S.records){
+    if(rec.type==='score'){
+      running[rec.who]+=rec.pts;
+      rec.totalAfter=[running[0],running[1]];
+    } else if(rec.type==='domino'){
+      rec.totalAfter=[running[0],running[1]];
+      if(rec.gameEnds){running[0]=0;running[1]=0;}
+    } else if(rec.type==='gameover'){
+      rec.finalScores=[running[0],running[1]];
+      running[0]=0;running[1]=0;
+    }
+  }
+  S.scores=[running[0],running[1]];
+  S.pendingWin=S.scores[0]>=S.target||S.scores[1]>=S.target;
+}
+
+function deleteRecord(id){
+  if(S.phase==='end' || S.gameOver) return;
+  const idx = S.records.findIndex(record => record.id === id);
+  if(idx === -1) return;
+  S.records.splice(idx,1);
+  recalcTotals();S.gameOver=false;S.pendingWin=false;
+  save();render();
+}
+
+function deleteScore(id){
+  if(S.phase==='end' || S.gameOver) return;
+  const idx = S.records.findIndex(r => r.id === id);
+  if (idx === -1) return;
+  const row = document.querySelector(`.hist-mini-row[data-score-id="${id}"]`);
+  if (row) {
+    row.classList.add('removing');
+    setTimeout(() => {
+      deleteRecord(id);
+    }, 220);
+  } else {
+    deleteRecord(id);
+  }
+}
+
+function patchMiniHistory(recentScores) {
+  const statusTextContainer = document.querySelector('.status-bar .status-text');
+  if (!statusTextContainer) return;
+  let list = statusTextContainer.querySelector('.hist-mini');
+
+  if (!list) {
+    statusTextContainer.innerHTML = '<div class="hist-mini"></div>';
+    list = statusTextContainer.querySelector('.hist-mini');
+  }
+
+  const existingRowMap = new Map();
+  list.querySelectorAll('.hist-mini-row').forEach(row => {
+    const id = Number(row.dataset.scoreId);
+    if (!isNaN(id)) existingRowMap.set(id, row);
+  });
+
+  const targetIds = new Set(recentScores.map(r => r.id));
+  existingRowMap.forEach((row, id) => {
+    if (!targetIds.has(id)) {
+      if (!row.classList.contains('removing') && !row.classList.contains('exiting-top')) {
+        row.classList.add('exiting-top');
+        setTimeout(() => {
+          if (row.parentNode) row.parentNode.removeChild(row);
+        }, 280);
+      }
+    }
+  });
+
+  const nextRows = recentScores.map(rec => {
+    let row = existingRowMap.get(rec.id);
+    if (!row) {
+      row = document.createElement('div');
+      row.className = 'hist-mini-row entering';
+      row.dataset.scoreId = String(rec.id);
+      row.innerHTML = S.phase === 'end' || S.gameOver ? '' : `
+        <span class="hist-mini-x" onclick="event.stopPropagation();deleteScore(${rec.id})">&#10005;</span>
+      `;
+      const ptsEl = document.createElement('span');
+      ptsEl.className = 'hist-mini-pts';
+      ptsEl.textContent = String(rec.pts);
+      const nameEl = document.createElement('span');
+      nameEl.className = 'hist-mini-name';
+      nameEl.textContent = S.names[rec.who] || '';
+      row.appendChild(ptsEl);
+      row.appendChild(nameEl);
+
+      void row.offsetHeight;
+      requestAnimationFrame(() => {
+        row.classList.remove('entering');
+        row.classList.add('enter-active');
+      });
+    } else {
+      row.classList.remove('removing', 'exiting-top');
+      const deleteButton = row.querySelector('.hist-mini-x');
+      if(S.phase === 'end' || S.gameOver) {
+        if(deleteButton) deleteButton.remove();
+      } else if(!deleteButton) {
+        const button = document.createElement('span');
+        button.className = 'hist-mini-x';
+        button.textContent = '✕';
+        button.onclick = event => {
+          event.stopPropagation();
+          deleteScore(rec.id);
+        };
+        row.prepend(button);
+      }
+      const ptsEl = row.querySelector('.hist-mini-pts');
+      const nameEl = row.querySelector('.hist-mini-name');
+      if (ptsEl) ptsEl.textContent = String(rec.pts);
+      if (nameEl) nameEl.textContent = S.names[rec.who] || '';
+    }
+    return row;
+  });
+
+  list.replaceChildren(...nextRows);
+}
+
+function startEdit(idx){
+  S.editingIdx=idx;
+  render();
+  setTimeout(()=>{
+    const inp=document.getElementById('edit-input-'+idx);
+    if(inp){inp.focus();inp.select();}
+  },50);
+}
+
+function commitEdit(idx){
+  const inp=document.getElementById('edit-input-'+idx);
+  if(!inp)return;
+  const newPts=parseInt(inp.value);
+  if(!isNaN(newPts)&&newPts>=0){
+    S.records[idx].pts=newPts;
+    recalcTotals();
+  }
+  S.editingIdx=-1;
+  save();render();
+}
+
+function cancelEdit(){S.editingIdx=-1;render();}
+
+function getExportText(){
+  const lines = [`Date,${S.names[0]},${S.names[1]}`];
+  (S.pastGames || []).forEach(g => {
+    const norm = normalizeGameDate(g.date || g.time || '');
+    const scores = Array.isArray(g.scores) ? g.scores : [Number(g.p1_score || 0), Number(g.p2_score || 0)];
+    lines.push(`${norm.date},${scores[0]},${scores[1]}`);
+  });
+  return lines.join('\n');
+}
+
+function copyExport(){
+  const data=getExportText();
+  const count = (S.pastGames || []).length;
+  S.optionsDataMode='export';
+  S.optionsDataText=data;
+  save();
+  render();
+  setStatus(`${count} scores copied. They are shown below if you need to copy them again.`,0);
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(data).then(()=>{
+      if(S.optionsDataMode==='export') setStatus(`${count} scores copied. They are shown below if you need to copy them again.`,0);
+    }).catch(()=>{
+      if(S.optionsDataMode!=='export') return;
+      setStatus(`${count} scores are below. Copy them to save.`,0);
+      selectExportData();
+    });
+  } else {
+    setStatus(`${count} scores are below. Copy them to save.`,0);
+    selectExportData();
+  }
+}
+
+function selectExportData(){
+  const taEl=document.getElementById('options-data');
+  if(taEl){taEl.focus();taEl.select();}
+}
+
+async function appendContestDataToCloud(games, names, expectedEpoch) {
+  const contest = getContestKey(names);
+  const url = getBackupUrl(contest);
+  if (!getBackupConfig(contest).enabled || !url || !games.length) return true;
+  if(typeof expectedEpoch === 'undefined') expectedEpoch = getClearEpoch(contest);
+  return withContestLock(contest, async () => {
+    if(expectedEpoch !== getClearEpoch(contest)) return null;
+    try {
+      const payloadGames = games.map(game => ({
+        date: normalizeGameDate(game.date || game.time || '').date,
+        p1_score: Number(game.scores ? game.scores[0] : (game.p1_score || 0)),
+        p2_score: Number(game.scores ? game.scores[1] : (game.p2_score || 0))
+      }));
+      try{
+        const response = await fetch(url,{method:'POST',mode:'cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({contest,names:[...names],games:payloadGames})});
+        const result = await response.json();
+        if(result.status !== 'success') throw new Error(result.message || 'Cloud sync failed');
+        if(Number(result.added) + Number(result.duplicates) !== payloadGames.length){
+          for(const game of payloadGames){
+            const singlePayload = {contest,names:[...names],...game};
+            const singleResponse = await fetch(url,{method:'POST',mode:'cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(singlePayload)});
+            const singleResult = await singleResponse.json();
+            if(singleResult.status !== 'success') throw new Error(singleResult.message || 'Cloud sync failed');
+          }
+        }
+      }catch(e){
+        const pending = readPendingGames();
+        payloadGames.forEach(game => {
+          const pendingGame = {...game,contest,names:[...names]};
+          if(!pending.some(item => item.contest === contest && gameKey(item) === gameKey(pendingGame))) pending.push(pendingGame);
+        });
+        writePendingGames(pending);
+        return false;
+      }
+      return true;
+    } catch (e) {
+      return false;
+    }
+  });
+}
+
+async function doImport(){
+  const ta=document.getElementById('options-data');
+  if(!ta||!ta.value.trim()){
+    setStatus('Paste score data below before importing.',0);
+    return;
+  }
+  S.optionsDataText=ta.value;
+  try{
+    const rawLines = ta.value.trim().split(/\r?\n/).map(line => line.trim()).filter(Boolean);
+    if(rawLines.length < 1) return;
+
+    const parseCsv = line => line.split(',').map(part => part.trim());
+    const firstLine = parseCsv(rawLines[0]);
+    let names = [];
+    let games = [];
+
+    if (firstLine[0] && firstLine[0].toLowerCase() === 'date') {
+      names = [firstLine[1] || '', firstLine[2] || ''];
+      if (!names[0] || !names[1]) {
+        setStatus('Invalid CSV header: expected date,Player 1,Player 2');
+        return;
+      }
+      for(let i=1; i<rawLines.length; i++) {
+        const row = parseCsv(rawLines[i]);
+        if(row.length < 3) continue;
+        const dateValue = row[0];
+        const s1 = parseInt(row[1], 10);
+        const s2 = parseInt(row[2], 10);
+        if(!dateValue || isNaN(s1) || isNaN(s2)) continue;
+        const norm = normalizeGameDate(dateValue);
+        games.push({
+          time: norm.time,
+          date: norm.date,
+          names: [...names],
+          scores: [s1, s2],
+          winnerIdx: s1 >= s2 ? 0 : 1
+        });
+      }
+    } else {
+      names = rawLines[0].split('|').map(n => n.trim());
+      if(names.length !== 2 || !names[0] || !names[1]) {
+        setStatus('Invalid first line: use "date,Player 1,Player 2" or the legacy "Player 1 | Player 2" format');
+        return;
+      }
+      for(let i=1; i<rawLines.length; i++) {
+        const line = rawLines[i];
+        const parts = line.split(/\s+/);
+        if(parts.length < 3) continue;
+
+        const s2 = parseInt(parts[parts.length - 1], 10);
+        const s1 = parseInt(parts[parts.length - 2], 10);
+        if(isNaN(s1) || isNaN(s2)) continue;
+
+        const rawDate = parts.slice(0, parts.length - 2).join(' ');
+        const norm = normalizeGameDate(rawDate);
+
+        games.push({
+          time: norm.time,
+          date: norm.date,
+          names: [...names],
+          scores: [s1, s2],
+          winnerIdx: s1 >= s2 ? 0 : 1
+        });
+      }
+    }
+
+    if(rawLines.length > 1 && games.length === 0) {
+      setStatus('No valid games found — expected date,score1,score2 rows');
+      return;
+    }
+    
+    const targetNames=names.map(name => name.trim());
+    const normalizedGames = games.map(game => ({...game, names:targetNames}));
+    const uniqueGames = [];
+    const seenKeys = new Set();
+    for (const game of normalizedGames) {
+      const key = gameKey(game);
+      if (seenKeys.has(key)) continue;
+      seenKeys.add(key);
+      uniqueGames.push(game);
+    }
+    const contest = getContestKey(targetNames);
+    const importEpoch = getClearEpoch(contest);
+    const importResult = await withContestLock(contest, () => {
+      if(importEpoch !== getClearEpoch(contest)) return null;
+      const isActive = getContestKey(S.names) === contest;
+      const storedContest = S.contests[contest];
+      const previousGames = isActive ? (S.pastGames || []) : (storedContest?.pastGames || readStoredContestGames(contest));
+      const previous = mergeGameLists(previousGames, []);
+      const previousByTimestamp = new Map(previous.map(game => [gameKey(game), game]));
+      const added = uniqueGames.filter(game => !previousByTimestamp.has(gameKey(game)));
+      const conflicts = uniqueGames.filter(game => {
+        const current = previousByTimestamp.get(gameKey(game));
+        if(!current) return false;
+        const existingScores = gameScores(current);
+        const importedScores = gameScores(game);
+        return existingScores[0] !== importedScores[0] || existingScores[1] !== importedScores[1];
+      }).length;
+      const merged = mergeGameLists(previous, uniqueGames);
+      if(!S.contests[contest]) S.contests[contest] = createEmptyContest(targetNames);
+      S.contests[contest].pastGames = merged;
+      if(isActive) {
+        S.pastGames = merged;
+        updateContest();
+      }
+      S.optionsDataMode='empty';
+      S.optionsDataText='';
+      save();
+      render();
+      return {added, conflicts};
+    });
+    if(importResult === null){setStatus('Import canceled because contest scores were cleared.', 5000);return;}
+    if (getBackupConfig(contest).enabled && getBackupUrl(contest) && importResult.added.length) {
+      const synced = await appendContestDataToCloud(importResult.added, targetNames, importEpoch);
+      if(synced === null){setStatus('Scores were cleared before cloud sync completed.', 5000);return;}
+      if(!synced){setStatus('Scores added locally, but cloud sync failed.', 5000);return;}
+    }
+    if(importEpoch !== getClearEpoch(contest)){setStatus('Scores were cleared before import completed.', 5000);return;}
+    S.optionsDataMode='empty';
+    S.optionsDataText='';
+    const submitted = Math.max(0, rawLines.length - 1);
+    const invalidRows = submitted - games.length;
+    const importSummary = `Added ${importResult.added.length} of ${submitted} score${submitted === 1 ? '' : 's'} to ${targetNames[0]} vs ${targetNames[1]}.` +
+      (importResult.conflicts ? ` Kept ${importResult.conflicts} existing local timestamp conflict${importResult.conflicts === 1 ? '' : 's'}.` : '') +
+      (invalidRows > 0 ? ` Ignored ${invalidRows} invalid row${invalidRows === 1 ? '' : 's'}.` : '');
+    save();
+    render();
+    setStatus(importSummary, 3000);
+  }catch(err){setStatus('Could not parse data — check the format and try again.');}
+}
+
+async function clearScores(){
+  beginClearConfirmation();
+}
+
+function handleContestChange(val) {
+  if (val === '__NEW__') {
+    S.lastNames = [...S.names];
+    S.showNewContestInputs = true;
+    S.hideNewContestHelp = false;
+    S.newNames = ['', ''];
+    S.optionsDataMode='new-contest';
+    S.optionsDataText='';
+    save();
+    render();
+    setStatus('Add player names and press Add.');
+  } else if (val) {
+    S.showNewContestInputs = false;
+    S.newNames = ['', ''];
+    S.optionsDataMode='empty';
+    S.optionsDataText='';
+    switchContest(S.contests[val].names);
+  }
+}
+
+function cancelNewContest() {
+  const hasContests = Object.keys(S.contests).length > 0;
+  if (!hasContests) {
+    S.optionsDataMode='empty';
+    S.optionsDataText='';
+    S.showNewContestInputs=false;
+    render();
+    return;
+  }
+  S.showNewContestInputs = false;
+  S.newNames = ['', ''];
+  S.optionsDataMode='empty';
+  S.optionsDataText='';
+  const target = (S.lastNames && (S.lastNames[0] || S.lastNames[1])) 
+    ? S.lastNames 
+    : S.contests[Object.keys(S.contests)[0]].names;
+  switchContest(target);
+}
+
+function switchContest(newNames, skipCurrentUpdate = false) {
+  if (!skipCurrentUpdate) updateContest();
+  const key = getContestKey(newNames);
+  const c = S.contests[key];
+  if (c) {
+    S.scores = c.scores;
+    S.handScores = c.handScores;
+    S.records = c.records;
+    S.pastGames = c.pastGames;
+    S.target = c.target;
+    S.gameOver = c.gameOver;
+    S.phase = c.phase;
+    S.firstPlayer = c.firstPlayer;
+    S.handFirstPlayer = c.handFirstPlayer;
+    S.handNum = c.handNum;
+    S.lastAdded = c.lastAdded;
+    S.pendingWin = c.pendingWin;
+    S.starterSelection = typeof c.starterSelection === 'boolean' ? c.starterSelection : c.phase === 'start';
+    S.highestDoublePlayer = c.highestDoublePlayer;
+    S.lastGameEndStatus = c.lastGameEndStatus || '';
+    S.theme = c.theme || 'system';
+  } else {
+    S.scores = [0, 0];
+    S.handScores = [0, 0];
+    S.records = [];
+    S.pastGames = [];
+    S.gameOver = false;
+    S.phase = 'start';
+    S.firstPlayer = -1;
+    S.handFirstPlayer = -1;
+    S.handNum = 0;
+    S.lastAdded = ['', ''];
+    S.pendingWin = false;
+    S.starterSelection = true;
+    S.highestDoublePlayer = -1;
+    S.lastGameEndStatus = '';
+  }
+  S.names = [...newNames];
+  S.statsYear = 'all';
+  S.statsYearError = '';
+  S.newNames = ['', ''];
+  S.helpMessage = '';
+  S.helpTab = -1;
+  S.gameEndMessage = '';
+  S.status = '';
+  S.statusUntil = 0;
+  S.showFirstPlayer = false;
+  S.optionsDataMode='empty';
+  S.optionsDataText='';
+  S.backupUrlConfirm=false;
+  S.pendingBackupUrl='';
+  S.pendingBackupContest='';
+  S.pendingBackupScriptVersion='';
+  const backupConfig=getBackupConfig(key);
+  S.backupEnabled=backupConfig.enabled;
+  S.scriptVersion=backupConfig.scriptVersion;
+  updateContest();
+  applyTheme();
+  save();
+  render();
+  if(S.backupEnabled) syncActiveContest();
+}
+
+function setTab(t){
+  S.editingIdx=-1;
+  S.tab=t;
+  if(t === 0 && S.phase === 'start' && S.status.startsWith('Contest selected:')){
+    S.status='';
+    S.statusUntil=0;
+  }
+  if (t === 2 && (S.names[0] || S.names[1])) {
+    S.showNewContestInputs = false;
+  }
+  render();
+}
+
+function gameYear(game){
+  const rawDate = game.date || game.time;
+  if(!rawDate) return null;
+  const date = normalizeGameDate(rawDate).date;
+  const match = String(date).match(/^(\d{4})-/);
+  return match ? Number(match[1]) : null;
+}
+
+function getStatsYears(games){
+  return [...new Set(games.map(gameYear).filter(year => year !== null))].sort((a,b) => a-b);
+}
+
+function moveStatsYear(direction){
+  const years = getStatsYears(S.pastGames || []);
+  if(!years.length) return;
+  const current = S.statsYear === 'all' ? -1 : years.indexOf(Number(S.statsYear));
+  if(current < 0) {
+    S.statsYear = direction > 0 ? years[0] : years[years.length - 1];
+  } else if(direction > 0) {
+    S.statsYear = current === years.length - 1 ? 'all' : years[current + 1];
+  } else {
+    S.statsYear = current === 0 ? 'all' : years[current - 1];
+  }
+  S.statsYearError = '';
+  save();
+  render();
+}
+
+function setStatsYear(value){
+  if(value === '') {
+    S.statsYear = 'all';
+    S.statsYearError = '';
+    save();
+    render();
+    return;
+  }
+  const year = Number(value);
+  if(!Number.isInteger(year) || !getStatsYears(S.pastGames || []).includes(year)) {
+    S.statsYearError = 'Choose a year with recorded games.';
+    render();
+    return;
+  }
+  S.statsYear = year;
+  S.statsYearError = '';
+  save();
+  render();
+}
+
+function render(){
+  const appEl = document.getElementById('app');
+  if (!appEl) return;
+  const existingScoresHistory = appEl.querySelector('.stats-scores-history');
+  const existingScoresHistoryScrollTop = existingScoresHistory ? existingScoresHistory.scrollTop : null;
+  const activeId = document.activeElement ? document.activeElement.id : null;
+  if(S.status && S.statusUntil && Date.now()>S.statusUntil){S.status='';S.statusUntil=0;save();}
+  const tabIcons=[
+    `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4h16v16H4z"/><path d="M4 12h16"/><path d="M12 4v16"/></svg>`,
+    `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 4a4 4 0 014 4 4 4 0 01-8 0 4 4 0 014-4z"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>`,
+    `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/></svg>`
+  ];
+  const tabNames=['Score','Stats','Options'];
+  const hasContests = Object.keys(S.contests).length > 0;
+  const contestActive = (S.names[0] || S.names[1]) && hasContests;
+  
+  const tabbar=tabNames.map((n,i)=>{
+    const unavailable = (i === 0 || i === 1) && !contestActive;
+    return `<div class="tbtab ${S.tab===i?'active':''} ${unavailable?'disabled':''}" onclick="${unavailable?'':'setTab('+i+')'}">${tabIcons[i]}<span>${n}</span></div>`;
+  }).join('');
+  
+  let defaultStartStatus = '';
+  const activeHelpMessage = S.helpTab === S.tab ? S.helpMessage : '';
+  if (!S.status && !activeHelpMessage) {
+    if (S.phase==='start' && S.tab === 2) {
+      if (S.showNewContestInputs && !S.hideNewContestHelp)       defaultStartStatus = 'Add player names and press Add.';
+      else defaultStartStatus = '';
+    }
+  }
+  const controlsDisabled = waitingForHighDouble() || S.phase === 'start';
+  const statusText = S.status || (S.tab === 0 ? S.gameEndMessage : '') || activeHelpMessage || defaultStartStatus;
+  const isNewContestHelp = !S.status && !activeHelpMessage && defaultStartStatus === 'Add player names and press Add.';
+  const statusIcon = (S.tab === 0 && waitingForHighDouble()) || S.status || activeHelpMessage || (S.tab === 0 && S.gameEndMessage) ? '&#10003;' : '?';
+  const statusClick = (S.tab === 0 && S.phase === 'start' && !S.status && !activeHelpMessage) ? 'showHelp()' : ((S.tab === 0 && waitingForHighDouble()) || S.status || activeHelpMessage || (S.tab === 0 && S.gameEndMessage) ? 'ackStatus()' : (isNewContestHelp ? 'S.hideNewContestHelp=true;render()' : 'showHelp()'));
+  
+  const recentScores = S.records.filter(r => r.type === 'score').slice(-4);
+  const showHistory = !S.status && !activeHelpMessage && !waitingForHighDouble() && (S.tab !== 0 || !S.gameEndMessage) && recentScores.length > 0;
+
+  // Targeted DOM update for Tab 0 if already mounted
+  const isTab0Mounted = S.tab === 0 && appEl.dataset.tab === '0' && appEl.querySelector('.scoreboard');
+  if (isTab0Mounted) {
+    const isStart = S.phase === 'start';
+    const highlightPlayers = S.phase === 'start' || waitingForHighDouble();
+
+    // 1. Display bar
+    const displayEl = document.getElementById('display-bar');
+    if (displayEl) {
+      displayEl.textContent = S.display || '0';
+      displayEl.className = 'display-bar' + (S.display ? '' : ' dim');
+    }
+
+    // 2. Keypad
+    const keypadKeys = appEl.querySelectorAll('.keypad .key');
+    keypadKeys.forEach(k => {
+      if (k.classList.contains('domino-key')) {
+        k.innerHTML = domTile();
+        if (controlsDisabled) k.classList.add('disabled');
+        else k.classList.remove('disabled');
+      } else {
+        if (controlsDisabled) k.classList.add('disabled');
+        else k.classList.remove('disabled');
+      }
+    });
+
+    // 3. Scoreboard Cards
+    const scards = appEl.querySelectorAll('.scoreboard .scard');
+    [0, 1].forEach(i => {
+      const sc = scards[i];
+      if (sc) {
+        sc.className = `scard ${highlightPlayers ? 'select-starter' : ''}`;
+        const pname = sc.querySelector('.pname');
+        const scoreTot = sc.querySelector('.score-total');
+        if (pname && pname.textContent !== S.names[i]) pname.textContent = S.names[i];
+        const val = String(END_SCORE_HOLD ? END_SCORE_HOLD[i] : (isStart ? 0 : S.scores[i]));
+        if (scoreTot && scoreTot.textContent !== val) scoreTot.textContent = val;
+      }
+    });
+
+    // 4. Status Bar
+    const statusBar = appEl.querySelector('.status-bar');
+    const statusTextEl = appEl.querySelector('.status-bar .status-text');
+    const statusIconEl = appEl.querySelector('.status-bar .status-icon');
+    if (statusBar) statusBar.setAttribute('onclick', statusClick);
+    if (statusIconEl) statusIconEl.innerHTML = statusIcon;
+    
+    if (statusTextEl) {
+      if (statusText) {
+        statusTextEl.innerHTML = escapeHTML(statusText).replace(/\n/g, '<br/>');
+        statusTextEl.classList.remove('empty');
+      } else if (showHistory) {
+        statusTextEl.classList.remove('empty');
+        patchMiniHistory(recentScores);
+      } else {
+        statusTextEl.innerHTML = defaultStartStatus ? escapeHTML(defaultStartStatus) : '&nbsp;';
+        if (!defaultStartStatus) statusTextEl.classList.add('empty');
+        else statusTextEl.classList.remove('empty');
+      }
+    }
+
+    // 5. Tabbar
+    const tabbarEl = appEl.querySelector('.tabbar');
+    if (tabbarEl) tabbarEl.innerHTML = tabbar;
+    return;
+  }
+
+  appEl.dataset.tab = String(S.tab);
+  let content = '';
+  if(S.tab===0){
+    const isStart=S.phase==='start';
+    const highlightPlayers = S.phase === 'start' || waitingForHighDouble();
+    const displayClass=S.display?'display-bar':'display-bar dim';
+    const cards=[0,1].map(i=>`
+      <div class="scard ${highlightPlayers?'select-starter':''}" onclick="tapPlayer(${i})">
+        <div class="pname">${escapeHTML(S.names[i])}</div>
+        <div class="score-total">${END_SCORE_HOLD ? END_SCORE_HOLD[i] : (isStart ? 0 : S.scores[i])}</div>
+      </div>`).join('');
+    const dominoLabel=domTile();
+
+    const statusInner = statusText 
+      ? escapeHTML(statusText).replace(/\n/g, '<br/>') 
+      : (showHistory ? '<div class="hist-mini"></div>' : (defaultStartStatus ? escapeHTML(defaultStartStatus) : '&nbsp;'));
+
+    content=`
+      <div class="numpad-wrap">
+        <div id="display-bar" class="${displayClass}">${S.display||'0'}</div>
+        <div class="keypad">
+          ${[1,2,3,4,5,6,7,8,9].map(n=>`<div class="key ${controlsDisabled?'disabled':''}" onclick="pressKey('${n}')">${n}</div>`).join('')}
+          <div class="key del ${controlsDisabled?'disabled':''}" onclick="delKey()">&#9003;</div>
+          <div class="key ${controlsDisabled?'disabled':''}" onclick="pressKey('0')">0</div>
+          <div class="key domino-key ${controlsDisabled?'disabled':''}" onclick="callDomino()">${dominoLabel}</div>
+        </div>
+      </div>
+      <div class="scoreboard">${cards}</div>
+      <div class="status-bar score-status" onclick="${statusClick}">
+        <div class="status-text ${(!statusText && !showHistory && !defaultStartStatus) ? 'empty' : ''}">
+          ${statusInner}
+        </div>
+        <div class="status-icon">${statusIcon}</div>
+      </div>
+    `;
+  } else if(S.tab===1){
+    const allGames = S.pastGames || [];
+    const statsYears = getStatsYears(allGames);
+    if(statsYears.length < 3) {
+      S.statsYear = 'all';
+      S.statsYearError = '';
+    }
+    if(S.statsYear !== 'all' && !statsYears.includes(Number(S.statsYear))) {
+      S.statsYear = 'all';
+      S.statsYearError = '';
+    }
+    const games = S.statsYear === 'all'
+      ? allGames
+      : allGames.filter(game => gameYear(game) === Number(S.statsYear));
+    const orderedGames = games.slice().sort((a,b) => gameKey(a).localeCompare(gameKey(b)));
+    const totalGames = games.length;
+    const wins = [0, 0];
+    const totals = [0, 0];
+    const margins = [];
+    const hostMargins = [];
+    const guestMargins = [];
+
+    games.forEach(g => {
+      const winnerIdx = gameWinnerIdx(g);
+      const scores = gameScores(g);
+      wins[winnerIdx]++;
+      totals[0] += scores[0];
+      totals[1] += scores[1];
+      const diff = Math.abs(scores[0] - scores[1]);
+      margins.push(diff);
+      if (winnerIdx === 0) hostMargins.push(diff);
+      else guestMargins.push(diff);
+    });
+
+    const p1Name = escapeHTML(S.names[0]) || 'Host';
+    const p2Name = escapeHTML(S.names[1]) || 'Guest';
+
+    const avg = [
+      totalGames ? (totals[0] / totalGames).toFixed(1) : '0.0',
+      totalGames ? (totals[1] / totalGames).toFixed(1) : '0.0'
+    ];
+
+    const box1Titles = ['GAMES WON', 'AVERAGE POINTS PER GAME', 'TOTAL POINTS'];
+    const box1Data = [
+      [wins[0], wins[1]],
+      [avg[0], avg[1]],
+      [totals[0], totals[1]]
+    ];
+
+    const box2Titles = ['CUMULATIVE GAMES WON', 'CUMULATIVE POINTS'];
+
+    const cumulativeWinsHost = [];
+    const cumulativeWinsGuest = [];
+    const cumulativePointsHost = [];
+    const cumulativePointsGuest = [];
+    let runningWinsHost = 0;
+    let runningWinsGuest = 0;
+    let runningPointsHost = 0;
+    let runningPointsGuest = 0;
+    orderedGames.forEach(g => {
+      const scores = gameScores(g);
+      if (gameWinnerIdx(g) === 0) runningWinsHost++;
+      else runningWinsGuest++;
+      cumulativeWinsHost.push(runningWinsHost);
+      cumulativeWinsGuest.push(runningWinsGuest);
+      runningPointsHost += scores[0];
+      runningPointsGuest += scores[1];
+      cumulativePointsHost.push(runningPointsHost);
+      cumulativePointsGuest.push(runningPointsGuest);
+    });
+
+    const makeLinePath = (points, opts={}) => {
+      if (!points.length) return '';
+      const width = opts.width || 320;
+      const height = opts.height || 70;
+      const padding = opts.padding || 16;
+      const minVal = Math.min(...points, 0);
+      const maxVal = Math.max(...points, 0);
+      const range = maxVal - minVal || 1;
+      const step = points.length > 1 ? (width - padding * 2) / (points.length - 1) : 0;
+      const mapped = points.map((value, index) => {
+        const x = padding + step * index;
+        const y = height - padding - ((value - minVal) / range) * (height - padding * 2);
+        return { x, y };
+      });
+      if (mapped.length === 1) {
+        const point = mapped[0];
+        return `M ${point.x} ${point.y} L ${point.x} ${point.y}`;
+      }
+      return `M ${mapped.map(point => `${point.x} ${point.y}`).join(' L ')}`;
+    };
+
+    // Prepare single-line lead series for games or points (host minus guest)
+    const gameLeads = cumulativeWinsHost.map((v,i)=> v - (cumulativeWinsGuest[i]||0));
+    const pointLeads = cumulativePointsHost.map((v,i)=> v - (cumulativePointsGuest[i]||0));
+    const leadSeries = S.statsBox2 === 0 ? gameLeads : pointLeads;
+    const leadTitle = ['GAMES', 'POINTS', 'SCORES'][S.statsBox2] || 'GAMES';
+    const leadPath = makeLinePath(leadSeries, {width:320,height:70,padding:16});
+    const scoreHistory = orderedGames;
+
+    const box3Titles = ['WIN MARGINS', `WIN MARGINS FOR ${p1Name.toUpperCase()}`, `WIN MARGINS FOR ${p2Name.toUpperCase()}`];
+    const selectedMargins = S.statsBox3 === 0 ? margins : S.statsBox3 === 1 ? hostMargins : guestMargins;
+    const histSvg = (() => {
+      const w = 360, h = 80;
+      const bins = 8;
+      const values = selectedMargins.length ? selectedMargins : [];
+      if (!values.length) return '';
+      const maxVal = Math.max(...values, 1);
+      const counts = new Array(bins).fill(0);
+      values.forEach(v => {
+        const index = Math.min(Math.floor((v / maxVal) * bins), bins - 1);
+        counts[index]++;
+      });
+      const maxCount = Math.max(...counts, 1);
+      return counts.map((c, i) => {
+        const barH = (c / maxCount) * h;
+        const x = (i / bins) * w + 2;
+        const barW = (w / bins) - 4;
+        return `<rect x="${x}" y="${h - barH}" width="${barW}" height="${barH}" fill="#1D9E75" opacity="0.65" />`;
+      }).join('');
+    })();
+
+    content = `
+      <div class="stats-grid">
+        ${statsYears.length >= 3 ? `<div class="stats-year-filter" aria-label="Filter statistics by year">
+          <button type="button" aria-label="Previous year" onclick="moveStatsYear(-1)" ${statsYears.length ? '' : 'disabled'}>&lsaquo;</button>
+          <input type="number" aria-label="Statistics year; blank shows all years" placeholder="All" value="${S.statsYear === 'all' ? '' : S.statsYear}" ${statsYears.length ? `min="${statsYears[0]}" max="${statsYears[statsYears.length - 1]}"` : 'disabled'} step="1" inputmode="numeric" onchange="setStatsYear(this.value)"/>
+          <button type="button" aria-label="Next year" onclick="moveStatsYear(1)" ${statsYears.length ? '' : 'disabled'}>&rsaquo;</button>
+        </div>` : ''}
+        ${S.statsYearError ? `<div class="stats-year-error" role="status">${escapeHTML(S.statsYearError)}</div>` : ''}
+        <div class="stats-box" onclick="S.statsBox1=(S.statsBox1+1)%3;save();render();">
+          <div class="stats-box-title">${box1Titles[S.statsBox1]}</div>
+          <div class="stats-box-data stats-card-content" style="gap:10px;max-width:180px;margin:0 auto;">
+            <div class="stats-box-row" style="justify-content:space-between;">
+              <span class="stats-box-num">${box1Data[S.statsBox1][0]}</span>
+              <span class="stats-box-label">${p1Name}</span>
+            </div>
+            <div class="stats-box-row" style="justify-content:space-between;">
+              <span class="stats-box-num">${box1Data[S.statsBox1][1]}</span>
+              <span class="stats-box-label">${p2Name}</span>
+            </div>
+          </div>
+        </div>
+        <div class="stats-box" onclick="S.statsBox2=(S.statsBox2+1)%3;save();render();">
+          <div class="stats-box-title">${leadTitle}</div>
+          ${S.statsBox2 === 2 ? `
+            <div class="stats-recent stats-scores-history" id="stats-scores-history" onclick="event.stopPropagation();">
+              <div class="stats-recent-row stats-recent-head">
+                <span>Date</span><span>${p1Name}</span><span>${p2Name}</span>
+              </div>
+              ${scoreHistory.map(game => {
+                const norm = normalizeGameDate(game.date || game.time || '');
+                const scores = gameScores(game);
+                return `<div class="stats-recent-row"><span>${escapeHTML(norm.date)}</span><span>${scores[0]}</span><span>${scores[1]}</span></div>`;
+              }).join('')}
+            </div>
+          ` : `
+            <div class="stats-card-content">
+              <div class="chart-container" style="margin:0;padding:10px;border:none;">
+                <svg viewBox="0 0 360 90" preserveAspectRatio="none" width="100%" height="90">
+                  <path d="${leadPath}" fill="none" stroke="#1D9E75" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              </div>
+            </div>
+          `}
+        </div>
+        <div class="stats-box" onclick="S.statsBox3=(S.statsBox3+1)%3;save();render();">
+          <div class="stats-box-title">${box3Titles[S.statsBox3]}</div>
+          <div class="stats-card-content">
+            <div class="chart-container" style="margin:0;padding:10px;border:none;">
+              <svg viewBox="0 0 360 80" width="100%" height="80">${histSvg}</svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  } else {
+    const currentKey = getContestKey(S.names);
+    const contestOptions = Object.keys(S.contests).map(k => {
+      const isSelected = !S.showNewContestInputs && currentKey === k;
+      const displayKey = k.split('|').map(escapeHTML).join(' vs ');
+      return `<option value="${escapeHTML(k)}" ${isSelected ? 'selected' : ''}>${displayKey}</option>`;
+    }).join('');
+    const dataMode = S.optionsDataMode || 'empty';
+    const backupUrl = getBackupUrl(currentKey);
+    const darkMode = S.theme==='dark';
+    const showNames = S.showNewContestInputs && (dataMode==='new-contest' || dataMode==='empty');
+    const showUrl = dataMode==='backup-url';
+    const showData = dataMode==='import' || dataMode==='export';
+    const namesBlock = showNames ? `
+        <label class="setting-row setting-stack" for="new-player-1">
+          <span>Player 1</span>
+          <input id="new-player-1" class="setting-input" type="text" autocomplete="off" placeholder="Name" value="${escapeHTML(S.newNames[0] || '')}" oninput="S.newNames[0]=this.value"/>
+        </label>
+        <label class="setting-row setting-stack" for="new-player-2">
+          <span>Player 2</span>
+          <input id="new-player-2" class="setting-input" type="text" autocomplete="off" placeholder="Name" value="${escapeHTML(S.newNames[1] || '')}" oninput="S.newNames[1]=this.value"/>
+        </label>
+        <div class="data-actions">
+          <button class="action-btn primary" onclick="createContestFromData()">Add</button>
+          <button class="action-btn" onclick="cancelNewContest()">Cancel</button>
+        </div>` : '';
+    const urlBlock = showUrl ? `
+        <label class="setting-row setting-stack" for="options-data">
+          <span>Backup URL</span>
+          <input id="options-data" class="setting-input" type="url" inputmode="url" placeholder="https://script.google.com/macros/s/…/exec" value="${escapeHTML(S.optionsDataText || '')}" oninput="S.optionsDataText=this.value"/>
+        </label>
+        <div class="data-actions">
+          <button class="action-btn primary" onclick="verifyBackupUrlFromData()">Set</button>
+          <button class="action-btn" onclick="cancelOptionsData()">Cancel</button>
+        </div>` : `
+        <div class="setting-row">
+          <span>Backup URL</span>
+          <button class="action-btn setting-action" onclick="openBackupUrlEditor()">${backupUrl ? 'Change' : 'Set'}</button>
+        </div>
+        ${backupUrl ? `<div class="setting-note">${escapeHTML(backupUrl)}</div>` : ''}`;
+    const dataBlock = showData ? `
+        <label class="opt-label" for="options-data">${dataMode==='export' ? 'Export' : 'Paste scores'}</label>
+        <textarea id="options-data" class="export-area" placeholder="${dataMode==='export' ? 'No scores to export' : 'date,Player 1,Player 2'}" ${dataMode==='export' ? 'readonly' : ''} oninput="S.optionsDataText=this.value">${escapeHTML(S.optionsDataText || '')}</textarea>
+        <div class="data-actions">
+          ${dataMode==='import' ? '<button class="action-btn primary" onclick="doImport()">Add scores</button>' : ''}
+          <button class="action-btn" onclick="cancelOptionsData()">${dataMode==='export' ? 'Done' : 'Cancel'}</button>
+        </div>` : '';
+
+    content = `
+      <section class="opt-section settings">
+        <div class="opt-label">Contest</div>
+        <label class="setting-row setting-stack" for="player-select">
+          <span>Players</span>
+          <select id="player-select" class="player-select" aria-label="Players" onchange="handleContestChange(this.value)">
+            <option value="__NEW__" ${S.showNewContestInputs ? 'selected' : ''}>New...</option>
+            ${contestOptions}
+          </select>
+        </label>
+        ${namesBlock}
+      </section>
+      <section class="opt-section settings">
+        <div class="opt-label">Game</div>
+        <label class="setting-row" for="target-score">
+          <span>Max score</span>
+          <input id="target-score" class="setting-number" type="number" value="${S.target}" min="25" max="500" step="25" onchange="S.target=Math.max(25,parseInt(this.value)||50);save();setStatus('Max score updated.',0);" inputmode="numeric"/>
+        </label>
+        <label class="setting-row" for="cloud-enabled">
+          <span>Cloud backup</span>
+          <input id="cloud-enabled" type="checkbox" ${S.backupEnabled?'checked':''} onchange="setBackupEnabled(this.checked)"/>
+        </label>
+        ${urlBlock}
+        <label class="setting-row" for="dark-enabled">
+          <span>Dark mode</span>
+          <input id="dark-enabled" type="checkbox" ${darkMode?'checked':''} onchange="toggleDarkMode(this.checked)"/>
+        </label>
+      </section>
+      <section class="opt-section settings">
+        <div class="opt-label">Scores</div>
+        <div class="data-action-row">
+          <button class="action-btn" onclick="openImport()">Import</button>
+          <button class="action-btn" onclick="copyExport()">Export</button>
+          <button class="action-btn danger" onclick="clearScores()">Erase</button>
+        </div>
+        ${dataBlock}
+      </section>
+    `;
+  }
+
+  const showStatusBarBottom = S.tab !== 0 && S.tab !== 1;
+  const clearConfirm = S.tab === 2 && S.clearConfirm;
+  const clearCloud = clearConfirm && (typeof clearConfirm.cloud === 'boolean' ? clearConfirm.cloud : S.backupEnabled);
+  const backupUrlConfirm = S.tab === 2 && S.backupUrlConfirm;
+  const statusHtml = S.tab === 2 ? `
+    <div class="status-bar option-status" onclick="event.stopPropagation();" ondblclick="showVersionStamp()">
+      <div class="status-text ${S.status || clearConfirm || backupUrlConfirm?'':'empty'}">
+        ${clearConfirm
+          ? `Clear all scores for ${escapeHTML(clearConfirm.names[0] || 'Player 1')} vs ${escapeHTML(clearConfirm.names[1] || 'Player 2')} from this device${clearCloud?' and the server':''}?`
+          : backupUrlConfirm
+            ? `${escapeHTML(S.status || 'Backup URL verified.')}<div class="opt-version">${escapeHTML(S.pendingBackupUrl)}</div>`
+            : escapeHTML(S.status || 'Choose a contest, or change a setting.').replace(/\n/g,'<br/>')}
+        ${clearConfirm ? `<div class="clear-confirm-actions">
+          <button class="action-btn" onclick="cancelClearConfirmation()">Cancel</button>
+          <button class="action-btn primary" onclick="performClearScores()">Confirm erase</button>
+        </div>` : ''}
+        ${backupUrlConfirm ? `<div class="clear-confirm-actions">
+          <button class="action-btn" onclick="cancelBackupUrlConfirmation()">Cancel</button>
+          <button class="action-btn primary" onclick="confirmBackupUrl()">Confirm URL</button>
+        </div>` : ''}
+      </div>
+      ${clearConfirm || backupUrlConfirm ? '' : `<div class="status-icon" onclick="${statusClick}; event.stopPropagation();" aria-label="${statusIcon==='?'?'Show help':'Dismiss status'}">${statusIcon}</div>`}
+    </div>
+  ` : (!showStatusBarBottom ? '' : `<div class="status-bar" onclick="${statusClick}" ondblclick="showVersionStamp()"><div class="status-text ${statusText?'':'empty'}">${statusText||' '}</div><div class="status-icon">${statusIcon}</div></div>`);
+  appEl.innerHTML = `<div class="tab-content">${content}${statusHtml}</div><div class="tabbar">${tabbar}</div>`;
+  const scoresHistory = appEl.querySelector('.stats-scores-history');
+  if(scoresHistory) {
+    scoresHistory.scrollTop = existingScoresHistoryScrollTop === null
+      ? scoresHistory.scrollHeight
+      : existingScoresHistoryScrollTop;
+  }
+  
+  if (S.tab === 0 && showHistory) {
+    patchMiniHistory(recentScores);
+  }
+  if(activeId) {
+    const el = document.getElementById(activeId);
+    if(el) {
+      el.focus();
+      if(el.tagName === 'INPUT' && el.type === 'text') {
+        const val = el.value;
+        el.value = '';
+        el.value = val;
+      }
+    }
+  }
+}
+
+window.render_game_to_text = () => JSON.stringify({
+  coordinateSystem: 'dom scorer, no canvas',
+  tab: ['Score','Stats','Options'][S.tab] || S.tab,
+  optionsDataMode: S.optionsDataMode,
+  showNewContest: !!S.showNewContestInputs,
+  names: S.names,
+  target: S.target,
+  dark: S.theme==='dark',
+  cloud: !!S.backupEnabled,
+  clearConfirm: !!S.clearConfirm,
+  backupUrlConfirm: !!S.backupUrlConfirm
+});
+window.advanceTime = () => {};
+
+load();
+if(S.backupEnabled) syncActiveContest();
+document.addEventListener('keydown', event => {
+  const target = event.target;
+  const isInput = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA';
+  if(isInput) return;
+  if(S.tab === 1 && S.statsBox2 === 2 && (event.key === 'j' || event.key === 'k') &&
+      !event.metaKey && !event.ctrlKey && !event.altKey && !event.shiftKey) {
+    const scoresHistory = document.getElementById('stats-scores-history');
+    if(scoresHistory) {
+      event.preventDefault();
+      scoresHistory.scrollBy({top:event.key === 'j' ? 80 : -80, behavior:'smooth'});
+      return;
+    }
+  }
+  if(event.key === '?' && S.tab === 0 && !event.metaKey && !event.ctrlKey && !event.altKey) {
+    event.preventDefault();
+    showHelp();
+    return;
+  }
+  if(event.metaKey || event.ctrlKey || event.altKey || event.shiftKey) return;
+  
+  if(event.key === 'g' || event.key === 'G') { event.preventDefault(); setTab(0); }
+  else if(event.key === 's' || event.key === 'S') { event.preventDefault(); setTab(1); }
+  else if(event.key === 'o' || event.key === 'O') { event.preventDefault(); setTab(2); }
+});
+document.addEventListener('click', event => {
+  if(Date.now() - LAST_STATUS_SET < 150) return;
+  if (S.tab === 0 && waitingForHighDouble() && !event.target.closest('.scard') && !event.target.closest('.tabbar') && !event.target.closest('.status-bar')) {
+    notifyHighDoublePrompt();
+    return;
+  }
+  if(!S.status && !S.gameEndMessage) return;
+  if(event.target.closest('.status-bar')) return;
+  clearStatus();
+});
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    // updateViaCache:'none' stops Safari from serving a stale sw.js from HTTP cache during update checks.
+    navigator.serviceWorker.register('./service-worker.js', { updateViaCache: 'none' }).then(reg => {
+      reg.update();
+    }).catch(() => {});
+  });
+  // Reload once when a new service worker takes control, so users get the fresh app shell.
+  let swRefreshing = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (swRefreshing) return;
+    swRefreshing = true;
+    location.reload();
+  });
+}
+
+render();
+</script>
+</body>
+</html>

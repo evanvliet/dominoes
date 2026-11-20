@@ -1,0 +1,17 @@
+n99
+
+year animation: invoke on double clickof year button and start animation from current year forward. 
+Stop on click or end of cycle, whichever coomes first.
+
+post-hand messages. totals stay visible until next click, and
+that click does both dismiss message and peform normal action.
+
+clouid sharing. downloaded sheets are new contests, that can update
+server. player name check an idea to identify scorer, so not
+needed now. the sheet name is not visible, so it serves as 
+authentication.
+
+500 score: read that sheets start with 1000 rows. by starting out
+with just 500, save space, and will grow naturally for long contests
+
+sheet name: invalid names are rejected at cloud initiation time.

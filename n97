@@ -2,10 +2,14 @@ n97
 
 add year animation: dbl click on "all" and cycle through years on 1 second intervals. any click returns to all. dbl click stops at current point in cycle.
 
-player combo box revisit. awkward now.
+only show help:
+    + if ? clicked, show help for current context, e.g. click user with
+    high double  at beginning of game, scores instruction during game.
+    + after domino clicked, showing hand or game totals
 
-Import needs more feedback in lower box.
+replace green highlighing with green circle in upper right corner
 
-status gets carried over from scores tab into lower box.
+make cloud url name of sheet for scores, add code to code.gs to prevent overuse. (no more than 1000 sheets) truncate sheets so they only have three columns.
 
+put url of scores into index.html, may move later into server call.
 

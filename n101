@@ -2,11 +2,24 @@ n101
 
 next steps
 modularize, per tab? per db, ui, options functionality? per javascript, css, html?
-create options just read / write json
-create alternate cloud backup using oracle or cloudflare
+create options just read / write json, read / write scores
+
 check dominoes scores for alternate rules and implement as options
+create options for qwirkle, scrabble, pool
+abstract to recording of events categorized by previous attributes
 create local only version
 cleanup readme
-simplify url setting - allow /?url=xxx
+scores / status / bottom play display, make like score diplays on options, stats tabs, perhaps multiple select and a delete / cancel button.
+redo help to minimize output, replace green highlighing with green circle in upper right corner
+only show help if ? clicked
+implicit selection of first alternation: turn off after user double click on new game
 
+hold urls for cloud backup in spreadsheet with id provided by scorer.
+then make a copy of dominoes spreadsheet and add its exec url to
+spreadsheet. any way to automate dominoes spreadsheet construction with
+all those alerts? don't mind doing by hand for the first 10 users.
+advantage: user does not have to copy paste long strings.
+
+how do other games provide score history? Currently thinking of using
+cloudflare R2 or oracle, have free oracle ubuntu server.
 
