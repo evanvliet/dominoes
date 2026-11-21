@@ -1,0 +1,16 @@
+n103
+
+Options: cloud, make more compact so both fields are visible
+
+recent scores should inclue red x to delete a score
+and score lines should be column adjusted, icon, score, text
+
+activate cloud, get new sheet but no 4 coliumn truncation, no header,
+no scores
+
+double click on options no longer print version tag
+
+options / import / help shows wrong message first
+
+on game start, highlight both tiles with green dot until one is clicked
+

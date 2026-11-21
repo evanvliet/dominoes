@@ -6,6 +6,7 @@
 * Track multiple players and contest sessions
 * Automatically identify winners and final standings
 * Keep a permanent history in your browser
+* Keep a scrollable score, hand, and game history while scoring
 
 ### Lifetime Statistics
 
@@ -45,6 +46,7 @@ View player trends at a glance:
 ## Data Storage
 
 Game history is stored locally in your browser using local storage.
+When Cloud backup is enabled, completed-game rows also record the scorekeeper; a blank scorekeeper defaults to the first player.
 
 That means:
 

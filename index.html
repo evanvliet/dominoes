@@ -69,6 +69,7 @@ html,body{height:100%;background:var(--color-background-tertiary);font-family:va
 /* numpad */
 .numpad-wrap{background:var(--color-background-primary);border-radius:var(--border-radius-lg);border:0.5px solid var(--color-border-tertiary);padding:8px;margin-bottom:8px;}
 .display-bar{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:8px 14px;text-align:right;font-size:30px;font-weight:500;color:var(--color-text-primary);margin:8px 0 6px;min-height:54px;display:flex;align-items:center;justify-content:flex-end;letter-spacing:2px;}
+.display-bar.hidden-entry{display:none;}
 .display-bar.dim{color:var(--color-text-tertiary);}
 .keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;}
 .key{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);font-size:36px;font-weight:400;color:var(--color-text-primary);height:60px;display:flex;align-items:center;justify-content:center;cursor:pointer;user-select:none;transition:background 0.1s,transform 0.08s;}
@@ -83,7 +84,6 @@ html,body{height:100%;background:var(--color-background-tertiary);font-family:va
 .domino-icon{width:62px;height:44px;transform:rotate(90deg);display:block;}
 .domino-key{font-size:0;}
 .status-icon{width:18px;height:18px;min-width:18px;font-size:12px;text-align:center;line-height:1;color:var(--color-text-tertiary);align-self:flex-start;display:flex;align-items:center;justify-content:center;border:0.5px solid var(--color-border-tertiary);border-radius:50%;background:transparent;padding:0;flex-shrink:0;}
-.scard.select-starter::after{content:'';position:absolute;top:7px;right:7px;width:10px;height:10px;border-radius:50%;background:#1D9E75;}
 
 /* scorecards */
 .scoreboard{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px;min-height:92px;}
@@ -138,16 +138,24 @@ html,body{height:100%;background:var(--color-background-tertiary);font-family:va
 .pts-input{width:60px;font-size:14px;font-weight:500;color:#1D9E75;border:1.5px solid #1D9E75;border-radius:5px;padding:3px 6px;background:var(--color-background-primary);color:#1D9E75;outline:none;font-family:inherit;}
 
 /* mini history */
-.hist-mini{flex:1;overflow:hidden;height:98px;min-height:98px;max-height:98px;display:flex;flex-direction:column;justify-content:flex-end;gap:3px;position:relative;contain:paint layout;}
-.hist-mini-row{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--color-text-secondary);min-height:22px;max-height:22px;height:22px;opacity:1;transform:translateY(0);will-change:transform,opacity,max-height,margin;transition:transform 0.28s cubic-bezier(0.16,1,0.3,1),opacity 0.24s ease-out,max-height 0.28s cubic-bezier(0.16,1,0.3,1),min-height 0.28s cubic-bezier(0.16,1,0.3,1),height 0.28s cubic-bezier(0.16,1,0.3,1),margin 0.28s cubic-bezier(0.16,1,0.3,1),padding 0.28s cubic-bezier(0.16,1,0.3,1);}
+.hist-mini{flex:1;overflow-y:auto;height:98px;min-height:98px;max-height:98px;display:flex;flex-direction:column;justify-content:flex-start;gap:3px;position:relative;overscroll-behavior:contain;}
+.hist-mini-row{display:grid;grid-template-columns:20px 38px minmax(0,1fr);align-items:center;gap:8px;font-size:14px;color:var(--color-text-secondary);min-height:22px;max-height:22px;height:22px;opacity:1;transform:translateY(0);will-change:transform,opacity,max-height,margin;transition:transform 0.28s cubic-bezier(0.16,1,0.3,1),opacity 0.24s ease-out,max-height 0.28s cubic-bezier(0.16,1,0.3,1),min-height 0.28s cubic-bezier(0.16,1,0.3,1),height 0.28s cubic-bezier(0.16,1,0.3,1),margin 0.28s cubic-bezier(0.16,1,0.3,1),padding 0.28s cubic-bezier(0.16,1,0.3,1);}
 .hist-mini-row.entering{transform:translateY(18px);opacity:0;max-height:22px;min-height:22px;}
 .hist-mini-row.enter-active{transform:translateY(0);opacity:1;max-height:22px;min-height:22px;}
 .hist-mini-row.exiting-top{transform:translateY(-20px);opacity:0;max-height:0 !important;min-height:0 !important;height:0 !important;margin-top:-3px !important;margin-bottom:0 !important;padding:0 !important;pointer-events:none;}
 .hist-mini-row.removing{transform:translateX(24px);opacity:0;max-height:0 !important;min-height:0 !important;height:0 !important;margin-top:-3px !important;margin-bottom:0 !important;padding:0 !important;pointer-events:none;}
-.hist-mini-x{color:#D85A30;font-size:14px;cursor:pointer;padding:2px 5px;border-radius:4px;line-height:1;display:inline-flex;align-items:center;justify-content:center;transition:background 0.15s,transform 0.1s;}
+.hist-mini-x{color:#D85A30;font-size:14px;cursor:pointer;padding:2px 5px;border:0;background:none;font:inherit;border-radius:4px;line-height:1;display:inline-flex;align-items:center;justify-content:center;transition:background 0.15s,transform 0.1s;}
 .hist-mini-x:active{background:rgba(216,90,48,0.15);transform:scale(0.88);}
+.hist-mini-old{color:var(--color-text-primary);font-size:14px;line-height:1;text-align:center;width:20px;}
 .hist-mini-pts{font-weight:600;color:var(--color-text-primary);min-width:24px;text-align:right;font-variant-numeric:tabular-nums;font-size:15px;}
 .hist-mini-name{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.hist-mini-icon{width:20px;height:16px;object-fit:contain;transform:none;flex:0 0 20px;}
+.hist-mini-pair{font-weight:600;color:var(--color-text-primary);min-width:38px;text-align:right;font-variant-numeric:tabular-nums;}
+.hist-mini-label{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.scard.first-player::after{content:'';position:absolute;top:7px;right:7px;width:10px;height:10px;border-radius:50%;background:#1D9E75;}
+.scard.select-starter::after{content:'';position:absolute;top:7px;right:7px;width:10px;height:10px;border-radius:50%;background:#1D9E75;}
+.scard.winner-flash::before{content:'';position:absolute;top:50%;left:50%;width:86px;height:86px;margin:-43px 0 0 -43px;border:2px solid #1D9E75;border-radius:50%;pointer-events:none;animation:winner-circle-flash 0.45s ease-out 3;}
+@keyframes winner-circle-flash{0%{opacity:0;transform:scale(0.88)}45%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1.12)}}
 
 .stats-box-data{display:flex;flex-direction:column;gap:6px;margin-top:8px;}
 .stats-box-row{font-size:14px;font-weight:600;color:var(--color-text-primary);display:flex;justify-content:center;gap:12px;align-items:center;width:100%;}
@@ -235,15 +243,32 @@ textarea.export-area{width:100%;height:145px;font-size:12px;font-family:monospac
 .clear-confirm-actions .action-btn{margin-bottom:0;flex:1;max-width:110px;}
 .backup-mode{flex:1;}
 .backup-mode .action-btn{min-width:0;}
-.data-panel{display:flex;flex-direction:column;gap:8px;height:180px;overflow-y:auto;}
-@media (max-width: 375px) {.data-panel{height:150px;}}
+.data-panel{display:flex;flex-direction:column;gap:8px;height:210px;overflow:hidden;}
+@media (max-width: 375px) {.data-panel{height:180px;}}
+@media (max-width: 375px) {
+  .data-panel textarea.export-area{height:72px;font-size:12px;}
+  .data-panel .opt-label{margin-bottom:4px;}
+  .data-actions .action-btn{padding:7px 6px;}
+}
 .data-panel > *{flex-shrink:0;}
 .data-mode-label{font-size:12px;color:var(--color-text-secondary);}
 .data-actions{display:flex;gap:8px;}
 .data-actions .action-btn{margin:0;flex:1;}
 .data-panel textarea.export-area{height:96px;margin-top:0;font-size:13px;}
-.cloud-input{width:100%;height:40px;padding:7px 11px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);background:var(--color-background-secondary);color:var(--color-text-primary);font:inherit;font-size:15px;margin-bottom:9px;}
+.cloud-input{width:100%;height:40px;padding:7px 11px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);background:var(--color-background-secondary);color:var(--color-text-primary);font:inherit;font-size:15px;}
+.cloud-form-row,.contest-form-row{display:grid;grid-template-columns:78px minmax(0,1fr);align-items:center;gap:8px;margin-bottom:9px;}
+.cloud-form-row:last-child,.contest-form-row:last-child{margin-bottom:0;}
+.cloud-form-row label,.contest-form-row label{font-size:13px;color:var(--color-text-secondary);font-weight:600;}
+.erase-confirm-copy{font-size:14px;line-height:1.45;color:var(--color-text-primary);padding:8px 2px 4px;}
+.option-status{height:78px;min-height:78px;max-height:78px;}
+@media (max-width: 375px) {
+  .option-status{height:68px;min-height:68px;max-height:68px;}
+  .data-panel{height:200px;}
+  .data-actions{gap:5px;}
+  .data-actions .action-btn{height:36px;padding:6px 4px;font-size:12px;}
+}
 .option-status .status-text{overflow:visible;overflow-wrap:anywhere;}
+.option-status .status-text{font-size:13px;}
 .status-box-header{display:flex;align-items:center;gap:8px;margin-bottom:4px;min-height:18px;}
 .status-box-icon{width:14px;height:14px;min-width:14px;font-size:12px;line-height:1;color:var(--color-text-secondary);display:flex;align-items:center;justify-content:center;border:0.5px solid var(--color-border-tertiary);border-radius:4px;background:var(--color-background-secondary);padding:0;margin-left:auto;}
 .status-label{display:inline-block;letter-spacing:0.08em;font-size:11px;margin:0;margin-right:auto;}
@@ -259,7 +284,13 @@ textarea.export-area{width:100%;height:145px;font-size:12px;font-family:monospac
 .data-action-row .action-btn{margin:0;padding:7px 8px;font-size:12px;}
 .inline-confirm{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:13px;color:var(--color-text-secondary);}
 .inline-confirm .action-btn{width:auto;margin:0;padding:7px 10px;}
-.option-status{height:150px;min-height:150px;padding:7px 8px;overflow-y:auto;}
+.option-status{height:78px;min-height:78px;max-height:78px;padding:7px 8px;overflow-y:auto;}
+@media (max-width: 375px) {
+  .option-status{height:68px;min-height:68px;max-height:68px;}
+  .data-panel{height:200px;}
+  .data-actions{gap:5px;}
+  .data-actions .action-btn{height:36px;padding:6px 4px;font-size:12px;}
+}
 .option-status .clear-confirm-actions{margin-top:8px;}
 .option-status .clear-confirm-actions .action-btn{max-width:none;}
 .parameter-header{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:22px;}
@@ -277,8 +308,8 @@ textarea.export-area{width:100%;height:145px;font-size:12px;font-family:monospac
 <body>
 <div class="app" id="app"></div>
 <script>
-const APP_VERSION = 'v2.0.22g';
-const CLOUD_API_URL = 'https://script.google.com/macros/s/AKfycbzyjYicf2IUriYpP7JGWohViqjpI4zd_atBDm4j69PlkMOiGH5csVCrMdLSEVLbtmA/exec';
+const APP_VERSION = 'v2.0.24g';
+const CLOUD_API_URL = 'https://script.google.com/macros/s/AKfycbwJeMPr4fMzAGQCXxjBsz-rJ0waNwZ0YL0w2GD2LryOUZ8UF6P5bOkkGkcbpfLopcU/exec';
 const BACKUP_URL_KEY = 'dom_backup_url';
 const BACKUP_ENABLED_KEY = 'dom_backup_enabled';
 const BACKUP_CONFIG_KEY = 'dom_backup_config_v1';
@@ -288,10 +319,9 @@ const PENDING_SYNC_KEY = 'pending_sync_games_v2';
 const CLOUD_SYNC_PREFIX = 'dom_cloud_sync:';
 const CLEAR_EPOCH_PREFIX = 'dom_clear_epoch:';
 const CLOUD_RECENT_PREFIX = 'dom_recent_cloud_import:';
+const GAME_HISTORY = 5;
 let pendingSyncPromise = null;
 let statsYearAnimationTimer = null;
-let dominoAnnouncementActive = false;
-let dominoAnnouncementEvent = null;
 
 function withContestLock(contest, callback){
   if(navigator.locks && navigator.locks.request){
@@ -318,6 +348,42 @@ function gameWinnerIdx(game){
   const [score1, score2] = gameScores(game);
   if(Number.isFinite(score1) && Number.isFinite(score2)) return score1 >= score2 ? 0 : 1;
   return game.winnerIdx === 1 ? 1 : 0;
+}
+
+function ensureGameHistoryEntries(games, names, history=S.scoreHistory){
+  if(!Array.isArray(history)) history=[];
+  const knownKeys=new Set(history.filter(entry=>entry.kind==='game' && entry.gameKey).map(entry=>entry.gameKey));
+  const missing=(games || []).filter(game=>{
+    const key=gameKey(game);
+    if(knownKeys.has(key)) return false;
+    knownKeys.add(key);
+    return true;
+  }).sort((a,b)=>gameKey(a).localeCompare(gameKey(b)));
+  missing.forEach(game=>{
+    const scores=gameScores(game);
+    const winner=scores[0]===scores[1]?-1:gameWinnerIdx(game);
+    history.push({
+      id:`game:${gameKey(game)}`,
+      kind:'game',
+      gameKey:gameKey(game),
+      scores,
+      label:winner<0?'tied game':`${(game.names || names)[winner]} game`
+    });
+  });
+  if(missing.length && history===S.scoreHistory) S.shouldScrollHistory=true;
+  return history;
+}
+
+function truncateScoreHistory(history, records=[]){
+  if(!Array.isArray(history)) return [];
+  const gameEntries=history.filter(entry=>entry.kind==='game');
+  const keepGameIds=new Set(gameEntries.slice(-GAME_HISTORY).map(entry=>entry.id));
+  const liveIds=new Set((records || []).map(record=>record.id));
+  return history.filter(entry=>{
+    if(entry.kind==='game') return keepGameIds.has(entry.id);
+    if(entry.kind==='score' || entry.kind==='hand') return liveIds.has(entry.id);
+    return true;
+  });
 }
 
 function mergeGameLists(existing, incoming){
@@ -368,6 +434,9 @@ const S={
   handScores:[0,0],
   display:'',
   records:[],
+  scoreHistory:[],
+  shouldScrollHistory:false,
+  scorekeeperName:'',
   lastGameRecentScores:[],
   pastGames:[],
   target:50,
@@ -388,6 +457,7 @@ const S={
   scriptVersion:'',
   helpMessage:'',
   helpTab:-1,
+  pendingScoreEntryId:null,
   highestDoublePlayer:-1,
   theme:'system',
   showNewContestInputs:false,
@@ -406,13 +476,28 @@ const S={
   optionsDataMode:'empty',
   optionsDataText:'',
   cloudSheetName:'',
-  cloudNames:['','']
+  cloudScorekeeper:''
 };
 let LAST_STATUS_SET=0;
 // Final scores shown on the tiles after a game ends, until the next click anywhere.
 let END_SCORE_HOLD = null;
-document.addEventListener('click', () => {
+let winnerFlashIdx=-1;
+let winnerFlashTimer=null;
+document.addEventListener('click', event => {
   stopStatsYearAnimation();
+  if(S.tab===2 && S.clearConfirm){
+  }else if(S.tab===0){
+    if(S.phase==='start' && !event.target.closest('.scard')){
+      notifyStarterPrompt();
+    }else if(waitingForHighDouble() && !event.target.closest('.scard')){
+      notifyHighDoublePrompt();
+    }
+  }
+  if(S.showFirstPlayer){
+    S.showFirstPlayer=false;
+    save();
+    if(S.tab===0) setTimeout(render,0);
+  }
   if(!END_SCORE_HOLD) return;
   END_SCORE_HOLD = null;
   setTimeout(render, 0);
@@ -445,7 +530,8 @@ function getBackupConfig(contest=getContestKey(S.names)){
     url,
     sheetName,
     enabled:config.enabled === true && Boolean(sheetName),
-    scriptVersion:String(config.scriptVersion || '')
+    scriptVersion:String(config.scriptVersion || ''),
+    scorekeeper:String(config.scorekeeper || '')
   };
 }
 
@@ -497,7 +583,7 @@ function writePendingGames(games){
 function setBackupEnabled(enabled){
   const contest=getContestKey(S.names);
   if(!contest){
-    setStatus('Select or create a contest before choosing backup mode.');
+    setStatus('Select or create a contest before choosing backup mode.',5000,'error');
     return;
   }
   if(!enabled){
@@ -516,30 +602,34 @@ function setBackupEnabled(enabled){
     return;
   }
   if(config.sheetName){
-    setBackupConfig(contest,{enabled:true});
-    S.backupEnabled=true;
-    S.scriptVersion=config.scriptVersion;
+    S.optionsDataMode='cloud-create';
+    S.cloudSheetName=config.sheetName;
+    S.cloudScorekeeper=config.scorekeeper;
     save();
     render();
-    setStatus('Cloud backup enabled for this contest.',0);
-    syncActiveContest();
+    setStatus('Cloud settings for this sheet are shown below.',0);
     return;
   }
   S.optionsDataMode='cloud-create';
   S.cloudSheetName='';
+  S.cloudScorekeeper=getBackupConfig(contest).scorekeeper;
   save();
   render();
   setStatus('Choose a hard-to-guess name for the shared score sheet.',0);
 }
 
 function validCloudSheetName(name){
-  return Boolean(name) && name === name.trim() && name.length <= 100 && !/[\\\/?*\[\]:]/.test(name);
+  return Boolean(name)
+    && name === name.trim()
+    && /^[\x20-\x7E]+$/.test(name)
+    && name.length <= 100
+    && !/[\\\/?*\[\]:]/.test(name);
 }
 
 function cancelCloudFlow(){
   S.optionsDataMode='empty';
   S.cloudSheetName='';
-  S.cloudNames=['',''];
+  S.cloudScorekeeper='';
   save();
   render();
   clearStatus();
@@ -548,19 +638,44 @@ function cancelCloudFlow(){
 async function createCloudSheet(){
   const field=document.getElementById('cloud-sheet-name');
   const sheetName=String(field ? field.value : S.cloudSheetName || '');
+  const scorekeeperField=document.getElementById('cloud-scorekeeper');
+  const scorekeeper=String(scorekeeperField ? scorekeeperField.value : S.cloudScorekeeper || '').trim();
   const contest=getContestKey(S.names);
   const names=[...S.names];
   const games=[...(S.pastGames || [])];
   const expectedEpoch=getClearEpoch(contest);
   if(!contest){
-    setStatus('Select or create a contest before enabling Cloud backup.');
+    setStatus('Select or create a contest before enabling Cloud backup.',5000,'error');
     return;
   }
   if(!validCloudSheetName(sheetName)){
-    setStatus('Use a sheet name of 1–100 characters without /, \\, ?, *, [ ], or :.');
+    setStatus('Use an ASCII sheet name of 1–100 characters without /, \\, ?, *, [ ], or :.',5000,'error');
     return;
   }
   S.cloudSheetName=sheetName;
+  S.cloudScorekeeper=scorekeeper;
+  const existingConfig=getBackupConfig(contest);
+  if(existingConfig.sheetName===sheetName){
+    setBackupConfig(contest,{sheetName,enabled:true,scorekeeper});
+    S.backupEnabled=true;
+    S.scorekeeperName=scorekeeper;
+    S.optionsDataMode='empty';
+    S.cloudSheetName='';
+    S.cloudScorekeeper='';
+    save();
+    render();
+    const upload=await appendContestDataToCloud(games,names);
+    if(upload===null){
+      setStatus('The local contest was erased before cloud sync completed.',7000,'error');
+    }else if(!upload.ok){
+      setStatus('Cloud backup enabled, but existing scores could not be uploaded.',7000,'error');
+    }else{
+      setStatus(games.length
+        ? `Cloud backup enabled. Uploaded ${games.length} existing score${games.length===1?'':'s'}.`
+        : 'Cloud backup enabled for this contest.',3000,'info');
+    }
+    return;
+  }
   setStatus('Creating cloud sheet...',0);
   try{
     const response=await fetch(CLOUD_API_URL,{method:'POST',mode:'cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({
@@ -570,31 +685,37 @@ async function createCloudSheet(){
     const result=await response.json();
     if(result.status!=='success') throw new Error(result.message || 'Sheet creation failed');
     if(expectedEpoch!==getClearEpoch(contest)){
-      setStatus('The local contest was erased while the cloud sheet was being created. Use Download to restore it.',7000);
+      setStatus('The local contest was erased while the cloud sheet was being created. Use Download to restore it.',7000,'error');
       return;
     }
-    setBackupConfig(contest,{sheetName,enabled:true,scriptVersion:String(result.script_version || '')});
+    S.scorekeeperName=scorekeeper;
+    setBackupConfig(contest,{sheetName,enabled:true,scriptVersion:String(result.script_version || ''),scorekeeper});
     const stillActive=getContestKey(S.names)===contest;
     if(stillActive){
       S.backupEnabled=true;
       S.scriptVersion=String(result.script_version || '');
       S.optionsDataMode='empty';
       S.cloudSheetName='';
+      S.cloudScorekeeper='';
       save();
       render();
     }
     const upload=await appendContestDataToCloud(games,names);
     if(upload===null){
-      setStatus('Local contest erased. The cloud sheet remains and can be restored with Download.',7000);
+      setStatus('Local contest erased. The cloud sheet remains and can be restored with Download.',7000,'error');
       return;
     }
     if(!upload.ok){
-      setStatus('Cloud sheet created, but existing scores could not be uploaded. Try Cloud sync again.',0);
+      setStatus('Cloud sheet created, but existing scores could not be uploaded. Try Cloud sync again.',0,'error');
       return;
     }
-    setStatus('Cloud sheet created. Share its name and both player names to let others download and add scores.',0);
+    if(stillActive){
+      setStatus(games.length
+        ? `Cloud backup enabled. Uploaded ${games.length} existing score${games.length===1?'':'s'} to the sheet.`
+        : 'Cloud backup enabled for this contest.',3000,'info');
+    }
   }catch(error){
-    setStatus(`Could not create cloud sheet: ${error.message || error}`,0);
+    setStatus(`Could not create cloud sheet: ${error.message || error}`,0,'error');
   }
 }
 
@@ -603,87 +724,84 @@ function beginCloudDownload(){
   S.showNewContestInputs=false;
   S.optionsDataMode='cloud-download';
   S.cloudSheetName='';
-  S.cloudNames=['',''];
+  S.cloudScorekeeper='';
   save();
   render();
-  setStatus('Enter the sheet name and both player names.',0);
+  setStatus('Enter the sheet name and optional scorekeeper name.',0);
 }
 
 async function downloadCloudContest(){
   const sheetField=document.getElementById('cloud-sheet-name');
   const sheetName=String(sheetField ? sheetField.value : S.cloudSheetName || '');
-  const player1=document.getElementById('cloud-player-1');
-  const player2=document.getElementById('cloud-player-2');
-  const names=[String(player1 ? player1.value : S.cloudNames[0] || '').trim(),String(player2 ? player2.value : S.cloudNames[1] || '').trim()];
+  const scorekeeperField=document.getElementById('cloud-scorekeeper');
+  const scorekeeper=String(scorekeeperField ? scorekeeperField.value : S.cloudScorekeeper || '').trim();
   if(!validCloudSheetName(sheetName)){
-    setStatus('Enter a valid sheet name (1–100 characters; no /, \\, ?, *, [ ], or :).');
-    return;
-  }
-  if(!names[0] || !names[1]){
-    setStatus('Enter both player names exactly as they appear on the sheet.');
-    return;
-  }
-  const contest=getContestKey(names);
-  const currentConfig=getBackupConfig(contest);
-  if(currentConfig.sheetName && currentConfig.sheetName!==sheetName){
-    setStatus('This player pair is already linked to a different cloud sheet. Erase the local contest before attaching another.');
+    setStatus('Enter a valid sheet name (1–100 characters; no /, \\, ?, *, [ ], or :).',5000,'error');
     return;
   }
   S.cloudSheetName=sheetName;
-  S.cloudNames=names;
-  const expectedEpoch=getClearEpoch(contest);
+  S.cloudScorekeeper=scorekeeper;
+  const epochSnapshot=new Map(Object.keys(S.contests || {}).map(contest=>[contest,getClearEpoch(contest)]));
+  const activeContest=getContestKey(S.names);
+  if(activeContest) epochSnapshot.set(activeContest,getClearEpoch(activeContest));
   setStatus('Downloading scores...',0);
   try{
-    const query=`?sheet=${encodeURIComponent(sheetName)}&p1=${encodeURIComponent(names[0])}&p2=${encodeURIComponent(names[1])}`;
+    const query=`?sheet=${encodeURIComponent(sheetName)}`;
     const response=await fetch(`${CLOUD_API_URL}${query}`,{mode:'cors',cache:'no-store'});
     if(!response.ok) throw new Error(`Download failed (${response.status})`);
     const result=await response.json();
     if(result.status!=='success') throw new Error(result.message || 'Download failed');
-    if(expectedEpoch!==getClearEpoch(contest)){
-      setStatus('The local contest was erased while downloading. Run Download again if you still want a local copy.',7000);
+    const names=normalizeContestNames(result.names);
+    if(names.length!==2) throw new Error('The score sheet does not contain two player names');
+    const contest=getContestKey(names);
+    const expectedEpoch=epochSnapshot.get(contest);
+    if(expectedEpoch!==undefined && expectedEpoch!==getClearEpoch(contest)){
+      setStatus('The local contest was erased while downloading. Run Download again if you still want a local copy.',7000,'error');
       return;
-    }
-    if(!Array.isArray(result.names) || result.names[0]!==names[0] || result.names[1]!==names[1]){
-      throw new Error('Player names do not match this sheet');
     }
     const cloudGames=(result.games || []).map(game=>{
       const scores=[Number(game.p1_score),Number(game.p2_score)];
       const normalized=normalizeGameDate(game.date);
-      return {date:normalized.date,time:normalized.time,names:[...names],scores,winnerIdx:scores[0]>=scores[1]?0:1};
+      return {date:normalized.date,time:normalized.time,names:[...names],scores,winnerIdx:scores[0]>=scores[1]?0:1,scorekeeper:String(game.scorekeeper || names[0])};
     });
     const wasActive=getContestKey(S.names)===contest;
     if(wasActive) updateContest();
     const existing=S.contests[contest] || createEmptyContest(names);
     const localGames=existing.pastGames || [];
     const cloudKeys=new Set(cloudGames.map(gameKey));
-    const localOnly=localGames.filter(game=>!cloudKeys.has(gameKey(game)));
-    existing.pastGames=mergeCloudAndLocal(cloudGames,localGames);
-    S.contests[contest]=existing;
-    setBackupConfig(contest,{sheetName,enabled:true,scriptVersion:String(result.script_version || '')});
-    localStorage.setItem(CLOUD_SYNC_PREFIX+contest,String(Date.now()));
-    S.optionsDataMode='empty';
-    S.cloudSheetName='';
-    S.cloudNames=['',''];
-    S.tab=0;
-    switchContest(names,wasActive);
-    const upload=await appendContestDataToCloud(localOnly,names);
-    if(upload===null){
-      setStatus('The local contest was erased before its pending scores could be uploaded.',7000);
-      return;
-    }
-    if(!upload.ok){
-      setStatus(`Downloaded ${cloudGames.length} scores, but could not upload existing local scores.`,7000);
-      return;
-    }
     const conflictCount=localGames.filter(game=>{
       const cloudGame=cloudGames.find(item=>gameKey(item)===gameKey(game));
       if(!cloudGame) return false;
       const localScores=gameScores(game), cloudScores=gameScores(cloudGame);
       return localScores[0]!==cloudScores[0] || localScores[1]!==cloudScores[1];
     }).length;
-    setStatus(`Downloaded ${cloudGames.length} scores for ${names[0]} vs ${names[1]}.${conflictCount ? ` Kept server scores for ${conflictCount} conflicting timestamp${conflictCount===1?'':'s'}.` : ''}`,7000);
+    const localOnly=localGames.filter(game=>!cloudKeys.has(gameKey(game)));
+    existing.pastGames=mergeCloudAndLocal(cloudGames,localGames);
+    S.contests[contest]=existing;
+    setBackupConfig(contest,{sheetName,enabled:true,scriptVersion:String(result.script_version || ''),scorekeeper});
+    localStorage.setItem(CLOUD_SYNC_PREFIX+contest,String(Date.now()));
+    S.optionsDataMode='empty';
+    S.cloudSheetName='';
+    S.cloudScorekeeper='';
+    S.tab=2;
+    switchContest(names,wasActive);
+    S.scorekeeperName=scorekeeper;
+    save();
+    render();
+    const upload=await appendContestDataToCloud(localOnly,names);
+    if(upload===null){
+      setStatus('The local contest was erased before its pending scores could be uploaded.',7000,'error');
+      return;
+    }
+    if(!upload.ok){
+      setStatus(`Downloaded ${cloudGames.length} scores, but could not upload existing local scores.`,7000,'error');
+      return;
+    }
+    if(conflictCount){
+      setStatus(`Kept server scores for ${conflictCount} conflicting timestamp${conflictCount===1?'':'s'}.`,7000,'error');
+    }
   }catch(error){
-    setStatus(`Could not download cloud contest: ${error.message || error}`,7000);
+    setStatus(`Could not download cloud contest: ${error.message || error}`,7000,'error');
   }
 }
 
@@ -699,7 +817,7 @@ function beginPlayerEntry(){
 
 function showVersionStamp(){
   const config=getBackupConfig();
-  setStatus(`${APP_VERSION}${config.scriptVersion ? ` � ${config.scriptVersion}` : ''}`,0);
+  setStatus(`${APP_VERSION}${config.scriptVersion ? ` ${config.scriptVersion}` : ''}`,0,'status');
 }
 
 function toggleDarkMode(enabled){
@@ -707,7 +825,10 @@ function toggleDarkMode(enabled){
   applyTheme();
   save();
   render();
-  setStatus(enabled?'Dark mode on.':'Using system appearance.',0);
+  S.status='';
+  S.statusUntil=0;
+  S.helpMessage='';
+  S.helpTab=-1;
 }
 
 function getVersionStamp(){
@@ -791,7 +912,8 @@ function queueFinishedGame(dateObj = new Date()){
     contest: contestKey,
     names: [...S.names],
     p1_score: S.scores[0],
-    p2_score: S.scores[1]
+    p2_score: S.scores[1],
+    scorekeeper: S.scorekeeperName.trim() || S.names[0]
   };
   if(!games.some(item => item.contest === contestKey && gameKey(item) === gameKey(game))) games.push(game);
   writePendingGames(games);
@@ -820,16 +942,17 @@ async function syncPendingGamesOnce(){
         const names=Array.isArray(game.names) ? game.names : S.names;
         const response=await fetch(url,{method:'POST',mode:'cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({
           mode:'append',sheet:config.sheetName,names,
-          date:game.date,p1_score:game.p1_score,p2_score:game.p2_score
+          date:game.date,p1_score:game.p1_score,p2_score:game.p2_score,
+          scorekeeper:game.scorekeeper || config.scorekeeper || names[0]
         })});
         const result=await response.json();
         if(result.status!=='success') throw new Error(result.message || 'Cloud upload failed');
         writePendingGames(readPendingGames().filter(item => !(item.contest === game.contest && gameKey(item) === gameKey(game))));
         if(Number(result.conflicts || 0) > 0 && game.contest === getContestKey(S.names)){
-          setStatus('A different score already exists on the server for this minute; the server score is kept.',7000);
+          setStatus('A different score already exists on the server for this minute; the server score is kept.',7000,'error');
         }
       }catch(e){
-        if(game.contest === getContestKey(S.names)) setStatus(`Cloud upload failed: ${e.message || e}`, 7000);
+        if(game.contest === getContestKey(S.names)) setStatus(`Cloud upload failed: ${e.message || e}`,7000,'error');
       }
     });
   }
@@ -852,7 +975,7 @@ async function loadCloudGamesForContest(names = S.names) {
   const config=getBackupConfig(contestKey);
   const url = getBackupUrl(contestKey);
   if (!config.enabled || !url || !config.sheetName) return null;
-  const query=`?sheet=${encodeURIComponent(config.sheetName)}&p1=${encodeURIComponent(names[0])}&p2=${encodeURIComponent(names[1])}`;
+  const query=`?sheet=${encodeURIComponent(config.sheetName)}`;
   const response = await fetch(`${url}${query}`,{mode:'cors', cache:'no-store'});
   if(!response.ok) throw new Error(`Cloud fetch failed (${response.status})`);
   const result = await response.json();
@@ -864,7 +987,8 @@ async function loadCloudGamesForContest(names = S.names) {
       date: normalizedDate.date,
       time: normalizedDate.time,
       scores,
-      winnerIdx: scores[0] >= scores[1] ? 0 : 1
+      winnerIdx: scores[0] >= scores[1] ? 0 : 1,
+      scorekeeper:String(game.scorekeeper || names[0])
     };
   });
 }
@@ -899,6 +1023,7 @@ async function syncContestFromCloud(names){
       }).length;
       if(current) current.pastGames = merged;
       S.pastGames = merged;
+      ensureGameHistoryEntries(merged,contestNames);
       updateContest();
       save();
       render();
@@ -910,7 +1035,7 @@ async function syncContestFromCloud(names){
           names: contestNames,
           games: toUpload.map(game => {
             const scores = gameScores(game);
-            return {date: gameKey(game), p1_score: scores[0], p2_score: scores[1]};
+            return {date: gameKey(game), p1_score: scores[0], p2_score: scores[1], scorekeeper:game.scorekeeper || config.scorekeeper || contestNames[0]};
           })
         })});
         if(!response.ok) throw new Error(`Cloud upload failed (${response.status})`);
@@ -933,10 +1058,14 @@ async function syncContestFromCloud(names){
       if(added > 0) localStorage.setItem(CLOUD_RECENT_PREFIX + contestKey, JSON.stringify({count: added, time: Date.now()}));
       const uploaded = Math.max(0,toUpload.length-uploadConflicts);
       const conflictCount=resolvedConflicts+uploadConflicts;
-      setStatus(`Cloud sync complete: ${added} imported, ${uploaded} uploaded.${conflictCount ? ` Kept server scores for ${conflictCount} timestamp conflict${conflictCount===1?'':'s'}.` : ''}`, 7000);
+      if(conflictCount){
+        setStatus(`Cloud kept its existing score for ${conflictCount} timestamp conflict${conflictCount===1?'':'s'}.`,7000,'error');
+      }else{
+        setStatus(`Cloud sync complete: ${added} imported, ${uploaded} uploaded.`,7000);
+      }
     });
   }catch(error){
-    if(getContestKey(S.names) === contestKey) setStatus(`Cloud sync failed: ${error.message || error}`, 7000);
+    if(getContestKey(S.names) === contestKey)     setStatus(`Cloud sync failed: ${error.message || error}`,7000,'error');
   }
 }
 
@@ -948,27 +1077,23 @@ async function syncActiveContest(){
 function openImport(){
   S.optionsDataMode='import';
   S.optionsDataText='';
+  S.status='';
+  S.statusUntil=0;
+  S.helpMessage='';
+  S.helpTab=-1;
   save();
   render();
-  let prefix = '';
-  try{
-    const recentKey = CLOUD_RECENT_PREFIX + getContestKey(S.names);
-    const recent = JSON.parse(localStorage.getItem(recentKey) || 'null');
-    if(recent && recent.count){
-      prefix = `Found ${recent.count} new scores from server. `;
-      localStorage.removeItem(recentKey);
-    }
-  }catch(e){}
-  setStatus(`${prefix}Paste scores into Data and press Import again to add scores.`,0);
 }
 
 function createContestFromData(){
-  const raw=String(S.optionsDataText || '').trim();
-  const names=raw.includes('\n')
-    ? raw.split(/\r?\n/).map(name=>name.trim()).filter(Boolean)
-    : raw.split('|').map(name=>name.trim()).filter(Boolean);
+  const player1=document.getElementById('new-player-1');
+  const player2=document.getElementById('new-player-2');
+  const names=[
+    String(player1 ? player1.value : (S.newNames[0] || '')).trim(),
+    String(player2 ? player2.value : (S.newNames[1] || '')).trim()
+  ];
   if(names.length!==2 || !names[0] || !names[1]){
-    setStatus('Enter exactly two player names on separate lines (or separated by |).');
+    setStatus('Enter both player names.',5000,'error');
     return;
   }
   S.showNewContestInputs=false;
@@ -1015,10 +1140,11 @@ function load(){
     }
     const d=JSON.parse(r);
     Object.assign(S, d);
+    S.pendingScoreEntryId=null;
     S.optionsDataMode='empty';
     S.optionsDataText='';
     S.cloudSheetName='';
-    S.cloudNames=['',''];
+    S.cloudScorekeeper='';
     S.clearConfirm=null;
     S.status='';
     S.statusUntil=0;
@@ -1046,6 +1172,38 @@ function load(){
     });
     if(!S.contests) S.contests = {};
     S.contests = migrateContestKeys(S.contests);
+    if(!Array.isArray(d.scoreHistory)){
+      const legacyHistory=[...(S.records || []),...(S.lastGameRecentScores || [])];
+      const seenHistoryIds=new Set();
+      S.scoreHistory=legacyHistory.filter(record=>{
+        if(record.type!=='score' || seenHistoryIds.has(record.id)) return false;
+        seenHistoryIds.add(record.id);
+        return true;
+      }).map(record=>({
+        id:record.id,
+        kind:'score',
+        points:record.pts,
+        playerName:(S.names || [])[record.who] || '',
+        time:record.time || ''
+      }));
+    }
+    if(typeof S.scorekeeperName!=='string') S.scorekeeperName='';
+    S.scoreHistory=ensureGameHistoryEntries(S.pastGames,S.names,S.scoreHistory);
+    S.scoreHistory=truncateScoreHistory(S.scoreHistory,S.records);
+    Object.values(S.contests).forEach(contest=>{
+      if(!Array.isArray(contest.scoreHistory)){
+        contest.scoreHistory=(contest.records || []).filter(record=>record.type==='score').map(record=>({
+          id:record.id,
+          kind:'score',
+          points:record.pts,
+          playerName:(contest.names || [])[record.who] || '',
+          time:record.time || ''
+        }));
+      }
+      if(typeof contest.scorekeeperName!=='string') contest.scorekeeperName='';
+      contest.scoreHistory=ensureGameHistoryEntries(contest.pastGames,contest.names,contest.scoreHistory);
+      contest.scoreHistory=truncateScoreHistory(contest.scoreHistory,contest.records);
+    });
     if(!S.theme) S.theme = 'system';
     if(!Array.isArray(S.lastGameRecentScores)) S.lastGameRecentScores = [];
     if(typeof S.helpMessage === 'undefined') S.helpMessage = '';
@@ -1119,6 +1277,8 @@ function updateContest() {
     scores: [...S.scores],
     handScores: [...S.handScores],
     records: [...S.records],
+    scoreHistory:[...S.scoreHistory],
+    scorekeeperName:S.scorekeeperName,
     lastGameRecentScores: [...S.lastGameRecentScores],
     pastGames: [...S.pastGames],
     target: S.target,
@@ -1142,6 +1302,8 @@ function createEmptyContest(names) {
     scores:[0,0],
     handScores:[0,0],
     records:[],
+    scoreHistory:[],
+    scorekeeperName:'',
     lastGameRecentScores:[],
     pastGames:[],
     target:50,
@@ -1177,7 +1339,14 @@ function domTile(){
   return `<img src="domino.svg" class="domino-icon" alt="Domino icon"/>`;
 }
 
-function setStatus(msg,timeout=5000){
+function setStatus(msg,timeout=5000,kind='info'){
+  if(kind==='info'){
+    S.status='';
+    S.statusUntil=0;
+    LAST_STATUS_SET=Date.now();
+    save();render();
+    return;
+  }
   S.status=msg;S.statusUntil=timeout>0?Date.now()+timeout:0;LAST_STATUS_SET=Date.now();
   if(msg && !msg.includes('Click here to reset')) S.lastStatus = msg;
   save();render();
@@ -1190,8 +1359,12 @@ function clearStatus(){
 function beginClearConfirmation(){
   const contest = getContestKey(S.names);
   if (!contest) return;
-  S.optionsDataMode='empty';
+  S.optionsDataMode='erase-confirm';
   S.optionsDataText='';
+  S.status='';
+  S.statusUntil=0;
+  S.helpMessage='';
+  S.helpTab=-1;
   S.clearConfirm = { contest, names: [...S.names] };
   save();
   render();
@@ -1199,6 +1372,7 @@ function beginClearConfirmation(){
 
 function cancelClearConfirmation(){
   S.clearConfirm = null;
+  S.optionsDataMode='empty';
   save();
   render();
 }
@@ -1227,6 +1401,8 @@ async function performClearScores(){
   S.scores = [0, 0];
   S.handScores = [0, 0];
   S.records = [];
+  S.scoreHistory = [];
+  S.scorekeeperName = '';
   S.lastGameRecentScores = [];
   S.gameOver = false;
   S.pendingWin = false;
@@ -1270,26 +1446,66 @@ function highDoublePrompt(){
   return 'Click player with high double to start a new game.';
 }
 
-function notifyStarterPrompt(){
-  setStatus('Click on user with high double to start game.', 0);
+function addScoreHistoryEntry(entry){
+  S.scoreHistory.push(entry);
+  S.shouldScrollHistory=true;
 }
 
-function lastGameStatusMessage(){
-  if(S.lastGameEndStatus) return S.lastGameEndStatus;
-  const games = (S.pastGames || []).slice().sort((a,b) => gameKey(a).localeCompare(gameKey(b)));
-  const game = games[games.length - 1];
-  if(!game) return highDoublePrompt();
-  const scores = gameScores(game);
-  if(scores[0] === scores[1]){
-    return `The last game was tied ${scores[0]} to ${scores[1]}.\nClick user with high double to start a new game.`;
+function updatePendingScoreEntry(){
+  const points=parseInt(S.display,10);
+  if(!S.display || !Number.isFinite(points)){
+    if(S.pendingScoreEntryId){
+      S.scoreHistory=S.scoreHistory.filter(entry=>entry.id!==S.pendingScoreEntryId);
+      S.pendingScoreEntryId=null;
+    }
+    return;
   }
-  const winner = scores[0] > scores[1] ? 0 : 1;
-  const winnerName = (game.names && game.names[winner]) || S.names[winner];
-  return `${winnerName} won the last game ${scores[0]} to ${scores[1]}.\nClick user with high double to start a new game.`;
+  if(!S.pendingScoreEntryId){
+    S.pendingScoreEntryId=`pending:${S.nextScoreRowId++}`;
+    S.scoreHistory.push({
+      id:S.pendingScoreEntryId,
+      kind:'score',
+      pending:true,
+      points,
+      playerName:'',
+      time:''
+    });
+  }else{
+    const entry=S.scoreHistory.find(item=>item.id===S.pendingScoreEntryId);
+    if(entry) entry.points=points;
+  }
+  S.shouldScrollHistory=true;
+}
+
+function assignPendingScoreEntry(rowId, points, playerName){
+  if(!S.pendingScoreEntryId) return;
+  const entry=S.scoreHistory.find(item=>item.id===S.pendingScoreEntryId);
+  if(entry){
+    entry.id=rowId;
+    entry.pending=false;
+    entry.points=points;
+    entry.playerName=playerName;
+  }
+  S.pendingScoreEntryId=null;
+}
+
+function flashWinner(index){
+  winnerFlashIdx=index;
+  if(winnerFlashTimer) clearTimeout(winnerFlashTimer);
+  render();
+  winnerFlashTimer=setTimeout(()=>{
+    winnerFlashIdx=-1;
+    winnerFlashTimer=null;
+    render();
+  },1500);
+}
+
+function notifyStarterPrompt(){
+  setStatus('Click player with high double to start a new game.',0,'error');
 }
 
 function notifyHighDoublePrompt(){
-  setStatus(waitingForHighDouble() ? lastGameStatusMessage() : highDoublePrompt(), 0);
+  setStatus('Click player with high double to start a new game.',0,'error');
 }
 
 function clearHelp(){
@@ -1312,7 +1528,9 @@ function ackStatus(){
 function showHelp(){
   clearStatus();
   S.helpTab = S.tab;
-  if (S.tab === 0) {
+  if (S.tab === 2 && S.clearConfirm) {
+    S.helpMessage = `Erase local data for ${S.clearConfirm.names[0] || 'Player 1'} vs ${S.clearConfirm.names[1] || 'Player 2'}?\nThe server copy remains.`;
+  } else if (S.tab === 0) {
     if (S.phase === 'play') {
       S.helpMessage = `Enter number and click Player to add that to their score. Delete mistakes in recent scores by clicking red x. Replace by adding the correct score.`;
     } else if (S.phase === 'start') {
@@ -1321,7 +1539,10 @@ function showHelp(){
       S.helpMessage = `Game finished. ${highDoublePrompt()}`;
     }
   } else if (S.optionsDataMode === 'cloud-create') {
-    S.helpMessage = `Choose a hard-to-guess sheet name and keep it secret. Anyone with the sheet name and both player names can download and add scores.`;
+    const existing=getBackupConfig();
+    S.helpMessage = existing.sheetName && existing.enabled===false
+      ? `Click enable to restore cloud backup. Update Score keeper name as needed.`
+      : `Choose a hard-to-guess sheet name and keep it secret. Anyone with the sheet name and both player names can download and add scores.`;
   } else if (S.optionsDataMode === 'cloud-download') {
     S.helpMessage = `Enter the sheet name and both player names exactly as shown in the shared contest. Download creates or attaches a local copy.`;
   } else if (S.optionsDataMode === 'new-contest') {
@@ -1330,6 +1551,14 @@ function showHelp(){
     S.helpMessage = `Paste score data in the format shown, then select Import to add it to this contest.`;
   } else if (S.optionsDataMode === 'export') {
     S.helpMessage = `Export copies this contest's completed scores. Save the copied text somewhere safe.`;
+  } else if (S.optionsDataMode === 'erase-confirm') {
+    S.helpMessage = `Erase removes local scores for this contest. The server copy remains and can be restored with Download.`;
+  } else if (S.tab === 2 && S.backupEnabled === false) {
+    S.helpMessage = `Cloud backup disabled.`;
+  } else if (S.tab === 2 && S.theme === 'dark') {
+    S.helpMessage = `Dark mode set.`;
+  } else if (S.tab === 2) {
+    S.helpMessage = `Dark mode set to system appearance.`;
   } else {
     S.helpMessage = `Create a contest with New..., or copy a shared contest with Download.... Import and Export move score data. Erase removes only the local copy.`;
   }
@@ -1338,6 +1567,7 @@ function showHelp(){
 
 function resetForNewGame(){
   S.scores=[0,0];S.handScores=[0,0];S.display='';S.records=[];
+  S.pendingScoreEntryId=null;
   S.lastGameRecentScores=[];
   S.gameOver=false;S.pendingWin=false;S.phase='start';
   S.starterSelection=true;
@@ -1361,7 +1591,10 @@ function pressKey(v){
   const hadPlayerHighlight = S.starterSelection || S.showFirstPlayer;
   clearPlayerHighlights();
   S.display+=v;
+  updatePendingScoreEntry();
   if(hadPlayerHighlight){save();render();return;}
+  save();
+  render();
   const el=document.getElementById('display-bar');
   if(el){el.textContent=S.display;el.className='display-bar';}
 }
@@ -1378,7 +1611,10 @@ function delKey(){
   const hadPlayerHighlight = S.starterSelection || S.showFirstPlayer;
   clearPlayerHighlights();
   S.display=S.display.slice(0,-1);
+  updatePendingScoreEntry();
   if(hadPlayerHighlight){save();render();return;}
+  save();
+  render();
   const el=document.getElementById('display-bar');
   if(el){el.textContent=S.display||'0';el.className='display-bar'+(S.display?'':' dim');}
 }
@@ -1420,21 +1656,24 @@ function tapPlayer(i){
     S.firstPlayer=starter;
     S.handFirstPlayer=starter;
     S.handNum=1;
-    S.showFirstPlayer=false;
+    S.showFirstPlayer=true;
     if(pts>0){
       S.scores[i]+=pts;S.handScores[i]+=pts;
       S.lastAdded=['',''];S.lastAdded[i]='+'+pts;
       const rowId = S.nextScoreRowId++;
-      S.records.push({id: rowId, who:i,pts,time:ts(),type:'score',hand:1,totalAfter:[S.scores[0],S.scores[1]]});
+      const record={id:rowId,who:i,pts,time:ts(),type:'score',hand:1,totalAfter:[S.scores[0],S.scores[1]]};
+      S.records.push(record);
+      addScoreHistoryEntry({id:rowId,kind:'score',points:pts,playerName:S.names[i],time:record.time});
       if(S.scores[i]>=S.target)S.pendingWin=true;
     }
     S.display='';S.phase='play';
     S.status='';S.statusUntil=0;S.helpMessage='';S.helpTab=-1;
     if(startingNewGame) S.lastGameEndStatus='';
-    setStatus(`${S.names[starter]} has the highest double, ${S.names[1-starter]} will start the next hand.`,15000);return;
+    save();render();return;
   }
   if(pts<=0){
     S.display='';
+    updatePendingScoreEntry();
     const el=document.getElementById('display-bar');
     if(el){el.textContent='0';el.className='display-bar dim';}
     return;
@@ -1444,18 +1683,28 @@ function tapPlayer(i){
   S.scores[i]+=pts;S.handScores[i]+=pts;
   S.lastAdded=['',''];S.lastAdded[i]='+'+pts;
   const rowId = S.nextScoreRowId++;
-  S.records.push({id: rowId, who:i,pts,time:ts(),type:'score',hand:S.handNum,totalAfter:[S.scores[0],S.scores[1]]});
+  const record={id:rowId,who:i,pts,time:ts(),type:'score',hand:S.handNum,totalAfter:[S.scores[0],S.scores[1]]};
+  S.records.push(record);
+  assignPendingScoreEntry(rowId,pts,S.names[i]);
+  if(!S.scoreHistory.some(entry=>entry.id===rowId)){
+    addScoreHistoryEntry({id:rowId,kind:'score',points:pts,playerName:S.names[i],time:record.time});
+  }
   if(S.scores[i]>=S.target)S.pendingWin=true;
   S.display='';
   save();render();
 }
 
 function callDomino(event){
-  if(S.phase==='start') return;
-  if(waitingForHighDouble()) return;
+  if(S.phase==='start'){
+    notifyStarterPrompt();
+    return;
+  }
+  if(waitingForHighDouble()){
+    notifyHighDoublePrompt();
+    return;
+  }
   clearStarterSelection();
   if(S.phase!=='play'||S.gameOver){
-    setStatus(highDoublePrompt());
     return;
   }
   
@@ -1463,50 +1712,48 @@ function callDomino(event){
   const handTotals = [S.handScores[0], S.handScores[1]];
   
   // Record the domino call
-  S.records.push({
+  const dominoRecord={
     id: S.nextScoreRowId++,
     who: -1, pts: 0, time: ts(), type: 'domino', hand: S.handNum,
     totalAfter: [S.scores[0], S.scores[1]],
     handTotals, gameEnds
+  };
+  S.records.push(dominoRecord);
+  const handWinner = handTotals[0] === handTotals[1] ? -1 : (handTotals[0] > handTotals[1] ? 0 : 1);
+  addScoreHistoryEntry({
+    id:dominoRecord.id,
+    kind:'hand',
+    scores:handTotals,
+    label:handWinner < 0 ? 'tied hand' : `${S.names[handWinner]} hand`
   });
-  S.shouldScrollHistory = true;
-  
-  // Build hand winner message
-  let handMsg = '';
-  if (handTotals[0] === handTotals[1]) {
-    handMsg = `A ${handTotals[0]} ${handTotals[1]} tied hand`;
-  } else {
-    const handWinner = handTotals[0] > handTotals[1] ? 0 : 1;
-    const handWinnerName = S.names[handWinner];
-    handMsg = `${handWinnerName} won that hand ${Math.max(handTotals[0], handTotals[1])} ${Math.min(handTotals[0], handTotals[1])}`;
-  }
-  
-  let msg = handMsg;
+
   S.gameEndMessage = '';
+  let flashIndex=-1;
   
-  // If game is ending, add game info
   if (gameEnds) {
     S.pendingWin = false;
     
     if (S.scores[0] !== S.scores[1]) {
-      // Game winner
       const gameWinner = S.scores[0] > S.scores[1] ? 0 : 1;
-      const gameWinnerName = S.names[gameWinner];
-      const winnerScore = S.scores[gameWinner];
-      const loserScore = S.scores[1 - gameWinner];
-      msg = `${gameWinnerName} wins ${winnerScore} to ${loserScore} on a ${handTotals[0]} ${handTotals[1]} hand.`;
-      S.gameEndMessage = msg;
-      S.lastGameEndStatus = `${gameWinnerName} won the last game ${winnerScore} to ${loserScore}.\nClick user with high double to start a new game.`;
-      
-      // Record and save game end
-      S.records.push({
-        who: -1, pts: 0, time: ts(), type: 'gameover',
-        finalScores: [S.scores[0], S.scores[1]], winnerIdx: gameWinner, winnerName: S.names[gameWinner]
-      });
       const now = new Date();
+      const finishedGameKey=formatIsoDate(now);
+      const gameoverRecord={
+        id:S.nextScoreRowId++,
+        who:-1,pts:0,time:ts(),type:'gameover',
+        finalScores: [S.scores[0], S.scores[1]], winnerIdx: gameWinner, winnerName: S.names[gameWinner]
+      };
+      S.records.push(gameoverRecord);
+      addScoreHistoryEntry({
+        id:gameoverRecord.id,
+        kind:'game',
+        gameKey:finishedGameKey,
+        scores:[S.scores[0],S.scores[1]],
+        label:`${S.names[gameWinner]} game`
+      });
       S.pastGames.unshift({
         time: ds(now), date: formatIsoDate(now), names: [S.names[0], S.names[1]],
-        scores: [S.scores[0], S.scores[1]], winnerIdx: gameWinner
+        scores: [S.scores[0], S.scores[1]], winnerIdx: gameWinner,
+        scorekeeper:S.scorekeeperName.trim() || S.names[0]
       });
       queueFinishedGame(now);
       S.gameOver = true;
@@ -1514,11 +1761,15 @@ function callDomino(event){
       S.showFirstPlayer = false;
       END_SCORE_HOLD = [S.scores[0], S.scores[1]];
       S.scores = [0, 0];
+      flashIndex=gameWinner;
     } else {
-      // Game is tied
-      msg = `The game is tied ${S.scores[0]} to ${S.scores[1]} on a ${handTotals[0]} ${handTotals[1]} hand.`;
-      S.gameEndMessage = msg;
-      S.lastGameEndStatus = `The last game was tied ${S.scores[0]} to ${S.scores[1]}.\nClick user with high double to start a new game.`;
+      const gameoverRecord={
+        id:S.nextScoreRowId++,
+        who:-1,pts:0,time:ts(),type:'gameover',
+        finalScores:[S.scores[0],S.scores[1]],winnerIdx:-1,winnerName:''
+      };
+      S.records.push(gameoverRecord);
+      addScoreHistoryEntry({id:gameoverRecord.id,kind:'game',scores:[S.scores[0],S.scores[1]],label:'tied game'});
       S.gameOver = true;
       S.phase = 'end';
       S.showFirstPlayer = false;
@@ -1530,10 +1781,8 @@ function callDomino(event){
     S.firstPlayer = nextStarter;
     S.handNum++;
     S.showFirstPlayer = true;
-    msg += `\n${S.names[nextStarter]} goes first.`;
   }
   
-  // Always show the message
   S.handScores = [0, 0];
   S.lastAdded = ['', ''];
   S.display = '';
@@ -1541,28 +1790,46 @@ function callDomino(event){
   if(S.phase==='end'){
     S.lastGameRecentScores=S.records.filter(record=>record.type==='score').slice(-4).map(record=>({...record}));
   }
-  dominoAnnouncementActive=true;
-  dominoAnnouncementEvent=event || null;
-  setStatus(msg,0);
+  S.status='';
+  S.statusUntil=0;
+  S.helpMessage='';
+  S.helpTab=-1;
   save();
   render();
+  if(flashIndex>=0) flashWinner(flashIndex);
 }
 
 function recalcTotals(){
   const running=[0,0];
+  const handRunning=[0,0];
   for(const rec of S.records){
     if(rec.type==='score'){
       running[rec.who]+=rec.pts;
+      handRunning[rec.who]+=rec.pts;
       rec.totalAfter=[running[0],running[1]];
+      const historyEntry=S.scoreHistory.find(entry=>entry.id===rec.id);
+      if(historyEntry) historyEntry.points=rec.pts;
     } else if(rec.type==='domino'){
       rec.totalAfter=[running[0],running[1]];
+      rec.handTotals=[...handRunning];
+      const historyEntry=S.scoreHistory.find(entry=>entry.id===rec.id);
+      if(historyEntry){
+        historyEntry.scores=[...handRunning];
+        const winner=handRunning[0]===handRunning[1]?-1:(handRunning[0]>handRunning[1]?0:1);
+        historyEntry.label=winner<0?'tied':`${S.names[winner]} takes hand`;
+      }
+      handRunning[0]=0;
+      handRunning[1]=0;
       if(rec.gameEnds){running[0]=0;running[1]=0;}
     } else if(rec.type==='gameover'){
       rec.finalScores=[running[0],running[1]];
+      const historyEntry=S.scoreHistory.find(entry=>entry.id===rec.id);
+      if(historyEntry) historyEntry.scores=[...running];
       running[0]=0;running[1]=0;
     }
   }
   S.scores=[running[0],running[1]];
+  S.handScores=[...handRunning];
   S.pendingWin=S.scores[0]>=S.target||S.scores[1]>=S.target;
 }
 
@@ -1571,6 +1838,7 @@ function deleteRecord(id){
   const idx = S.records.findIndex(record => record.id === id);
   if(idx === -1) return;
   S.records.splice(idx,1);
+  S.scoreHistory=S.scoreHistory.filter(entry=>entry.id!==id);
   recalcTotals();S.gameOver=false;S.pendingWin=false;
   save();render();
 }
@@ -1579,7 +1847,7 @@ function deleteScore(id){
   if(S.phase==='end' || S.gameOver) return;
   const idx = S.records.findIndex(r => r.id === id);
   if (idx === -1) return;
-  const row = document.querySelector(`.hist-mini-row[data-score-id="${id}"]`);
+  const row = document.querySelector(`.hist-mini-row[data-history-id="${id}"]`);
   if (row) {
     row.classList.add('removing');
     setTimeout(() => {
@@ -1590,7 +1858,7 @@ function deleteScore(id){
   }
 }
 
-function patchMiniHistory(recentScores) {
+function patchMiniHistory(historyEntries) {
   const statusTextContainer = document.querySelector('.status-bar .status-text');
   if (!statusTextContainer) return;
   let list = statusTextContainer.querySelector('.hist-mini');
@@ -1599,72 +1867,71 @@ function patchMiniHistory(recentScores) {
     statusTextContainer.innerHTML = '<div class="hist-mini"></div>';
     list = statusTextContainer.querySelector('.hist-mini');
   }
-
-  const existingRowMap = new Map();
-  list.querySelectorAll('.hist-mini-row').forEach(row => {
-    const id = Number(row.dataset.scoreId);
-    if (!isNaN(id)) existingRowMap.set(id, row);
-  });
-
-  const targetIds = new Set(recentScores.map(r => r.id));
-  existingRowMap.forEach((row, id) => {
-    if (!targetIds.has(id)) {
-      if (!row.classList.contains('removing') && !row.classList.contains('exiting-top')) {
-        row.classList.add('exiting-top');
-        setTimeout(() => {
-          if (row.parentNode) row.parentNode.removeChild(row);
-        }, 280);
+  list.onclick=event=>event.stopPropagation();
+  const oldScrollTop=list.scrollTop;
+  const wasAtBottom=list.scrollHeight-list.scrollTop-list.clientHeight<8;
+  const nextRows=historyEntries.map(entry=>{
+    const row=document.createElement('div');
+    row.className='hist-mini-row';
+    row.dataset.historyId=String(entry.id);
+    if(entry.kind==='score'){
+      const record=S.records.find(current=>current.id===entry.id && current.type==='score');
+      if(record && !S.gameOver && S.phase!=='end'){
+        const button=document.createElement('button');
+        button.type='button';
+        button.className='hist-mini-x';
+        button.textContent='×';
+        button.setAttribute('aria-label','Delete score');
+        button.onclick=event=>{event.stopPropagation();deleteScore(entry.id);};
+        row.appendChild(button);
+      }else if(entry.pending){
+        const blank=document.createElement('span');
+        blank.className='hist-mini-old';
+        blank.textContent='';
+        blank.setAttribute('aria-label','Score awaiting player');
+        row.appendChild(blank);
+      }else{
+        const old=document.createElement('span');
+        old.className='hist-mini-old';
+        old.textContent='-';
+        old.setAttribute('aria-label','Previous game score');
+        row.appendChild(old);
       }
-    }
-  });
-
-  const nextRows = recentScores.map(rec => {
-    let row = existingRowMap.get(rec.id);
-    if (!row) {
-      row = document.createElement('div');
-      row.className = 'hist-mini-row entering';
-      row.dataset.scoreId = String(rec.id);
-      row.innerHTML = !S.records.some(current => current.id === rec.id) || S.phase === 'end' || S.gameOver ? '' : `
-        <span class="hist-mini-x" onclick="event.stopPropagation();deleteScore(${rec.id})">&#10005;</span>
-      `;
-      const ptsEl = document.createElement('span');
-      ptsEl.className = 'hist-mini-pts';
-      ptsEl.textContent = String(rec.pts);
-      const nameEl = document.createElement('span');
-      nameEl.className = 'hist-mini-name';
-      nameEl.textContent = S.names[rec.who] || '';
-      row.appendChild(ptsEl);
-      row.appendChild(nameEl);
-
-      void row.offsetHeight;
-      requestAnimationFrame(() => {
-        row.classList.remove('entering');
-        row.classList.add('enter-active');
-      });
-    } else {
-      row.classList.remove('removing', 'exiting-top');
-      const deleteButton = row.querySelector('.hist-mini-x');
-      if(S.phase === 'end' || S.gameOver) {
-        if(deleteButton) deleteButton.remove();
-      } else if(!deleteButton) {
-        const button = document.createElement('span');
-        button.className = 'hist-mini-x';
-        button.textContent = '✕';
-        button.onclick = event => {
-          event.stopPropagation();
-          deleteScore(rec.id);
-        };
-        row.prepend(button);
+      const points=document.createElement('span');
+      points.className='hist-mini-pts';
+      points.textContent=String(entry.points);
+      const name=document.createElement('span');
+      name.className='hist-mini-name';
+      name.textContent=entry.playerName || '';
+      row.append(points,name);
+    }else{
+      if(entry.kind==='hand'){
+        const icon=document.createElement('img');
+        icon.className='hist-mini-icon';
+        icon.src='domino.svg';
+        icon.alt='Hand';
+        row.appendChild(icon);
+      }else{
+        const icon=document.createElement('span');
+        icon.className='hist-mini-icon';
+        icon.textContent='★';
+        icon.setAttribute('aria-label','Game');
+        row.appendChild(icon);
       }
-      const ptsEl = row.querySelector('.hist-mini-pts');
-      const nameEl = row.querySelector('.hist-mini-name');
-      if (ptsEl) ptsEl.textContent = String(rec.pts);
-      if (nameEl) nameEl.textContent = S.names[rec.who] || '';
+      const pair=document.createElement('span');
+      pair.className='hist-mini-pair';
+      pair.textContent=(entry.scores || []).join('/');
+      const label=document.createElement('span');
+      label.className='hist-mini-label';
+      label.textContent=entry.label || '';
+      row.append(pair,label);
     }
     return row;
   });
-
   list.replaceChildren(...nextRows);
+  if(S.shouldScrollHistory || wasAtBottom) list.scrollTop=list.scrollHeight;
+  else list.scrollTop=oldScrollTop;
+  S.shouldScrollHistory=false;
 }
 
 function startEdit(idx){
@@ -1739,7 +2006,8 @@ async function appendContestDataToCloud(games, names, expectedEpoch) {
       const payloadGames = games.map(game => ({
         date: normalizeGameDate(game.date || game.time || '').date,
         p1_score: Number(game.scores ? game.scores[0] : (game.p1_score || 0)),
-        p2_score: Number(game.scores ? game.scores[1] : (game.p2_score || 0))
+        p2_score: Number(game.scores ? game.scores[1] : (game.p2_score || 0)),
+        scorekeeper:String(game.scorekeeper || config.scorekeeper || names[0])
       }));
       const response = await fetch(url,{method:'POST',mode:'cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({
         mode:'append',sheet:config.sheetName,names:[...names],games:payloadGames
@@ -1748,7 +2016,7 @@ async function appendContestDataToCloud(games, names, expectedEpoch) {
       const result = await response.json();
       if(result.status !== 'success') throw new Error(result.message || 'Cloud sync failed');
       if(Number(result.conflicts || 0) > 0 && contest===getContestKey(S.names)){
-        setStatus(`Cloud kept its existing score for ${result.conflicts} timestamp conflict${Number(result.conflicts)===1?'':'s'}.`,7000);
+        setStatus(`Cloud kept its existing score for ${result.conflicts} timestamp conflict${Number(result.conflicts)===1?'':'s'}.`,7000,'error');
       }
       return {ok:true,conflicts:Number(result.conflicts || 0)};
     } catch (e) {
@@ -1766,7 +2034,7 @@ async function appendContestDataToCloud(games, names, expectedEpoch) {
 async function doImport(){
   const ta=document.getElementById('options-data');
   if(!ta||!ta.value.trim()){
-    setStatus('Paste score data into Data before importing.',0);
+  setStatus('Paste score data into Data before importing.',0,'error');
     return;
   }
   S.optionsDataText=ta.value;
@@ -1782,7 +2050,7 @@ async function doImport(){
     if (firstLine[0] && firstLine[0].toLowerCase() === 'date') {
       names = [firstLine[1] || '', firstLine[2] || ''];
       if (!names[0] || !names[1]) {
-        setStatus('Invalid CSV header: expected date,Player 1,Player 2');
+        setStatus('Invalid CSV header: expected date,Player 1,Player 2',5000,'error');
         return;
       }
       for(let i=1; i<rawLines.length; i++) {
@@ -1804,7 +2072,7 @@ async function doImport(){
     } else {
       names = rawLines[0].split('|').map(n => n.trim());
       if(names.length !== 2 || !names[0] || !names[1]) {
-        setStatus('Invalid first line: use "date,Player 1,Player 2" or the legacy "Player 1 | Player 2" format');
+        setStatus('Invalid first line: use "date,Player 1,Player 2" or the legacy "Player 1 | Player 2" format',5000,'error');
         return;
       }
       for(let i=1; i<rawLines.length; i++) {
@@ -1830,7 +2098,7 @@ async function doImport(){
     }
 
     if(rawLines.length > 1 && games.length === 0) {
-      setStatus('No valid games found — expected date,score1,score2 rows');
+      setStatus('No valid games found — expected date,score1,score2 rows',5000,'error');
       return;
     }
     
@@ -1874,16 +2142,16 @@ async function doImport(){
       render();
       return {added, conflicts};
     });
-    if(importResult === null){setStatus('Import canceled because contest scores were cleared.', 5000);return;}
+    if(importResult === null){setStatus('Import canceled because contest scores were cleared.',5000,'error');return;}
     S.showNewContestInputs=false;
     switchContest(targetNames);
     if (getBackupConfig(contest).enabled && getBackupUrl(contest) && importResult.added.length) {
       const synced = await appendContestDataToCloud(importResult.added, targetNames, importEpoch);
-      if(synced === null){setStatus('Scores were cleared before cloud sync completed.', 5000);return;}
-      if(!synced.ok){setStatus('Scores added locally, but cloud sync failed.', 5000);return;}
-      if(synced.conflicts){setStatus(`Scores added locally; the server kept ${synced.conflicts} existing score${synced.conflicts===1?'':'s'} for timestamp conflicts.`,7000);return;}
+      if(synced === null){setStatus('Scores were cleared before cloud sync completed.',5000,'error');return;}
+      if(!synced.ok){setStatus('Scores added locally, but cloud sync failed.',5000,'error');return;}
+      if(synced.conflicts){setStatus(`Scores added locally; the server kept ${synced.conflicts} existing score${synced.conflicts===1?'':'s'} for timestamp conflicts.`,7000,'error');return;}
     }
-    if(importEpoch !== getClearEpoch(contest)){setStatus('Scores were cleared before import completed.', 5000);return;}
+    if(importEpoch !== getClearEpoch(contest)){setStatus('Scores were cleared before import completed.',5000,'error');return;}
     S.optionsDataMode='empty';
     S.optionsDataText='';
     const submitted = Math.max(0, rawLines.length - 1);
@@ -1893,8 +2161,19 @@ async function doImport(){
       (invalidRows > 0 ? ` Ignored ${invalidRows} invalid row${invalidRows === 1 ? '' : 's'}.` : '');
     save();
     render();
-    setStatus(importSummary, 3000);
-  }catch(err){setStatus('Could not parse data — check the format and try again.');}
+    setStatus(importSummary,3000,importResult.conflicts || invalidRows>0?'error':'info');
+  }catch(err){setStatus('Could not parse data — check the format and try again.',5000,'error');}
+}
+
+function cancelImport(){
+  S.optionsDataMode='empty';
+  S.optionsDataText='';
+  S.status='';
+  S.statusUntil=0;
+  S.helpMessage='';
+  S.helpTab=-1;
+  save();
+  render();
 }
 
 async function clearScores(){
@@ -1944,6 +2223,10 @@ function cancelNewContest() {
 
 function switchContest(newNames, skipCurrentUpdate = false) {
   stopStatsYearAnimation();
+  S.pendingScoreEntryId=null;
+  if(winnerFlashTimer) clearTimeout(winnerFlashTimer);
+  winnerFlashTimer=null;
+  winnerFlashIdx=-1;
   if (!skipCurrentUpdate) updateContest();
   const key = getContestKey(newNames);
   const c = S.contests[key];
@@ -1951,6 +2234,8 @@ function switchContest(newNames, skipCurrentUpdate = false) {
     S.scores = c.scores;
     S.handScores = c.handScores;
     S.records = c.records;
+    S.scoreHistory = truncateScoreHistory(c.scoreHistory || [], c.records || []);
+    S.scorekeeperName = c.scorekeeperName || '';
     S.lastGameRecentScores = c.lastGameRecentScores || [];
     S.pastGames = c.pastGames;
     S.target = c.target;
@@ -1969,6 +2254,8 @@ function switchContest(newNames, skipCurrentUpdate = false) {
     S.scores = [0, 0];
     S.handScores = [0, 0];
     S.records = [];
+    S.scoreHistory = [];
+    S.scorekeeperName = '';
     S.lastGameRecentScores = [];
     S.pastGames = [];
     S.gameOver = false;
@@ -1995,10 +2282,11 @@ function switchContest(newNames, skipCurrentUpdate = false) {
   S.optionsDataMode='empty';
   S.optionsDataText='';
   S.cloudSheetName='';
-  S.cloudNames=['',''];
+  S.cloudScorekeeper='';
   const backupConfig=getBackupConfig(key);
   S.backupEnabled=backupConfig.enabled;
   S.scriptVersion=backupConfig.scriptVersion;
+  S.scoreHistory=ensureGameHistoryEntries(S.pastGames,S.names,S.scoreHistory);
   updateContest();
   applyTheme();
   save();
@@ -2010,13 +2298,16 @@ function setTab(t){
   stopStatsYearAnimation();
   S.editingIdx=-1;
   S.tab=t;
-  if(t === 0 && S.phase === 'start' && S.status.startsWith('Contest selected:')){
-    S.status='';
-    S.statusUntil=0;
-  }
+  S.status='';
+  S.statusUntil=0;
+  S.gameEndMessage='';
+  S.helpMessage='';
+  S.helpTab=-1;
+  S.clearConfirm=null;
   if (t === 2 && (S.names[0] || S.names[1])) {
     S.showNewContestInputs = false;
   }
+  save();
   render();
 }
 
@@ -2131,14 +2422,13 @@ function render(){
   let defaultStartStatus = '';
   const activeHelpMessage = S.helpTab === S.tab ? S.helpMessage : '';
   const controlsDisabled = waitingForHighDouble() || S.phase === 'start';
-  const statusText = S.status || (S.tab === 0 ? S.gameEndMessage : '') || activeHelpMessage || defaultStartStatus;
+  const statusText = S.status || activeHelpMessage || defaultStartStatus;
   const isNewContestHelp = !S.status && !activeHelpMessage && defaultStartStatus === 'Add player names and press Add.';
-  const statusIcon = (S.tab === 0 && waitingForHighDouble()) || S.status || activeHelpMessage || (S.tab === 0 && S.gameEndMessage) ? '&#10003;' : '?';
-  const statusClick = (S.tab === 0 && S.phase === 'start' && !S.status && !activeHelpMessage) ? 'showHelp()' : ((S.tab === 0 && waitingForHighDouble()) || S.status || activeHelpMessage || (S.tab === 0 && S.gameEndMessage) ? 'ackStatus()' : (isNewContestHelp ? 'S.hideNewContestHelp=true;render()' : 'showHelp()'));
+  const statusIcon = S.status || activeHelpMessage ? '&#10003;' : '?';
+  const statusClick = S.status || activeHelpMessage ? 'ackStatus()' : (isNewContestHelp ? 'S.hideNewContestHelp=true;render()' : 'showHelp()');
   
-  const activeRecentScores = S.records.filter(r => r.type === 'score').slice(-4);
-  const recentScores = activeRecentScores.length ? activeRecentScores : (S.lastGameRecentScores || []);
-  const showHistory = !S.status && !activeHelpMessage && (S.tab !== 0 || !S.gameEndMessage) && recentScores.length > 0;
+  const historyEntries = S.scoreHistory || [];
+  const showHistory = !S.status && !activeHelpMessage && historyEntries.length > 0;
 
   // Targeted DOM update for Tab 0 if already mounted
   const isTab0Mounted = S.tab === 0 && appEl.dataset.tab === '0' && appEl.querySelector('.scoreboard');
@@ -2150,7 +2440,7 @@ function render(){
     const displayEl = document.getElementById('display-bar');
     if (displayEl) {
       displayEl.textContent = S.display || '0';
-      displayEl.className = 'display-bar' + (S.display ? '' : ' dim');
+    displayEl.className = 'display-bar hidden-entry';
     }
 
     // 2. Keypad
@@ -2171,11 +2461,12 @@ function render(){
     [0, 1].forEach(i => {
       const sc = scards[i];
       if (sc) {
-        sc.className = `scard ${highlightPlayers ? 'select-starter' : ''}`;
+        sc.className = `scard ${highlightPlayers ? 'select-starter' : ''} ${S.showFirstPlayer && S.firstPlayer===i ? 'first-player' : ''} ${winnerFlashIdx===i ? 'winner-flash' : ''}`;
         const pname = sc.querySelector('.pname');
         const scoreTot = sc.querySelector('.score-total');
         if (pname && pname.textContent !== S.names[i]) pname.textContent = S.names[i];
-        const val = String(END_SCORE_HOLD ? END_SCORE_HOLD[i] : (isStart ? 0 : S.scores[i]));
+        const scoreValue = END_SCORE_HOLD ? END_SCORE_HOLD[i] : (isStart ? 0 : S.scores[i]);
+        const val = scoreValue > 0 ? String(scoreValue) : '';
         if (scoreTot && scoreTot.textContent !== val) scoreTot.textContent = val;
       }
     });
@@ -2193,7 +2484,7 @@ function render(){
         statusTextEl.classList.remove('empty');
       } else if (showHistory) {
         statusTextEl.classList.remove('empty');
-        patchMiniHistory(recentScores);
+        patchMiniHistory(historyEntries);
       } else {
         statusTextEl.innerHTML = defaultStartStatus ? escapeHTML(defaultStartStatus) : '&nbsp;';
         if (!defaultStartStatus) statusTextEl.classList.add('empty');
@@ -2214,15 +2505,15 @@ function render(){
     const highlightPlayers = S.phase === 'start' || waitingForHighDouble();
     const displayClass=S.display?'display-bar':'display-bar dim';
     const cards=[0,1].map(i=>`
-      <div class="scard ${highlightPlayers?'select-starter':''}" onclick="tapPlayer(${i})">
+      <div class="scard ${highlightPlayers?'select-starter':''} ${S.showFirstPlayer && S.firstPlayer===i?'first-player':''} ${winnerFlashIdx===i?'winner-flash':''}" onclick="tapPlayer(${i})">
         <div class="pname">${escapeHTML(S.names[i])}</div>
-        <div class="score-total">${END_SCORE_HOLD ? END_SCORE_HOLD[i] : (isStart ? 0 : S.scores[i])}</div>
+        <div class="score-total">${END_SCORE_HOLD ? (END_SCORE_HOLD[i] > 0 ? END_SCORE_HOLD[i] : '') : (!isStart && S.scores[i] > 0 ? S.scores[i] : '')}</div>
       </div>`).join('');
     const dominoLabel=domTile();
 
     const statusInner = statusText 
       ? escapeHTML(statusText).replace(/\n/g, '<br/>') 
-      : (showHistory ? '<div class="hist-mini"></div>' : (defaultStartStatus ? escapeHTML(defaultStartStatus) : '&nbsp;'));
+      : (showHistory ? '<div class="hist-mini"></div>' : '&nbsp;');
 
     content=`
       <div class="scoreboard">${cards}</div>
@@ -2234,7 +2525,7 @@ function render(){
           <div class="key domino-key ${controlsDisabled?'disabled':''}" onclick="callDomino(event)">${dominoLabel}</div>
         </div>
       </div>
-      <div id="display-bar" class="${displayClass}">${S.display||'0'}</div>
+      ${S.display ? `<div id="display-bar" class="${displayClass}">${S.display}</div>` : ''}
       <div class="status-bar score-status" onclick="${statusClick}">
         <div class="status-text ${(!statusText && !showHistory && !defaultStartStatus) ? 'empty' : ''}">
           ${statusInner}
@@ -2437,25 +2728,36 @@ function render(){
     }[dataMode] || {label:'DATA',placeholder:''};
     const darkMode=S.theme==='dark';
     const dataActions = dataMode==='cloud-create'
-        ? `<button class="action-btn primary" onclick="createCloudSheet()">Create sheet</button><button class="action-btn" onclick="cancelCloudFlow()">Cancel</button>`
+        ? `<button class="action-btn primary" onclick="createCloudSheet()">${getBackupConfig().sheetName ? 'Enable' : 'Create sheet'}</button><button class="action-btn" onclick="cancelCloudFlow()">Cancel</button>`
         : dataMode==='cloud-download'
           ? `<button class="action-btn primary" onclick="downloadCloudContest()">Download</button><button class="action-btn" onclick="cancelCloudFlow()">Cancel</button>`
         : dataMode==='new-contest'
           ? `<button class="action-btn primary" onclick="createContestFromData()">Add</button><button class="action-btn" onclick="cancelNewContest()">Cancel</button>`
+          : dataMode==='import'
+            ? `<button class="action-btn primary" onclick="doImport()">Import</button><button class="action-btn" onclick="cancelImport()">Cancel</button>`
+          : dataMode==='erase-confirm'
+            ? `<button class="action-btn" onclick="cancelClearConfirmation()">Cancel</button><button class="action-btn danger" onclick="performClearScores()">Erase</button>`
           : '';
     const cloudFields = dataMode==='cloud-create'
-      ? `<label class="opt-label" for="cloud-sheet-name">Sheet name (keep it secret)</label>
-         <input id="cloud-sheet-name" class="cloud-input" type="password" autocomplete="new-password" placeholder="${escapeHTML(dataConfig.placeholder)}" value="${escapeHTML(S.cloudSheetName || '')}" oninput="S.cloudSheetName=this.value"/>`
+      ? `<div class="cloud-form-row"><label for="cloud-sheet-name">Sheet</label>
+         <input id="cloud-sheet-name" class="cloud-input" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="${escapeHTML(dataConfig.placeholder)}" value="${escapeHTML(S.cloudSheetName || '')}" oninput="S.cloudSheetName=this.value"/></div>
+         <div class="cloud-form-row"><label for="cloud-scorekeeper">Scorer</label>
+         <input id="cloud-scorekeeper" class="cloud-input" type="text" autocomplete="name" placeholder="Defaults to first player" value="${escapeHTML(S.cloudScorekeeper || '')}" oninput="S.cloudScorekeeper=this.value"/></div>`
       : dataMode==='cloud-download'
-        ? `<label class="opt-label" for="cloud-sheet-name">Sheet name</label>
-           <input id="cloud-sheet-name" class="cloud-input" type="password" autocomplete="off" placeholder="${escapeHTML(dataConfig.placeholder)}" value="${escapeHTML(S.cloudSheetName || '')}" oninput="S.cloudSheetName=this.value"/>
-           <label class="opt-label" for="cloud-player-1">Player 1</label>
-           <input id="cloud-player-1" class="cloud-input" type="text" autocomplete="off" value="${escapeHTML(S.cloudNames[0] || '')}" oninput="S.cloudNames[0]=this.value"/>
-           <label class="opt-label" for="cloud-player-2">Player 2</label>
-           <input id="cloud-player-2" class="cloud-input" type="text" autocomplete="off" value="${escapeHTML(S.cloudNames[1] || '')}" oninput="S.cloudNames[1]=this.value"/>`
+        ? `<div class="cloud-form-row"><label for="cloud-sheet-name">Sheet</label>
+           <input id="cloud-sheet-name" class="cloud-input" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="${escapeHTML(dataConfig.placeholder)}" value="${escapeHTML(S.cloudSheetName || '')}" oninput="S.cloudSheetName=this.value"/></div>
+           <div class="cloud-form-row"><label for="cloud-scorekeeper">Scorer</label>
+           <input id="cloud-scorekeeper" class="cloud-input" type="text" autocomplete="name" placeholder="Defaults to first player" value="${escapeHTML(S.cloudScorekeeper || '')}" oninput="S.cloudScorekeeper=this.value"/></div>`
+      : dataMode==='new-contest'
+        ? `<div class="contest-form-row"><label for="new-player-1">Player 1</label>
+           <input id="new-player-1" class="cloud-input" type="text" autocomplete="name" value="${escapeHTML((S.newNames && S.newNames[0]) || '')}" oninput="S.newNames[0]=this.value"/></div>
+           <div class="contest-form-row"><label for="new-player-2">Player 2</label>
+           <input id="new-player-2" class="cloud-input" type="text" autocomplete="name" value="${escapeHTML((S.newNames && S.newNames[1]) || '')}" oninput="S.newNames[1]=this.value"/></div>`
         : '';
-    const showDataTextarea = dataMode==='import' || dataMode==='export' || dataMode==='new-contest';
-
+    const showDataTextarea = dataMode==='import' || dataMode==='export';
+    const eraseFields = dataMode==='erase-confirm'
+      ? `<div class="erase-confirm-copy">Erase local data for ${escapeHTML(S.clearConfirm.names[0] || 'Player 1')} vs ${escapeHTML(S.clearConfirm.names[1] || 'Player 2')}?<br/>The server copy remains.</div>`
+      : '';
     content = `
       <section class="opt-section parameters">
         <div class="opt-label opt-heading parameter-header">
@@ -2491,7 +2793,7 @@ function render(){
       </section>
 
       <section class="opt-section data-panel">
-        ${cloudFields || (showDataTextarea ? `
+        ${eraseFields || cloudFields || (showDataTextarea ? `
           <label class="opt-label" for="options-data">${escapeHTML(dataConfig.label)}</label>
           <textarea id="options-data" class="export-area" placeholder="${escapeHTML(dataConfig.placeholder)}" ${dataMode==='export'?'readonly':''} oninput="S.optionsDataText=this.value;save()">${escapeHTML(S.optionsDataText || '')}</textarea>
         ` : '')}
@@ -2504,18 +2806,12 @@ function render(){
   const clearConfirm = S.tab === 2 && S.clearConfirm;
   const statusHtml = S.tab === 2 ? `
     <div class="status-bar option-status" onclick="event.stopPropagation();" ondblclick="showVersionStamp()">
-      <div class="status-text ${S.status || activeHelpMessage || clearConfirm?'':'empty'}">
-        ${clearConfirm
-          ? `Erase local data for ${escapeHTML(clearConfirm.names[0] || 'Player 1')} vs ${escapeHTML(clearConfirm.names[1] || 'Player 2')}? The server copy will remain and can be restored with Download.`
-          : escapeHTML(S.status || activeHelpMessage || 'Ready. Choose a parameter or score action.').replace(/\n/g,'<br/>')}
-        ${clearConfirm ? `<div class="clear-confirm-actions">
-          <button class="action-btn" onclick="cancelClearConfirmation()">Cancel</button>
-          <button class="action-btn primary" onclick="performClearScores()">Confirm erase</button>
-        </div>` : ''}
+      <div class="status-text ${S.status || activeHelpMessage?'':'empty'}">
+        ${escapeHTML(S.status || activeHelpMessage || '').replace(/\n/g,'<br/>')}
       </div>
-      ${clearConfirm ? '' : `<div class="status-icon" onclick="${statusClick}; event.stopPropagation();" aria-label="${statusIcon==='?'?'Show help':'Dismiss status'}">${statusIcon}</div>`}
+      <div class="status-icon" onclick="${statusClick}; event.stopPropagation();" aria-label="${statusIcon==='?'?'Show help':'Dismiss status'}">${statusIcon}</div>
     </div>
-  ` : (!showStatusBarBottom ? '' : `<div class="status-bar" onclick="${statusClick}" ondblclick="showVersionStamp()"><div class="status-text ${statusText?'':'empty'}">${statusText||' '}</div><div class="status-icon">${statusIcon}</div></div>`);
+  ` : (!showStatusBarBottom ? '' : `<div class="status-bar" onclick="${statusClick}"><div class="status-text ${statusText?'':'empty'}">${statusText||' '}</div><div class="status-icon">${statusIcon}</div></div>`);
   appEl.innerHTML = `<div class="tab-content">${content}${statusHtml}</div><div class="tabbar">${tabbar}</div>`;
   const scoresHistory = appEl.querySelector('.stats-scores-history');
   if(scoresHistory) {
@@ -2525,7 +2821,7 @@ function render(){
   }
   
   if (S.tab === 0 && showHistory) {
-    patchMiniHistory(recentScores);
+    patchMiniHistory(historyEntries);
   }
   if(activeId) {
     const el = document.getElementById(activeId);
@@ -2567,26 +2863,8 @@ document.addEventListener('keydown', event => {
   else if(event.key === 'o' || event.key === 'O') { event.preventDefault(); setTab(2); }
 });
 document.addEventListener('click', event => {
-  if(event===dominoAnnouncementEvent){
-    dominoAnnouncementEvent=null;
-    return;
-  }
-  if(dominoAnnouncementActive){
-    dominoAnnouncementActive=false;
-    dominoAnnouncementEvent=null;
-    clearStatus();
-    return;
-  }
-  if(S.tab===0 && S.phase==='start' && !event.target.closest('.scard, .tabbar, .status-bar')){
-    showHelp();
-    return;
-  }
   if(Date.now() - LAST_STATUS_SET < 150) return;
-  if (S.tab === 0 && waitingForHighDouble() && !event.target.closest('.scard') && !event.target.closest('.tabbar') && !event.target.closest('.status-bar')) {
-    notifyHighDoublePrompt();
-    return;
-  }
-  if(!S.status && !S.gameEndMessage) return;
+  if(!S.status) return;
   if(event.target.closest('.status-bar')) return;
   clearStatus();
 });

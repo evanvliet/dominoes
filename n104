@@ -1,0 +1,90 @@
+n104
+
+cloud sheet: a bug of failed cloud activation, sheet created, but otherwise empty and no scores.
+
+cloud fields: (actually all fields) when adding players, configuring
+sheet name, scorekeeper, etc. like to keep that data block a non
+scrolling set of options and buttons. scores, clearly, can scroll.
+please review and advise difficulties. example: Cloud fields could
+be:
+Sheet  ____________
+Scorer ____________
+
+and new names could be:
+Player1 ___________
+Player2 ___________
+<add>.  <cancel>
+
+status / help
+generally blank, but ? should always provide help for last action.
+e.g.
+new game.  click outside player.  "Click on user with high double..."
+import.    add <import> <cancel> buttons to first line
+           click on non-button.    "Paste data, then click import or cancel"
+export.    click on ?             "n scores in data, copy to save"
+and should be blank whenever tab changes, e.g. from options to score
+
+recent scores: 3 columns, red x only for current game, black - for scores
+of previous games. additionally, truncate score history at startup, keep only
+last GAME_HISTORY = 5 games.
+
+DB click: i no longer see version stamp, like to have it
+
+import / help: like to redo import flow with import cancel buttons below
+scrolling scores window
+
+starter highlighting: dots stay on until first player selected
+
+sorry about typos
+
+
+----- additional detail
+
+cloud bug: yes cloud should be enabled and existing scores should be uploaded
+
+score history: yes, only refers to number of games shown in the score history
+
+three columns: yes use - vs x for old scores that cannot be deleted
+
+status / help: yes clear status w/o reappearance
+
+import: yes, want the buttons always visible and data scrolling a box above
+
+double click: version stamp only shows up on options tab status area click
+
+Minor correction: Click on player is correct, my bad
+
+------ todo:
+
+new game - not showing "Click player..." on non-player click
+takes hand -> hand (Able hand)
+wins -> game (Able game)
+DATA block should stay same size on Options tab
+still not seeing version stamp
+Options Erase: put buttons in Data block, show message for any other click or ?
+
+------ todo.2:
+
+Erase, show message only for other click or ? and put in status area.
+Import, DATA block doesn't fit buttons for SE
+Help: Disable cloud, click ?, expect "Cloud backup disabled"
+Help: Enable cloud, leaves old status, should show dialog with fields filled in.
+Sheet name: treat as strict ASCII, no special password processing. show value
+on cloud fields.
+Options: Dark: should clear status, pressing ? should say Dark mode set. Check mark
+or other click should clear.
+remove the 0 total, put values instead into recent scores, so numbers entered there now show up in a new line on the recent scores tab
+
+------- todo.3:
+
+click dark mode twice, message does not change. should be blank, then report new state after ?
+import - button still cropped in SE display
+erase - put buttons in data field, display message only on ?
+needs more detail here for "remove the 0 total, put values instead into recent scores, so numbers entered there now show up in a new line on the recent scores tab"
+like to remove the "Total" field below the keypad. when a keypad digit is clicked
+it shows up as a new "recent score" and name and red star added after player
+is clicked.
+Need to make DATA block bigger and status block smaller on Options tab
+When re-enabling cloud backup, buttons should be Enable and Cancel. note buttons
+are currently clipped on an SE display. Help for re-enabling cloud should read
+"Click enable to restore cloud backup. Update Score keeper name as needed."

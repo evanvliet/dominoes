@@ -1,4 +1,4 @@
-var SCRIPT_VERSION = 'gs.2.9';
+var SCRIPT_VERSION = 'gs.3.1g';
 
 function doPost(e) {
   var lock = LockService.getScriptLock();
@@ -21,8 +21,8 @@ function doPost(e) {
         return jsonOutput({"status": "error", "message": "That sheet name is already in use.", "script_version": SCRIPT_VERSION});
       }
       var newSheet = ss.insertSheet(newName);
-      setSheetSize(newSheet, 501, 3);
-      newSheet.getRange(1, 1, 1, 3).setValues([['Date', names[0], names[1]]]);
+      setSheetSize(newSheet, 501, 4);
+      newSheet.getRange(1, 1, 1, 4).setValues([['Date', names[0], names[1], 'Scorekeeper']]);
       return jsonOutput({"status": "success", "created": true, "names": names, "script_version": SCRIPT_VERSION});
     }
 
@@ -35,6 +35,7 @@ function doPost(e) {
     var sheet = ss.getSheetByName(validName);
     if (!sheet) throw new Error("Sheet not found");
     if (!sheetNamesMatch(sheet, names)) throw new Error("Player names do not match this sheet");
+    ensureScorekeeperColumn(sheet);
 
     var tz = ss.getSpreadsheetTimeZone();
     var values = sheet.getDataRange().getValues();
@@ -67,14 +68,15 @@ function doPost(e) {
         }
       } else {
         gamesByTimestamp[key] = [p1, p2];
-        additions.push([key, p1, p2]);
+        var scorekeeper = String(game.scorekeeper || payload.scorekeeper || names[0]).trim() || names[0];
+        additions.push([key, p1, p2, scorekeeper]);
       }
     }
 
     if (additions.length) {
       var firstRow = sheet.getLastRow() + 1;
       ensureRowCapacity(sheet, firstRow + additions.length - 1);
-      sheet.getRange(firstRow, 1, additions.length, 3).setValues(additions);
+      sheet.getRange(firstRow, 1, additions.length, 4).setValues(additions);
     }
     return jsonOutput({
       "status": "success",
@@ -136,6 +138,20 @@ function sheetNamesMatch(sheet, names) {
     String(header[2] || '').trim() === names[1];
 }
 
+function ensureScorekeeperColumn(sheet) {
+  var columns = sheet.getMaxColumns();
+  if (columns < 4) {
+    sheet.insertColumnAfter(columns);
+  }
+  var header = sheet.getRange(1, 1, 1, 4).getValues()[0];
+  if (header[3] && String(header[3]).trim() !== 'Scorekeeper') {
+    throw new Error("Score sheet has an invalid scorekeeper column");
+  }
+  if (header[3] !== 'Scorekeeper') {
+    sheet.getRange(1, 4).setValue('Scorekeeper');
+  }
+}
+
 function setSheetSize(sheet, rows, columns) {
   var currentColumns = sheet.getMaxColumns();
   if (currentColumns > columns) sheet.deleteColumns(columns + 1, currentColumns - columns);
@@ -156,7 +172,7 @@ function doGet(e) {
   var locked = false;
   try {
     if (e && e.parameter && e.parameter.check === 'version') {
-      return jsonOutput({"status": "success", "api_version": 3, "script_version": SCRIPT_VERSION});
+      return jsonOutput({"status": "success", "api_version": 4, "script_version": SCRIPT_VERSION});
     }
     lock.waitLock(30000);
     locked = true;
@@ -164,13 +180,18 @@ function doGet(e) {
     var requestedName = String(params.sheet || params.contest || '');
     if (!requestedName) throw new Error("sheet is required");
     requestedName = validateSheetName(requestedName);
-    var names = validateNames([params.p1, params.p2]);
     var ss = SpreadsheetApp.getActiveSpreadsheet();
     var sheet = ss.getSheetByName(requestedName);
     if (!sheet) throw new Error("Sheet not found");
-    if (!sheetNamesMatch(sheet, names)) throw new Error("Player names do not match this sheet");
     var tz = ss.getSpreadsheetTimeZone();
     var values = sheet.getDataRange().getValues();
+    if (!values.length || String(values[0][0] || '').trim().toLowerCase() !== 'date') {
+      throw new Error("Score sheet has an invalid header");
+    }
+    var names = validateNames([values[0][1], values[0][2]]);
+    if (values[0][3] && String(values[0][3]).trim() !== 'Scorekeeper') {
+      throw new Error("Score sheet has an invalid scorekeeper column");
+    }
     var games = [];
 
     for (var i = 1; i < values.length; i++) {
@@ -181,11 +202,12 @@ function doGet(e) {
       games.push({
         date: date,
         p1_score: Number(row[1]),
-        p2_score: Number(row[2])
+        p2_score: Number(row[2]),
+        scorekeeper: String(row[3] || names[0]).trim() || names[0]
       });
     }
     games.sort(function(a, b) { return compareDateStrings(a.date, b.date); });
-    return jsonOutput({"status": "success", "games": games, "names": names, "api_version": 3, "script_version": SCRIPT_VERSION});
+    return jsonOutput({"status": "success", "games": games, "names": names, "api_version": 4, "script_version": SCRIPT_VERSION});
   } catch(error) {
     return jsonOutput({"status": "error", "message": error.toString(), "script_version": SCRIPT_VERSION});
   } finally {
