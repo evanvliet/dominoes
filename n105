@@ -1,0 +1,27 @@
+n105
+
+score: enter number click domino without player, get broken entry
+expect: cleared entry
+
+unclick cloud: message shout appear in status.
+
+Click export: then dark: then status: get export help: expect: dark enabled.
+
+upshot each change should display:
+cloud:
+dark:
+max:
+import:
+export:
+erase:
+
+then check or other click erases, then ? displays last help as above. now getting previous help, e.g cloud re-enable, get help for export.
+
+re-enable cloud and specify new sheet, works, but just remove editing of sheet name and just show name, do allow editing scorekeeper, but retain locally
+ and use in subsequest scoreing. and button = Reconnect vs Enable
+
+turn off dark mode, should get system color, insteal export help
+
+change shet to contest everywhere.
+
+seeing scroll bar in recent scores, please suppress.
