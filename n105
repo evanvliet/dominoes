@@ -25,3 +25,7 @@ turn off dark mode, should get system color, insteal export help
 change shet to contest everywhere.
 
 seeing scroll bar in recent scores, please suppress.
+
+Cloud: and Erase: should have labels - DETAILS and CONFIRMATION, and match
+size and placement of controls with Parameters (e.g. spacing and font size)
+
